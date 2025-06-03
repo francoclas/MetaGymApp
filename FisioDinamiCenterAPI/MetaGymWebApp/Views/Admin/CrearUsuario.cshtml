@@ -1,0 +1,39 @@
+﻿
+<h1>Entorno de pruebas - Administrador</h1>
+<hr />
+<form asp-action="CrearUsuario" method="post">
+    <h2>Crear usuarios</h2>
+    <input  name="Ci" placeholder="CI" />
+    <input  name="Usuario" placeholder="Usuario" />
+    <input name="NombreCompleto" placeholder="Nombre completo" />
+    <input  name ="Password" placeholder="Contraseña" type="password" />
+    <input  name="Correo" placeholder="Correo" />
+    <input name="Telefono" placeholder="Telefono" />
+    <select  name="Rol">
+        <option value="Admin">Admin</option>
+        <option value="Profesional">Profesional</option>
+        <option value="Cliente">Cliente</option>
+    </select>
+    <button type="submit">Crear usuario</button>
+</form>
+<hr />
+<form asp-action="CrearEstablecimiento" method="post">
+    <h2>Registrar establecimiento</h2>
+    <input name="NombreEstablecimiento" placeholder="Nombre" />
+    <input name="Direccion" placeholder="Direccion" />
+    <button type="submit">Crear establecimiento</button>
+</form>
+<hr />
+<form asp-action="CrearEspecialidad" method="post">
+    <h2>Registrar especialidad</h2>
+    <input name="NombreEspecialidad" placeholder="NombreEspecialidad" />
+    <input name="DescripcionEspecialidad" placeholder="Descripcion" />
+    <button type="submit">Crear especialidad</button>
+</form>
+
+@if (TempData["Error"] != null)
+{
+    <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 10px; border: 1px solid #f5c6cb;">
+        @TempData["Error"]
+    </div>
+}

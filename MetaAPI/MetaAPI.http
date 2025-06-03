@@ -1,0 +1,6 @@
+@MetaAPI_HostAddress = http://localhost:5118
+
+GET {{MetaAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

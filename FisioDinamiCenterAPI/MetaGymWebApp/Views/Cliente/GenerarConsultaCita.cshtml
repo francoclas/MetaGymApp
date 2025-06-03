@@ -1,0 +1,40 @@
+﻿@model LogicaApp.DTOS.CitaDTO
+
+@{
+    ViewData["Title"] = "Crear Cita";
+}
+
+
+<form asp-action="GenerarConsultaCita" method="post">
+    <div class="form-group">
+        <label asp-for="EspecialidadId">Especialidad</label>
+        <select asp-for="EspecialidadId" class="form-control"
+                asp-items="@(new SelectList(ViewBag.Especialidades, "Id", "NombreEspecialidad"))">
+            <option value="">Seleccione una especialidad</option>
+        </select>
+        <span asp-validation-for="EspecialidadId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="EstablecimientoId">Establecimiento</label>
+        <select asp-for="EstablecimientoId" class="form-control"
+                asp-items="@(new SelectList(ViewBag.Establecimientos, "Id", "Nombre"))">
+            <option value="">Seleccione un establecimiento</option>
+        </select>
+        <span asp-validation-for="EstablecimientoId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Descripcion"></label>
+        <textarea asp-for="Descripcion" class="form-control"></textarea>
+        <span asp-validation-for="Descripcion" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FechaAsistencia">Fecha deseada</label>
+        <input asp-for="FechaAsistencia" type="datetime-local" class="form-control" />
+        <span asp-validation-for="FechaAsistencia" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Solicitar Cita</button>
+</form>

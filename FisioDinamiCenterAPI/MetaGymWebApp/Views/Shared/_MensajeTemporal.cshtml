@@ -1,0 +1,12 @@
+﻿@{
+    var mensaje = TempData["Mensaje"] as string;
+    var tipo = TempData["TipoMensaje"] as string ?? "info";
+}
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-@tipo alert-dismissible fade show mt-2" role="alert">
+        @mensaje
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
