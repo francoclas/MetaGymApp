@@ -10,7 +10,7 @@ namespace LogicaNegocio.Extra
 {
     public static class FuncionesAuxiliares
     {
-        public static void Validar(string CI,string Pass,string Correo)
+        public static void ValidarDatosUsuario(string CI,string Pass,string Correo)
         {
             //Que no esten vacios
             if (string.IsNullOrWhiteSpace(CI)) throw new UsuarioException("CI requerida");

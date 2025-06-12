@@ -16,11 +16,13 @@ namespace LogicaNegocio.Clases
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Nombre { get; set; }
-        public string Tipo { get; set; }
-        public string GrupoMuscular { get; set; }
-        public string Instrucciones { get; set; }
+        public string? Tipo { get; set; }
+        public string? GrupoMuscular { get; set; }
+        public string? Instrucciones { get; set; }
 
-        public List<RutinaEjercicio> RutinaEjercicios { get; set; }
+        public List<Media> Medias { get; set; } = new List<Media>();
+
+        public List<SesionRutina> RutinaEjercicios { get; set; }
 
 
     }

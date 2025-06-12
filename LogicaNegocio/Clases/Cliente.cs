@@ -22,7 +22,7 @@ namespace LogicaNegocio.Clases
 
         public List<Cita> Citas { get; set; } = new List<Cita>();
         public List<Rutina> Rutinas { get; set; } = new List<Rutina>();
-
+        public List<SesionRutina> SesionesEntrenadas { get; set; } = new List<SesionRutina> { };
 
         //Constructor registro
         public Cliente(string ci, string nombreusuario, string nombreCompleto, string pass, string correo, string telefono)
@@ -37,7 +37,7 @@ namespace LogicaNegocio.Clases
 
         public void Validar()
         {
-            FuncionesAuxiliares.Validar(this.CI, this.Pass, this.Correo);
+            FuncionesAuxiliares.ValidarDatosUsuario(this.CI, this.Pass, this.Correo);
         }
     }
 }

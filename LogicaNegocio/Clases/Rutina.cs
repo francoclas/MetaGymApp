@@ -14,8 +14,6 @@ namespace LogicaNegocio.Clases
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
-       
         public string NombreRutina { get; set; }
 
         [ForeignKey("Profesional")]
@@ -25,7 +23,7 @@ namespace LogicaNegocio.Clases
 
         public string Tipo { get; set; }
 
-        public List<RutinaEjercicio> RutinaEjercicios { get; set; }
+        public List<SesionRutina> RutinaEjercicios { get; set; }
 
         public List<Cliente> Asignados = new List<Cliente>();
 

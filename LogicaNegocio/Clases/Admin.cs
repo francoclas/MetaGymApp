@@ -33,7 +33,7 @@ namespace LogicaNegocio.Clases
 
         public void Validar()
         {
-            FuncionesAuxiliares.Validar(this.CI, this.Pass, this.Correo);
+            FuncionesAuxiliares.ValidarDatosUsuario(this.CI, this.Pass, this.Correo);
         }
     }
 }

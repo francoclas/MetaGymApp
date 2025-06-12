@@ -15,14 +15,7 @@ namespace LogicaDatos.Interfaces.Repos
         Cliente VerificarCredenciales(string usuario,string pass);
         List<Cliente> BuscarClienteNombre(string Nombre);
         List<Cliente> BuscarClienteCI(string CI);
-        //Citas
-        List<Cita> ObtenerHistorial(int ClienteID);
-        List<Cita> ObtenerCitasPorEstado(int ClienteID,EstadoCita Estado);
-        List<Cita> ObtenerCitasEntreFechas(int ClienteID,DateTime FechaInicial,DateTime FechaFinal);
-        //Rutinas
-
-
-
+   
 
     }
 }

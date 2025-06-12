@@ -17,6 +17,8 @@ namespace LogicaNegocio.Clases
         public string Titulo { get; set; }
         public string Descripcion { get; set; }
         public DateTime Fecha { get; set; }
+
+        public List<Media> ListaMedia { get; set; } = new List<Media>();
         //Referencia Profesional
         [ForeignKey("Profesional")]
         [InverseProperty("PublicacionesCreadasProfesional")]
