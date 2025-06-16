@@ -11,6 +11,8 @@ namespace LogicaNegocio.Interfaces.Servicios
     public interface IUsuarioServicio
     {
         //Inicio de sesion
+
+        SesionDTO IniciarSesion(LoginDTO login);
         Cliente IniciarSesionCliente(LoginDTO login);
         Admin IniciarSesionAdmin(string NombreUsuario, string Password);
         Profesional IniciarSesionProfesional(string NombreUsuario, string Password);

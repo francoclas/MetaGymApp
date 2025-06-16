@@ -30,9 +30,8 @@ namespace LogicaNegocio.Clases
         public string Descripcion { get; set; } = "";
         public string? Conclusion { get; set; } = "";
         public DateTime FechaCreacion { get; set; }
-
         public DateTime? FechaAsistencia { get; set; }
-
+        public DateTime? FechaFinalizacion { get; set; }
         public Cita() { }
 
         public Cita (int ClienteId,
@@ -87,8 +86,8 @@ namespace LogicaNegocio.Clases
                 throw new CitaException("La cita no se puede cancelar si no esta en espera, o no fue aceptada.");
             }
             //Se agrega el motivo de cancelacion a la conclusion
-            Conclusion = MotivoCancelacion;
-            Estado = EstadoCita.Cancelada;
+            this.Conclusion = MotivoCancelacion;
+            this.Estado = EstadoCita.Cancelada;
         }
         public void FinalizarCita(string conclusion) { 
             if (Estado != EstadoCita.Aceptada)
@@ -99,6 +98,7 @@ namespace LogicaNegocio.Clases
                 throw new CitaException("Debe ingresar una conclusion descriptiva a la cita.");
             }
             this.Conclusion = conclusion;
+            this.Estado = EstadoCita.Finalizada;
         }
         public void RechazarCita(string MotivoRechazo)
         {
@@ -130,8 +130,6 @@ namespace LogicaNegocio.Clases
 
         public void Validar()
         {
-         
-
             if (string.IsNullOrEmpty(this.Descripcion))
             {
                 throw new CitaException("La descripcion no puede estar vacia.");

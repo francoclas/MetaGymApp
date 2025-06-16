@@ -1,0 +1,56 @@
+﻿
+@model List<UsuarioGenericoDTO>
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+}
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#tablaUsuarios').DataTable({
+                language: {
+                    search: "Buscar:",
+                    lengthMenu: "Mostrar _MENU_ registros",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ usuarios",
+                    paginate: {
+                        previous: "Anterior",
+                        next: "Siguiente"
+                    }
+                }
+            });
+        });
+    </script>
+}
+    <body>
+        <h2>Gestión de Usuarios</h2>
+
+        <a href="@Url.Action("CrearUsuario","Admin")" class="btn btn-sm btn-primary"> Registrar un usuario</a>
+        <hr />
+        <table id="tablaUsuarios" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var usuario in Model)
+                {
+                    <tr>
+                        <td>@usuario.Usuario</td>
+                        <td>@usuario.Nombre</td>
+                        <td>@usuario.Correo</td>
+                        <td>@usuario.Rol</td>
+                        <td>
+                        <a href="@Url.Action("EditarUsuario", "Admin", new { id = usuario.Id, rol = usuario.Rol })" class="btn btn-sm btn-primary">Editar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+</body>

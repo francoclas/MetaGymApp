@@ -1,0 +1,35 @@
+﻿@using LogicaApp.DTOS
+@model CitaDTO
+
+
+<div>
+	<h1>Solicitud de cita </h1>
+	<h2>Solicitante: <A>@Model.Cliente.NombreCompleto </A></h2>
+	<p>Identificador: @Model.CitaId</p>
+	<hr />
+	<div>
+		<h2>Informacion sobre solicitud</h2>
+		<div>
+			<h3>Establecimiento @Model.Establecimiento.Nombre</h3>
+			<br />
+			<p>Direccion: @Model.Establecimiento.Direccion</p>
+		</div>
+		<div>
+			<h3>Detalles</h3>
+			<br />
+			<p>@Model.Descripcion</p>
+			<p>Fecha solicitada: @Model.FechaAsistencia</p>
+		</div>
+	
+	</div>
+	<div id="AceptarSolicitud">
+		<input type="button">Aceptar</input>
+	</div>
+	<div id="Salir">
+		<input type="button">Salir</input>
+	</div>
+</div>
+
+
+
+

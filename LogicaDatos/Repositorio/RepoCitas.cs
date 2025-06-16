@@ -101,12 +101,30 @@ namespace LogicaDatos.Repositorio
 
         public Cita ObtenerPorId(int id)
         {
-            return _context.Citas.FirstOrDefault(c => c.Id == id);
+            return _context.Citas
+                .Include(C=>C.Cliente)
+                .Include(C=> C.Especialidad)
+                .Include(C=> C.Establecimiento)
+                .FirstOrDefault(c => c.Id == id);
         }
 
         public bool ExisteCita(Cita cita)
         {
             return _context.Citas.Contains(cita);
+        }
+
+        public List<Cita> BuscarPorEstado(EstadoCita estado)
+        {
+            return _context.Citas
+                .Include(C => C.Cliente)
+                .Include(c => c.Especialidad)
+                .Include(c => c.Establecimiento)
+                .ToList();
+        }
+
+        public List<Cita> ObtenerHabilitadasParaProfesional(int profesionalid)
+        {
+            throw new NotImplementedException();
         }
     }
 }

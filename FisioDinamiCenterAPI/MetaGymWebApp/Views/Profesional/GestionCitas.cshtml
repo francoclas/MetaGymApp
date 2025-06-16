@@ -1,0 +1,46 @@
+﻿@using LogicaNegocio.Extra
+@model GestionCitasModelo
+
+@{
+    ViewBag.Title = "Gestión de Citas";
+    var estado = Model.EstadoSeleccionado;
+}
+
+<div class="container mt-4">
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link @(estado == EstadoCita.EnEspera ? "active" : "")" href="?estado=EnEspera">Solicitudes</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(estado == EstadoCita.Aceptada ? "active" : "")" href="?estado=Aceptada">Próximas</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(estado == EstadoCita.Finalizada ? "active" : "")" href="?estado=Finalizada">Finalizadas</a>
+        </li>
+    </ul>
+
+    <h4>@estado - Citas</h4>
+
+    @if (Model.Citas.Any())
+    {
+        foreach (var cita in Model.Citas)
+        {
+            <div class="card mb-3">
+                <div class="card-body d-flex justify-content-between">
+                    <div>
+                        <strong>@cita.FechaAsistencia.ToShortDateString() - @cita.Cliente.NombreCompleto</strong><br />
+                        <span>Especialidad: @cita.Especialidad.NombreEspecialidad</span><br />
+                        <small class="text-muted">Enviado: @cita.FechaCreacion?.ToShortDateString()</small>
+                    </div>
+                    <div>
+                        <a href="@Url.Action("Revisar", "Cita", new { id = cita.CitaId })" class="btn btn-primary">Revisar</a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>No hay citas en esta categoría.</p>
+    }
+</div>

@@ -1,0 +1,20 @@
+﻿@model LoginDTO
+<h2>Inicio de sesion</h2>
+
+<form asp-action="Login" method="post">
+    <div>
+        <label>Nombre de usuario:</label>
+        <input asp-for="NombreUsuario" class="form-control" />
+    </div>
+    <div>
+        <label>Contraseña:</label>
+        <input asp-for="Password" type="password" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Iniciar sesión</button>
+</form>
+
+@foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+{
+    <div class="text-danger">@error.ErrorMessage</div>
+}

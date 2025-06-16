@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LogicaDatos.Interfaces.Repos;
 using LogicaNegocio.Clases;
+using Microsoft.EntityFrameworkCore;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LogicaDatos.Repositorio
@@ -32,6 +33,10 @@ namespace LogicaDatos.Repositorio
         public List<Profesional> BuscarPorCi(string ci)
         {
             return _context.Profesionales
+            .Include(p => p.Especialidades)
+            .Include(p => p.Citas)
+            .Include(p => p.Rutinas)
+            .Include(p => p.Publicaciones)
             .Where(P => P.CI.ToLower().Contains(ci.ToLower()))
             .ToList();
         }
@@ -39,9 +44,13 @@ namespace LogicaDatos.Repositorio
         public List<Profesional> BuscarPorNombre(string Nombre)
         {
             return _context.Profesionales
-            .Where(c => c.NombreUsuario.ToLower().Contains(Nombre.ToLower()))
-            .ToList();
-        }
+                .Include(p => p.Especialidades)
+                .Include(p => p.Citas)
+                .Include(p => p.Rutinas)
+                .Include(p => p.Publicaciones)
+                    .Where(c => c.NombreUsuario.ToLower().Contains(Nombre.ToLower()))
+                    .ToList();
+                }
 
         public void Eliminar(int id)
         {
@@ -55,12 +64,21 @@ namespace LogicaDatos.Repositorio
 
         public Profesional ObtenerPorId(int id)
         {
-            return _context.Profesionales.FirstOrDefault(C => C.Id == id);
+            return _context.Profesionales
+                .Include(p => p.Especialidades)
+                .Include(p => p.Citas)
+                .Include(p => p.Rutinas)
+                .Include(p => p.Publicaciones).FirstOrDefault(C => C.Id == id);
         }
 
         public IEnumerable<Profesional> ObtenerTodos()
         {
-            return _context.Profesionales.ToList();
+            return _context.Profesionales
+                .Include(p => p.Especialidades)
+                .Include(p => p.Citas)
+                .Include(p => p.Rutinas)
+                .Include(p => p.Publicaciones)
+                .ToList();
         }
 
         public Profesional VerificarCredenciales(string usuario, string pass)

@@ -1,0 +1,67 @@
+﻿@using LogicaNegocio.Clases
+@model UsuarioGenericoDTO
+
+@{
+    ViewData["Title"] = "Editar Profesional";
+    var especialidadesDisponibles = ViewBag.EspecialidadesDisponibles as List<Especialidad>; // Lista para agregar
+}
+
+<h2>Editar Profesional</h2>
+
+<form asp-action="GuardarEdicionProfesional" asp-controller="Admin" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Rol" />
+
+    <div class="form-group">
+        <label asp-for="Nombre"></label>
+        <input asp-for="Nombre" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Usuario">Usuario</label>
+        <input asp-for="Usuario" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Correo"></label>
+        <input asp-for="Correo" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Pass">Contraseña</label>
+        <input asp-for="Pass" type="password" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Telefono"></label>
+        <input asp-for="Telefono" class="form-control" />
+    </div>
+
+    <hr />
+    <div class="form-group">
+        <label>Agregar nueva especialidad</label>
+        <select id="especialidadId" class="form-control" name="especialidadId">
+            <option value="">-- Seleccione una --</option>
+            @foreach (var esp in especialidadesDisponibles)
+            {
+                <option value="@esp.Id">@esp.NombreEspecialidad</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Guardar cambios</button>
+</form>
+<h4>Especialidades actuales</h4>
+<ul>
+    @foreach (var esp in Model.Especialidades)
+    {
+        <li>
+            @esp.NombreEspecialidad
+            <form asp-action="EliminarEspecialidadProfesional" asp-controller="Admin" method="post" class="d-inline">
+                <input type="hidden" name="profesionalId" value="@Model.Id" />
+                <input type="hidden" name="especialidadId" value="@esp.Id" />
+                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+            </form>
+        </li>
+    }
+</ul>

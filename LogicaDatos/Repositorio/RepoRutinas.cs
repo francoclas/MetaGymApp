@@ -81,6 +81,11 @@ namespace LogicaDatos.Repositorio
             throw new NotImplementedException();
         }
 
+        public IEnumerable<Rutina> ObtenerTodos()
+        {
+            throw new NotImplementedException();
+        }
+
         public void RegistrarSesion(SesionRutina sesion)
         {
             throw new NotImplementedException();
@@ -96,4 +101,3 @@ namespace LogicaDatos.Repositorio
         }
     }
     }
-}

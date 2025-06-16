@@ -27,5 +27,9 @@ namespace LogicaNegocio.Clases
 
         public List<Cliente> Asignados = new List<Cliente>();
 
+        public DateTime FechaCreacion { get; set; }
+        public DateTime FechaModificacion{ get; set; }
+
+
     }
 }

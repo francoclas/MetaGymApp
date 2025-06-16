@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LogicaNegocio.Clases;
 
 namespace LogicaNegocio.Interfaces.Servicios
 {
@@ -10,6 +11,6 @@ namespace LogicaNegocio.Interfaces.Servicios
     {
         //Datos personales
 
-
+        List<Cliente> ObtenerTodos();
     }
 }

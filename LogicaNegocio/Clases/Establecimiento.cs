@@ -16,6 +16,7 @@ namespace LogicaNegocio.Clases
         public string Nombre { get; set; }
         public string Direccion { get; set; }
 
+        public List<Media> Media { get; set; }
         //Relacion de citas en ese establecimiento
 
         public List<Cita> Citas { get; set; } = new List<Cita>();

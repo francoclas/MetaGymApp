@@ -87,6 +87,45 @@ namespace LogicaNegocio.Servicios
             repoProfesional.Agregar(NuevoProfesional);
         }
 
+        public SesionDTO IniciarSesion(LoginDTO login)
+        {
+            //Reviso en admin
+            Admin admin = repoAdmin.VerificarCredenciales(login.NombreUsuario, login.Password);
+            if (admin != null)
+            {
+                return new SesionDTO
+                {
+                    UsuarioId = admin.Id,
+                    Nombre = admin.NombreUsuario,
+                    Rol = "Admin"
+                };
+            }
+            //Reviso en profesional
+            Profesional profesional = repoProfesional.VerificarCredenciales(login.NombreUsuario, login.Password);
+            if (profesional != null)
+            {
+                return new SesionDTO
+                {
+                    UsuarioId = profesional.Id,
+                    Nombre = profesional.NombreUsuario,
+                    Rol = "Profesional"
+                };
+            }
+            //Reviso en cliente
+            Cliente cliente = repoCliente.VerificarCredenciales(login.NombreUsuario, login.Password);
+            if (cliente != null)
+            {
+                return new SesionDTO
+                {
+                    UsuarioId = cliente.Id,
+                    Nombre = cliente.NombreUsuario,
+                    Rol = "Cliente"
+                };
+            }
+            //No encontre nada
+            throw new UsuarioException("Revisar credenciales ingresadas");
+        }
+
         public Admin IniciarSesionAdmin(string NombreUsuario, string Password)
         {
             Admin UsuarioCliente = repoAdmin.VerificarCredenciales(NombreUsuario, Password);

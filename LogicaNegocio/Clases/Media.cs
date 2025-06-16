@@ -19,6 +19,9 @@ namespace LogicaNegocio.Clases
         //Conexion Ejercicio
         public int? EjercicioId { get; set; }
         public Ejercicio? Ejercicio { get; set; }
+        //Conexion Establecimiento
+        public int? EstablecimientoId { get; set; }
+        public Establecimiento Establecimiento { get;set; }
 
         public Media() { }
     }

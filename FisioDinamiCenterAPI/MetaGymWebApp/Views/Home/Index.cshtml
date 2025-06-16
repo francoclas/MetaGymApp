@@ -1,5 +1,8 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Bienvenido a MetaGym";
+    var sesion = GestionSesion.ObtenerSesion(HttpContextAccessor.HttpContext);
+    var estaLogueado = sesion != null;
 }
 
 <div class="text-center">

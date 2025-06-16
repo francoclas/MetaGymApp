@@ -13,20 +13,24 @@ namespace LogicaNegocio.Interfaces.Servicios
     {
         //ABM
         void GenerarNuevaCita(CitaDTO cita);
-        void FinalizarCita(Cita cita);
-        void ActualizarCita(Cita cita);
-
+        //Flujo cita
+        void FinalizarCita(CitaDTO cita);
+        void ActualizarCita(CitaDTO cita);
+        void CancelarCita(CitaDTO cita);
+        void NoAsistioCita(CitaDTO cita);
         //Listados
-        
+
         //Profesional
+        List<Cita>BuscarSolicitudesSegunEspecialidades(List<int> especialidadesId);
         List<Cita> SolicitarProximasProfesional(int profesionalID);
         List<Cita> SolicitarHistorialProfesional(int profesionalID);
         //Cliente
         List<Cita> SolicitarProximasCliente(int clienteID);
         List<Cita> SolicitarHistorialCliente(int clienteID);
-
         //Buscar
         List<Cita> BuscarPorClienteYEstado(int clienteID,EstadoCita estado);
+        List<Cita> BuscarPorEstado(EstadoCita estado);
+        Cita ObtenerPorId(int citaId);
 
 
     }

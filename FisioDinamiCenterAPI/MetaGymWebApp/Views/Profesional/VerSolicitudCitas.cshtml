@@ -1,0 +1,55 @@
+﻿@model IEnumerable<LogicaNegocio.Clases.Cita>
+
+@{
+    ViewData["Title"] = "VerSolicitudCitas";
+}
+
+<h1>Solicitud de clientes</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Solicitante
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Especialidad)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Establecimiento)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Descripcion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaAsistencia)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Cliente.NombreCompleto)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Especialidad.NombreEspecialidad)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Establecimiento.Nombre)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Descripcion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FechaAsistencia)
+            </td>
+            <td>
+                <a asp-action="RevisarCita" asp-route-id="@item.Id">Gestionar</a> 
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

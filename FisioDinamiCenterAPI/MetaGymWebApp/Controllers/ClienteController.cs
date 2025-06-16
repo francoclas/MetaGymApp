@@ -50,8 +50,6 @@ namespace MetaGymWebApp.Controllers
             //Redirecciono
             TempDataMensaje.SetMensaje(this, "Se inicio sesion correctamente exitoso", "success");
             return RedirectToAction("PanelControlCliente", "Cliente");
-
-
         }
         [HttpGet]
         public IActionResult RegistrarUsuario()

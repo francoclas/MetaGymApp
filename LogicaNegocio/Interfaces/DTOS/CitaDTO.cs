@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LogicaNegocio.Clases;
 
 namespace LogicaApp.DTOS
 {
     public class CitaDTO
     {
         public CitaDTO() { }
+        public int CitaId {  get; set; }
         public int ClienteId {  get; set; }
+        public Cliente Cliente { get; set; }
         public int EspecialidadId { get; set; }
+        public Especialidad Especialidad { get; set; }
         public int EstablecimientoId { get; set; }
+        public Establecimiento Establecimiento { get; set; }
         public string? Descripcion {  get; set; }
         public DateTime FechaAsistencia { get; set; }
 
