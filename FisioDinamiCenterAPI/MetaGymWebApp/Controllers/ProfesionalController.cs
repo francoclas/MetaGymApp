@@ -110,7 +110,7 @@ namespace MetaGymWebApp.Controllers
             return View(model);
         }
         [HttpGet]
-        public IActionResult GestionRutinas(string tipoFiltro = "")
+        public IActionResult GestionRutinas()
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
             var rutinas = rutinaServicio.ObtenerPorProfesional(profesionalId);
@@ -122,6 +122,41 @@ namespace MetaGymWebApp.Controllers
                 Tipo = r.Tipo,
                 UltimaModificacion = DateTime.Now // después podés usar r.FechaModif si lo agregás
             }).ToList());
+        }
+        //Ejercicios
+        [HttpGet]
+        public IActionResult RegistrarEjercicio()
+        {
+            return View(new EjercicioDTO());
+        }
+        [HttpPost]
+        public IActionResult RegistrarEjercicio(EjercicioDTO dto, IFormFile archivo)
+        {
+            // Guardar el ejercicio primero
+            var ejercicio = new Ejercicio { GrupoMuscular = dto.GrupoMuscular, Nombre = dto.Nombre,};
+
+            // Si hay archivo subido
+            if (archivo != null && archivo.Length > 0)
+            {
+                var nombreArchivo = $"{Guid.NewGuid()}_{archivo.FileName}";
+                var ruta = Path.Combine("wwwroot", "Media", "Ejercicios", nombreArchivo);
+
+                using (var stream = new FileStream(ruta, FileMode.Create))
+                {
+                    archivo.CopyTo(stream);
+                }
+
+                var media = new Media
+                {
+                    Url = $"/Media/Ejercicios/{nombreArchivo}",
+                    Tipo = Enum_TipoMedia.Imagen, // o Video si corresponde
+                    EjercicioId = ejercicio.Id
+                };
+                ejercicio.Medias.Add(media);
+                extraServicio.RegistrarMedia(media);
+            }
+            rutinaServicio.GenerarNuevoEjercicio(ejercicio);
+            return RedirectToAction("GestionEjercicios");
         }
     }
 

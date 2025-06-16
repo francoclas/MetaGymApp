@@ -66,6 +66,17 @@ namespace LogicaApp.Servicios
             return repoExtras.ListarEstablecimientos();
         }
 
+        public void RegistrarMedia(Media media)
+        {
+            //Valido datos
+            if (!string.IsNullOrEmpty(media.Url))
+            {
+                throw new Exception("Debe cargar un archivo");
+            }
+            //Mando a sistema
+            repoExtras.AltaMedia(media);
+        }
+
         public void RegistrarNuevaEspecialidad(Especialidad especialidad)
         {
             //Valido datos

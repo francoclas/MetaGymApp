@@ -33,6 +33,8 @@ namespace LogicaDatos
         //Extras
         public DbSet<Especialidad> Especialidades { get; set; }
         public DbSet<Establecimiento> Establecimientos { get; set; }
+        //Imagenes y video
+        public DbSet<Media> Medias { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

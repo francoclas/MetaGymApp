@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LogicaDatos.Interfaces.Repos;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Interfaces.Servicios;
 
@@ -10,6 +11,13 @@ namespace LogicaApp.Servicios
 {
     public class ServicioRutina : IRutinaServicio
     {
+        private readonly IRepositorioRutina repositorioRutina;
+
+        public ServicioRutina(IRepositorioRutina repositorioRutina)
+        {
+            this.repositorioRutina = repositorioRutina;
+        }
+
         public void AsignarRutina(Rutina rutina, Cliente cliente)
         {
             throw new NotImplementedException();
@@ -38,6 +46,11 @@ namespace LogicaApp.Servicios
         public void ModificarRutina(Rutina rutina)
         {
             throw new NotImplementedException();
+        }
+
+        public List<Rutina> ObtenerPorProfesional(int profesionalId)
+        {
+           return repositorioRutina.ObtenerPorProfesional(profesionalId);
         }
     }
 }

@@ -12,8 +12,8 @@ namespace LogicaNegocio.Interfaces.Servicios
 
 
         //Gestion de Ejercicios
-            Ejercicio GenerarNuevoEjercicio(Ejercicio ejercicio);
-            void ModificarEjercicio (Ejercicio ejercicio);
+        Ejercicio GenerarNuevoEjercicio(Ejercicio ejercicio);
+        void ModificarEjercicio (Ejercicio ejercicio);
         List<Rutina> ObtenerPorProfesional(int profesionalId);
         //Gestion de rutinas
         Rutina GenerarNuevaRutina (Rutina rutina);

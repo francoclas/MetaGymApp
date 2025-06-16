@@ -19,7 +19,7 @@ namespace LogicaNegocio.Interfaces.Servicios
         Especialidad ObtenerEspecialidad(int Id);
         List<Establecimiento> ObtenerEstablecimientos();
         List<Especialidad> ObtenerEspecialidades();
-
+        void RegistrarMedia(Media media);
 
 
     }

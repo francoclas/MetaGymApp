@@ -19,5 +19,7 @@ namespace LogicaDatos.Interfaces.Repos
         List<Establecimiento> BuscarEstablecimiento(string Nombre);
         List<Establecimiento> ListarEstablecimientos();
         List<Especialidad> ListarEspecialidades();
+        void AltaMedia(Media nueva);
+
     }
 }

@@ -27,6 +27,12 @@ namespace LogicaDatos.Repositorio
             _context.Establecimientos.Add(Nuevo);
             _context.SaveChanges();
         }
+
+        public void AltaMedia(Media nueva)
+        {
+            _context.Medias.Add(nueva); 
+        }
+
         public List<Especialidad> BuscarEspecialidad(string Nombre)
         {
             return _context.Especialidades.Where(e => e.NombreEspecialidad.ToLower().Contains(Nombre.ToLower())).ToList();
