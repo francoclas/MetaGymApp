@@ -20,3 +20,159 @@ html {
 body {
   margin-bottom: 60px;
 }
+/* Fuentes */
+
+/* Titulados*/
+h1, h2, h3, .titulo {
+    font-family: 'Anton', sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Textos */
+body, p, span, a, .texto {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.hero-banner {
+    background-image: url('/MediaWeb/Imagenes/banner-motivacion.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 70vh; 
+    width: 100vw;
+    padding: 0 20px;
+    position: relative;
+    margin: 0;
+    overflow: hidden;
+}
+
+    /* Estilos del navegador */
+.nav-link.menu-link {
+    font-size: 1.4rem;
+    color: #e50914;
+    padding: 8px 12px;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 5px;
+}
+
+    .nav-link.menu-link:hover {
+        color: white;
+        background-color: rgba(229, 9, 20, 0.6); /* rojo translúcido */
+    }
+
+    .hero-banner::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 1;
+    }
+
+    .hero-banner > div {
+        position: relative;
+        z-index: 2;
+    }
+body {
+    background-color: #121212;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Links */
+a, .nav-link {
+    color: #e50914;
+    text-decoration: none;
+}
+
+    a:hover, .nav-link:hover {
+        color: #ff4b4b;
+    }
+
+/* Botones */
+.btn-primary {
+    background-color: #e50914;
+    border: none;
+}
+
+    .btn-primary:hover {
+        background-color: #ff1a1a;
+    }
+
+/* Tarjetas */
+.card {
+    background-color: 	#1e1e1e;
+    color: #fff;
+    border: 1px solid #333;
+}
+
+    .card .btn {
+        background-color: #e50914;
+        border: none;
+    }
+
+        .card .btn:hover {
+            background-color: #c40612;
+        }
+
+/* Hero seccion inicio */
+.hero-banner {
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    padding: 0 20px;
+    position: relative;
+    color: #fff;
+}
+
+    .hero-banner::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 1;
+    }
+
+    .hero-banner > div {
+        position: relative;
+        z-index: 2;
+    }
+
+/* Secciones */
+.section {
+    padding: 60px 0;
+}
+/* Seccion inicio de sesion */
+
+.login-wrapper {
+    min-height: 100vh;
+    background-color: black;
+    padding: 40px 20px;
+    border-radius: 8px;
+}
+
+.login-logo {
+    max-height: 80px;
+}
+
+.login-card {
+    background-color: 	#1e1e1e;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0 20px rgba(229, 9, 20, 0.2);
+    color: white;
+}
+
+.btn-login {
+    background-color: #e50914;
+    color: white;
+    font-weight: bold;
+}
+
+    .btn-login:hover {
+        background-color: #ff1f1f;
+    }

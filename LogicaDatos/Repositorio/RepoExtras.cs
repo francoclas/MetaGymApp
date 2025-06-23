@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LogicaDatos.Interfaces.Repos;
 using LogicaNegocio.Clases;
+using Microsoft.EntityFrameworkCore;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LogicaDatos.Repositorio
@@ -50,7 +51,8 @@ namespace LogicaDatos.Repositorio
 
         public List<Establecimiento> ListarEstablecimientos()
         {
-            return _context.Establecimientos.ToList();
+            return _context.Establecimientos.Include(e => e.Media)
+            .ToList();
         }
 
         public void ModificarEspecialidad(Especialidad EspecialidadMod)
@@ -70,7 +72,11 @@ namespace LogicaDatos.Repositorio
 
         public Establecimiento ObtenerEstablecimientoId(int Id)
         {
-            return _context.Establecimientos.FirstOrDefault(E => E.Id == Id);
+            return _context.Establecimientos.Include(e => e.Media).FirstOrDefault(E => E.Id == Id);
+        }
+        public void GuardarCambios()
+        {
+            _context.SaveChanges();
         }
     }
 }

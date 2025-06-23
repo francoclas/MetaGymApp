@@ -12,49 +12,55 @@
     <title>@ViewData["Title"] - Metagym</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="icon" type="image/x-icon" href="~/MediaWeb/favicon.ico" />
+    <!--Fuentes usadas-->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     @RenderSection("Styles", required: false)
+
 </head>
 <body>
-    <header class="bg-light p-2 border-bottom">
+    <header class="bg-black p-2 border-bottom border-dark">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                <a class="navbar-brand d-flex align-items-center" href="@Url.Action("Index", "Home")">
-                    <img src="~/MediaWeb/Imagenes/logo.png" alt="Logo" style="height: 50px; margin-right: 10px;" />
-                    MetaGym
+                <a class="navbar-brand d-flex align-items-center text-white" href="@Url.Action("Index", "Home")">
+                    <img src="@Url.Content("~/MediaWeb/Imagenes/logo.png")" alt="Logo" style="height: 50px; margin-right: 10px;" />
                 </a>
             </div>
-
             <nav>
                 <ul class="nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Informacion", "Home")">Información</a>
+                        <a class="nav-link menu-link" href="@Url.Action("Publicaciones", "Home")">Noticias</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="https://www.instagram.com/metagym.uy/" target="_blank">Instagram</a>
+                        <a class="nav-link menu-link" href="@Url.Action("AcercaDe", "Home")">Acerca de MetaGym</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="https://www.instagram.com/metagym.uy/" target="_blank">Instagram</a>
                     </li>
 
                     @if (!estaLogueado)
                     {
                         <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Login", "Home")">Iniciar Sesión</a>
+                            <a class="nav-link menu-link" href="@Url.Action("Login", "Home")">Iniciar Sesión</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("RegistrarUsuario", "Cliente")">¡Hacerse miembro!</a>
+                            <a class="nav-link menu-link" href="@Url.Action("RegistrarUsuario", "Home")">¡Hacerse miembro!</a>
                         </li>
                     }
                     else
                     {
                         <li class="nav-item">
-                            <span class="nav-link">Hola, @sesion.Nombre</span>
+                            <span class="nav-link menu-link">Hola, @sesion.Nombre</span>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Logout", "Home")">Cerrar sesión</a>
+                            <a class="nav-link menu-link" href="@Url.Action("Logout", "Home")">Cerrar sesión</a>
                         </li>
                     }
                 </ul>
             </nav>
         </div>
     </header>
+    @Html.Partial("_MensajeTemporal")
 
     <main class="container mt-4">
         <div class="row">
@@ -75,8 +81,11 @@
             }
         </div>
     </main>
-
-    @RenderSection("Scripts", required: false)
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="~/js/manejoTablas.js"></script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

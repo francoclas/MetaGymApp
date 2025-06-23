@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LogicaNegocio.Clases;
+using LogicaNegocio.Interfaces.DTOS;
 
 namespace LogicaNegocio.Interfaces.Servicios
 {
     public interface IExtraServicio
     {
+        void RegistrarEspecialidad(EspecialidadDTO dto);
+        void RegistrarEstablecimiento(EstablecimientoDTO dto);
         void RegistrarNuevaEspecialidad(Especialidad especialidad);
         void ModificarEspecialidad(Especialidad especialidad);
         void RegistrarNuevoEstablecimiento(Establecimiento establecimiento);
@@ -20,7 +23,8 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<Establecimiento> ObtenerEstablecimientos();
         List<Especialidad> ObtenerEspecialidades();
         void RegistrarMedia(Media media);
-
+        public void GuardarCambios();
+     
 
     }
 }

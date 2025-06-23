@@ -5,21 +5,27 @@
 
 <h2>Registrar nuevo ejercicio</h2>
 
-<form asp-action="RegistrarEjercicio" asp-controller="Profesional" method="post" enctype="multipart/form-data">
+<form asp-action="RegistrarEjercicio" method="post" enctype="multipart/form-data">
     <div class="form-group">
-        <label asp-for="Tipo">Nombre del ejercicio</label>
+        <label>Nombre</label>
+        <input asp-for="Nombre" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Tipo</label>
         <input asp-for="Tipo" class="form-control" />
     </div>
-
     <div class="form-group">
-        <label asp-for="GrupoMuscular">Descripción</label>
-        <textarea asp-for="GrupoMuscular" class="form-control"></textarea>
+        <label>Grupo Muscular</label>
+        <input asp-for="GrupoMuscular" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Instrucciones</label>
+        <textarea asp-for="Instrucciones" class="form-control"></textarea>
+    </div>
+    <div class="form-group">
+        <label>Imagen o video</label>
+        <input type="file" name="archivo" class="form-control" />
     </div>
 
-    <div class="form-group">
-        <label>Imagen del ejercicio (opcional)</label>
-        <input type="file" name="archivo" class="form-control" accept="image/*,video/*" />
-    </div>
-
-    <button type="submit" class="btn btn-success mt-3">Guardar ejercicio</button>
+    <button type="submit" class="btn btn-success mt-3">Registrar</button>
 </form>

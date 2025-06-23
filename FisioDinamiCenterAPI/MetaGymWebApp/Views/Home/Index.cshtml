@@ -5,15 +5,4 @@
     var estaLogueado = sesion != null;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Bienvenido a MetaGymApp - Actualmente bajo desarrollo</h1>
-    <p>A continuacion tiene acceso a las principales funcionalidades generadas. Como la gestion del panel administrador, registro e inicio de sesion de clientes</p>
-    <a asp-controller="Cliente" asp-action="LoginCliente">Iniciar sesion como Cliente</a>
-    <br />
-    <a asp-controller="Cliente" asp-action="RegistrarUsuario">Registrarse como un nuevo cliente</a>
-    <br />
-    <a asp-controller="Admin" asp-action="CrearUsuario">Acceso Admin</a>
-    @Html.Partial("_MensajeTemporal")
-</div>
-
 

@@ -1,20 +1,24 @@
-﻿using LogicaApp.DTOS;
+﻿using System.Text.Json;
+using LogicaApp.DTOS;
 using LogicaApp.Servicios;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
+using MetaGymWebApp.Filtros;
 using Microsoft.AspNetCore.Mvc;
+using static LogicaNegocio.Interfaces.DTOS.EstablecimientoDTO;
 
 namespace MetaGymWebApp.Controllers
 {
+    [AutorizacionRol("Admin", "Cliente")]
     public class ClienteController : Controller
-    {   
+    {
         private readonly IUsuarioServicio usuarioServicio;
         private readonly ICitaServicio citaServicio;
         private readonly IExtraServicio extraServicio;
 
-        public ClienteController(IUsuarioServicio usuarioServicio,  ICitaServicio citaServicio, IExtraServicio extraServicio)
+        public ClienteController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio)
         {
             this.usuarioServicio = usuarioServicio;
             this.citaServicio = citaServicio;
@@ -31,45 +35,39 @@ namespace MetaGymWebApp.Controllers
 
         [HttpGet]
 
-        public IActionResult LoginCliente() { 
+        public IActionResult LoginCliente()
+        {
             return View();
         }
         [HttpPost]
         public IActionResult LoginCliente(LoginDTO login)
         {
             //Valido Credenciales
-            if (string.IsNullOrEmpty(login.Password)) {
-                throw new Exception("Verifique ingresar la contraseña.");
-            }
-            if (string.IsNullOrEmpty(login.NombreUsuario)) { 
-                throw new Exception("Verifique ingresar el usuario.");
-            }
-            //Consulto 
-            Cliente UsuarioLogueado = usuarioServicio.IniciarSesionCliente(login);
-            HttpContext.Session.SetInt32("ClienteId", UsuarioLogueado.Id);
-            //Redirecciono
-            TempDataMensaje.SetMensaje(this, "Se inicio sesion correctamente exitoso", "success");
-            return RedirectToAction("PanelControlCliente", "Cliente");
-        }
-        [HttpGet]
-        public IActionResult RegistrarUsuario()
-        {
-            return View();
-        }
-        [HttpPost]
-        public IActionResult RegistrarUsuario(ClienteDTO cliente)
-        {
-            //Valido datos ingresados
-            if(!ModelState.IsValid)
-                return View();
-            if(cliente.Password != cliente.ConfPass)
+            try
             {
-                throw new Exception("La confirmacion no coincide.");
+                if (string.IsNullOrEmpty(login.Password))
+                {
+                    throw new Exception("Verifique ingresar la contraseña.");
+                }
+                if (string.IsNullOrEmpty(login.NombreUsuario))
+                {
+                    throw new Exception("Verifique ingresar el usuario.");
+                }
+                //Consulto 
+                Cliente UsuarioLogueado = usuarioServicio.IniciarSesionCliente(login);
+                HttpContext.Session.SetInt32("ClienteId", UsuarioLogueado.Id);
+                //Redirecciono
+                return RedirectToAction("PanelControlCliente", "Cliente");
             }
-            //Mando a Servicio
-            usuarioServicio.RegistrarCliente(cliente);
-            return RedirectToAction("Index", "Home");
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return View("LoginCliente", login);
+            }
+
         }
+
         //Panel de control cliente
         [HttpGet]
         public IActionResult PanelControlCliente()
@@ -80,32 +78,117 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult GenerarConsultaCita()
         {
-            //Cargo las especialidades y los establecimientos
-            ViewBag.Especialidades = extraServicio.ObtenerEspecialidades(); 
-            ViewBag.Establecimientos = extraServicio.ObtenerEstablecimientos(); 
+
+            var especialidades = extraServicio.ObtenerEspecialidades();
+            var establecimientos = extraServicio.ObtenerEstablecimientos();
+            //Mapeo a DTOs para vista
+            var establecimientosDTO = establecimientos.Select(e => new EstablecimientoPreviewDTO
+            {
+                Id = e.Id,
+                Nombre = e.Nombre,
+                Direccion = e.Direccion,
+                UrlMedia = e.Media?.FirstOrDefault()?.Url
+            }).ToList();
+            ViewBag.Especialidades = especialidades;
+            ViewBag.Establecimientos = establecimientos;
+            //Serializo para poder mostrar imagenes desde la vista
+            ViewBag.EstablecimientosJson = JsonSerializer.Serialize(establecimientosDTO, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
             return View(new CitaDTO());
         }
         [HttpPost]
         public IActionResult GenerarConsultaCita(CitaDTO dto)
         {
-            int clienteId = (int)HttpContext.Session.GetInt32("ClienteId");
-            dto.ClienteId = clienteId;
-            //Valido por modelo del dto
-            if (!ModelState.IsValid)
+            try
+            {
+                int clienteId = GestionSesion.ObtenerUsuarioId(this.HttpContext);
+                dto.ClienteId = clienteId;
+                //Valido informcion
+                if (dto.ClienteId == 0) throw new Exception("Vuelva a iniciar sesion.");
+                if (string.IsNullOrEmpty(dto.Descripcion)) throw new Exception("La descripcion no puede estar vacia.");
+                if (dto.FechaAsistencia < DateTime.Today) throw new Exception("La fecha deseada debe ser posterior a hoy.");
+                //Llamo al repo
+                citaServicio.GenerarNuevaCita(dto);
+                return RedirectToAction("MisCitas");
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
                 return View(dto);
-            //Llamo al repo
-            citaServicio.GenerarNuevaCita(dto);
+            }
+            //Obtengo id del cliente logueado
 
-            return RedirectToAction("CitasEnEspera");
 
         }
-        //Listar citas EnEspera de ser aceptadas
+        //Seccion de citas del cliente
         [HttpGet]
-        public IActionResult CitasEnEspera()
+        public IActionResult MisCitas()
         {
-            int? clienteId = HttpContext.Session.GetInt32("ClienteId");
-            var citas = citaServicio.BuscarPorClienteYEstado(clienteId.Value, EstadoCita.EnEspera); // Este método lo implementás en el servicio
-            return View(citas); // Pasa la lista de citas a la vista
+            //Obtengo ID y Citas
+            int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            var citas = citaServicio.SolicitarHistorialCliente(clienteId);
+
+            //Mapeo a DTO
+            var dtoList = citas.Select(c => new CitaDTO
+            {
+                CitaId = c.Id,
+                ClienteId = c.ClienteId,
+                Cliente = c.Cliente,
+                EspecialidadId = c.EspecialidadId,
+                Especialidad = c.Especialidad,
+                Estado = c.Estado,
+                EstablecimientoId = c.EstablecimientoId,
+                Establecimiento = c.Establecimiento,
+                Descripcion = c.Descripcion,
+                FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
+                FechaCreacion = c.FechaCreacion,
+                ProfesionalId = c.ProfesionalId,
+                Conclusion = c.Conclusion
+            }).ToList();
+            //Devuelvo
+            return View(dtoList);
+        }
+        //Ir a los detalles de la cita
+        [HttpGet]
+        public IActionResult VerDetalleCita(int id)
+        {
+            var cita = citaServicio.ObtenerPorId(id);
+
+            if (cita == null || cita.ClienteId != GestionSesion.ObtenerUsuarioId(HttpContext))
+            {
+                TempDataMensaje.SetMensaje(this, "No tenés permisos para ver esta cita.", "Error");
+                return RedirectToAction("MisCitas");
+            }
+
+            var dto = new CitaDTO
+            {
+                CitaId = cita.Id,
+                ClienteId = cita.ClienteId,
+                Cliente = cita.Cliente,
+                EspecialidadId = cita.EspecialidadId,
+                Especialidad = cita.Especialidad,
+                EstablecimientoId = cita.EstablecimientoId,
+                Establecimiento = cita.Establecimiento,
+                Descripcion = cita.Descripcion,
+                FechaAsistencia = cita.FechaAsistencia ?? DateTime.MinValue,
+                FechaCreacion = cita.FechaCreacion,
+                ProfesionalId = cita.ProfesionalId,
+                Conclusion = cita.Conclusion,
+                Estado = cita.Estado
+            };
+
+            return View("DetalleCita", dto);
+        }
+        //Rutinas
+
+        [HttpGet]
+        public IActionResult MisRutinas()
+        {
+            return View();
         }
     }
 }

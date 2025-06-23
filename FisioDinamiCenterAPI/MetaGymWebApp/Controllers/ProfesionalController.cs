@@ -4,11 +4,13 @@ using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
+using MetaGymWebApp.Filtros;
 using MetaGymWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetaGymWebApp.Controllers
 {
+    [AutorizacionRol("Profesional")]
     public class ProfesionalController : Controller
     {
         //Instancia
@@ -17,14 +19,16 @@ namespace MetaGymWebApp.Controllers
         private readonly ICitaServicio citaServicio;
         private readonly IExtraServicio extraServicio;
         private readonly IRutinaServicio rutinaServicio;
+        private readonly IMediaServicio mediaServicio;
 
-        public ProfesionalController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio, IProfesionalServicio proservicio, IRutinaServicio rutina)
+        public ProfesionalController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio, IProfesionalServicio proservicio, IRutinaServicio rutina, IMediaServicio mediaServicio)
         {
             this.usuarioServicio = usuarioServicio;
             this.citaServicio = citaServicio;
             this.extraServicio = extraServicio;
             this.profesionalServicio = proservicio;
             this.rutinaServicio = rutina;
+            this.mediaServicio = mediaServicio;
         }
         [HttpGet]
         public IActionResult VerSolicitudCitas()
@@ -51,6 +55,7 @@ namespace MetaGymWebApp.Controllers
                 Especialidad = Cita.Especialidad,
                 Descripcion = Cita.Descripcion,
                 FechaAsistencia = (DateTime)Cita.FechaAsistencia,
+                
             });
         }
         [HttpPost]
@@ -66,7 +71,7 @@ namespace MetaGymWebApp.Controllers
 
         public IActionResult GestionCitas(EstadoCita estado = EstadoCita.EnEspera)
         {
-            int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext); // Tu lógica
+            int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
 
             List<Cita> citas;
 
@@ -120,7 +125,7 @@ namespace MetaGymWebApp.Controllers
                 Id = r.Id,
                 NombreRutina = r.NombreRutina,
                 Tipo = r.Tipo,
-                UltimaModificacion = DateTime.Now // después podés usar r.FechaModif si lo agregás
+                UltimaModificacion = DateTime.Now
             }).ToList());
         }
         //Ejercicios
@@ -130,33 +135,26 @@ namespace MetaGymWebApp.Controllers
             return View(new EjercicioDTO());
         }
         [HttpPost]
+        [HttpPost]
         public IActionResult RegistrarEjercicio(EjercicioDTO dto, IFormFile archivo)
-        {
-            // Guardar el ejercicio primero
-            var ejercicio = new Ejercicio { GrupoMuscular = dto.GrupoMuscular, Nombre = dto.Nombre,};
+            {
+            var nuevo = new Ejercicio
+            {
+                Nombre = dto.Nombre,
+                Tipo = dto.Tipo,
+                GrupoMuscular = dto.GrupoMuscular,
+                Instrucciones = dto.Instrucciones
+            };
 
-            // Si hay archivo subido
+            rutinaServicio.GenerarNuevoEjercicio(nuevo);
+
             if (archivo != null && archivo.Length > 0)
             {
-                var nombreArchivo = $"{Guid.NewGuid()}_{archivo.FileName}";
-                var ruta = Path.Combine("wwwroot", "Media", "Ejercicios", nombreArchivo);
-
-                using (var stream = new FileStream(ruta, FileMode.Create))
-                {
-                    archivo.CopyTo(stream);
-                }
-
-                var media = new Media
-                {
-                    Url = $"/Media/Ejercicios/{nombreArchivo}",
-                    Tipo = Enum_TipoMedia.Imagen, // o Video si corresponde
-                    EjercicioId = ejercicio.Id
-                };
-                ejercicio.Medias.Add(media);
-                extraServicio.RegistrarMedia(media);
+                mediaServicio.GuardarArchivo(archivo, Enum_TipoEntidad.Ejercicio, nuevo.Id);
             }
-            rutinaServicio.GenerarNuevoEjercicio(ejercicio);
-            return RedirectToAction("GestionEjercicios");
+
+            TempData["Mensaje"] = "Ejercicio registrado correctamente.";
+            return RedirectToAction("GestionRutinas");
         }
     }
 

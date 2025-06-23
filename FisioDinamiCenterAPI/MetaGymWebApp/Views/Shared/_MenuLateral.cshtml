@@ -3,23 +3,23 @@
 <ul class="list-group">
     @if (Model.Rol == "Admin")
     {
-        <li class="list-group-item"><a href="/Cita/Gestion">Comunidad</a></li>
+        <li class="list-group-item"><a href="/Home/Comunidad">Comunidad</a></li>
+        <li class="list-group-item"><a href="/Admin/PanelControl">Control administrador</a></li>
         <li class="list-group-item"><a href="/Admin/GestionUsuarios">Gestionar de usuarios</a></li>
         <li class="list-group-item"><a href="/Admin/Publicaciones">Gestion de publicaciones</a></li>
     }
     else if (Model.Rol == "Profesional")
     {
-        <li class="list-group-item"><a href="/Cita/Gestion">Comunidad</a></li>
+        <li class="list-group-item"><a href="/Home/Comunidad">Comunidad</a></li>
         <li class="list-group-item"><a href="/Profesional/GestionCitas">Gestion de citas</a></li>
         <li class="list-group-item"><a href="/Profesional/GestionRutinas">Gestion de rutinas</a></li>
 
     }
     else if (Model.Rol == "Cliente")
     {
-        <li class="list-group-item"><a href="/Cliente/GenerarConsultaCita">Proxima cita</a></li>
-        <li class="list-group-item"><a href="/Cliente/GenerarConsultaCita">Agendar una cita</a></li>
-        <li class="list-group-item"><a href="/Cliente/GenerarConsultaCita">Historial clinico</a></li>
-        <li class="list-group-item"><a href="/Rutinas/MisRutinas">Mis rutinas</a></li>
+        <li class="list-group-item"><a href="/Home/Comunidad">Comunidad</a></li>
+        <li class="list-group-item"><a href="/Cliente/MisCitas">Mis citas</a></li>
+        <li class="list-group-item"><a href="/Cliente/MisRutinas">Mis rutinas</a></li>
     }
 
     <li class="list-group-item"><a href="/Home/Logout">Cerrar sesión</a></li>

@@ -6,7 +6,7 @@
     var estado = Model.EstadoSeleccionado;
 }
 
-<div class="container mt-4">
+<div class="container mt-4 bg-dark border rounded py-4">
     <ul class="nav nav-tabs mb-3">
         <li class="nav-item">
             <a class="nav-link @(estado == EstadoCita.EnEspera ? "active" : "")" href="?estado=EnEspera">Solicitudes</a>
@@ -20,20 +20,29 @@
     </ul>
 
     <h4>@estado - Citas</h4>
+    
+        <div class="mb-3">
+            <input type="text" id="filtroCitas" class="form-control" placeholder="Buscar citas...">
+        </div>
 
+        <div class="mb-3">
+            <button class="btn btn-outline-light btn-sm me-2" onclick="ordenarCitas('asc')">Más viejas</button>
+            <button class="btn btn-outline-light btn-sm" onclick="ordenarCitas('desc')">Más nuevas</button>
+        </div>
     @if (Model.Citas.Any())
     {
         foreach (var cita in Model.Citas)
         {
-            <div class="card mb-3">
+            <div class="card mb-3 cita-card" data-fecha="@cita.FechaAsistencia.ToString("yyyy-MM-ddTHH:mm")">
                 <div class="card-body d-flex justify-content-between">
                     <div>
-                        <strong>@cita.FechaAsistencia.ToShortDateString() - @cita.Cliente.NombreCompleto</strong><br />
-                        <span>Especialidad: @cita.Especialidad.NombreEspecialidad</span><br />
-                        <small class="text-muted">Enviado: @cita.FechaCreacion?.ToShortDateString()</small>
+                        <h5 class="card-title">@cita.Cliente.NombreCompleto</h5>
+                        <p class="card-text">Especialidad: @cita.Especialidad.NombreEspecialidad</p>
+                        <p class="card-text">@cita.Descripcion</p>
+                        <p class="card-text"><small class="text-muted">Fecha: @cita.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</small></p>
                     </div>
                     <div>
-                        <a href="@Url.Action("Revisar", "Cita", new { id = cita.CitaId })" class="btn btn-primary">Revisar</a>
+                        <a href="@Url.Action("RevisarCita", "Profesional", new { id = cita.CitaId })" class="btn btn-primary">Revisar</a>
                     </div>
                 </div>
             </div>
@@ -44,3 +53,4 @@
         <p>No hay citas en esta categoría.</p>
     }
 </div>
+<script src ="~/js/gestionCitas.js"></script>

@@ -1,0 +1,74 @@
+﻿@model PanelControlAdminModel
+@{
+    ViewData["Title"] = "Panel de Control del Administrador";
+}
+
+<h2 class="mb-4">Panel de Administración MetaGym</h2>
+
+<!-- 🔹 Sección 1: Funciones de Usuario -->
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white">Gestión de Usuarios</div>
+    <div class="card-body">
+        <a asp-action="CrearUsuario" asp-controller="Admin" class="btn btn-success">Registrar nuevo usuario</a>
+    </div>
+</div>
+
+<!-- 🔹 Sección 2: Establecimientos -->
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between">
+        <span>Establecimientos del sistema</span>
+        <a asp-action="RegistrarEstablecimiento" asp-controller="Admin" class="btn btn-primary btn-sm">Nuevo Establecimiento</a>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-dark table-hover datatable">
+            <thead class="table-light">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var est in Model.Establecimientos)
+                {
+                        <tr>
+                            <td>@est.Nombre</td>
+                            <td>@est.Direccion</td>
+                            <td>
+                                <a asp-action="EditarEstablecimiento" asp-controller="Admin" asp-route-id="@est.Id" class="btn btn-sm btn-warning">Editar</a>
+                            </td>
+                        </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 🔹 Sección 3: Especialidades -->
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between">
+        <span>Especialidades del sistema</span>
+        <a asp-action="RegistrarEspecialidad" asp-controller="Admin" class="btn btn-primary btn-sm">Nueva Especialidad</a>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-dark table-hover datatable">
+            <thead class="table-light">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var esp in Model.Especialidades)
+                {
+                        <tr>
+                            <td>@esp.NombreEspecialidad</td>
+                            <td>
+                                <a asp-action="EditarEspecialidad" asp-controller="Admin" asp-route-id="@esp.Id" class="btn btn-sm btn-warning">Editar</a>
+                            </td>
+                        </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

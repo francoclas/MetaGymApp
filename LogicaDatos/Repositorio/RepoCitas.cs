@@ -52,6 +52,10 @@ namespace LogicaDatos.Repositorio
         public List<Cita> ObtenerPorCliente(int clienteId)
         {
             return _context.Citas
+                .Include(C => C.Cliente)
+                .Include(C => C.Especialidad)
+                .Include(C => C.Establecimiento)
+                    .ThenInclude(e => e.Media)
                 .Where(c => c.ClienteId == clienteId)
                 .ToList();
         }
@@ -105,6 +109,7 @@ namespace LogicaDatos.Repositorio
                 .Include(C=>C.Cliente)
                 .Include(C=> C.Especialidad)
                 .Include(C=> C.Establecimiento)
+                    .ThenInclude(e => e.Media)
                 .FirstOrDefault(c => c.Id == id);
         }
 

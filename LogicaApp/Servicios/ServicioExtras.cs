@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LogicaDatos.Interfaces.Repos;
 using LogicaDatos.Repositorio;
 using LogicaNegocio.Clases;
+using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
 
 namespace LogicaApp.Servicios
@@ -105,6 +106,32 @@ namespace LogicaApp.Servicios
             }
             //Envio al repositorio
             repoExtras.AltaEstablecimiento(establecimiento);
+        }
+        //registros solo con dtos
+        public void RegistrarEspecialidad(EspecialidadDTO dto)
+        {
+            var nueva = new Especialidad
+            {
+                NombreEspecialidad = dto.NombreEspecialidad,
+                DescripcionEspecialidad = dto.DescripcionEspecialidad
+            };
+            repoExtras.AltaEspecialidad(nueva);
+         
+        }
+
+        public void RegistrarEstablecimiento(EstablecimientoDTO dto)
+        {
+            var nuevo = new Establecimiento
+            {
+                Nombre = dto.Nombre,
+                Direccion = dto.Direccion
+            };
+            repoExtras.AltaEstablecimiento(nuevo);
+                    }
+
+        public void GuardarCambios()
+        {
+            repoExtras.GuardarCambios();
         }
     }
 }

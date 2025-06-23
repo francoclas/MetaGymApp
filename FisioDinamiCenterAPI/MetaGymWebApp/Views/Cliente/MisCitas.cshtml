@@ -1,0 +1,54 @@
+﻿@model List<LogicaApp.DTOS.CitaDTO>
+@{
+    ViewData["Title"] = "Mis Citas";
+}
+
+<div class="container mt-4 bg-dark border rounded py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Mis Citas</h2>
+        <a class="btn btn-success" asp-action="GenerarConsultaCita">Solicitar nueva cita</a>
+    </div>
+
+    <div class="mb-3">
+        <input type="text" id="filtroCitas" class="form-control" placeholder="Buscar...">
+    </div>
+
+    <div class="mb-3 d-flex gap-2 flex-wrap">
+        <button class="btn btn-outline-primary btn-sm" onclick="filtrarEstado('')">Todas</button>
+        <button class="btn btn-outline-warning btn-sm" onclick="filtrarEstado('EnEspera')">Pendientes</button>
+        <button class="btn btn-outline-info btn-sm" onclick="filtrarEstado('Aceptada')">Aceptadas</button>
+        <button class="btn btn-outline-info btn-sm" onclick="filtrarEstado('FinalizadaCancelada')">Historial</button>
+        <button class="btn btn-outline-light btn-sm ms-auto" onclick="ordenarCitas('asc')">Más viejas</button>
+        <button class="btn btn-outline-light btn-sm" onclick="ordenarCitas('desc')">Más nuevas</button>
+
+    </div>
+    <div class="alert alert-info py-2" id="mensajeEstado">
+        Mostrando todas las citas
+    </div>
+    <div id="contenedor-citas">
+        @foreach (var cita in Model)
+        {
+            var estado = cita.Estado.ToString();
+            var estadoGrupo = estado;
+            if (estado == "Finalizada" || estado == "Cancelada")
+            {
+                estadoGrupo = "FinalizadaCancelada";
+            }
+            <div class="card mb-3 cita-card"
+                 data-fecha="@cita.FechaAsistencia.ToString("yyyy-MM-ddTHH:mm")"
+                 data-estado="@estadoGrupo">
+                <div class="card-body">
+                    <h5 class="card-title">@cita.Especialidad.NombreEspecialidad</h5>
+                    <p class="card-text">@cita.Descripcion</p>
+                    <p class="card-text"><strong>Fecha:</strong> @cita.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p class="card-text"><strong>Estado:</strong> @estado</p>
+                    <a href="@Url.Action("VerDetalleCita", "Cliente", new { id = cita.CitaId })" class="btn btn-sm btn-outline-primary">Ver detalles</a>
+                </div>
+            </div>
+        }
+    </div>
+    <div id="sinResultados" class="alert alert-warning mt-3" style="display: none;">
+        No hay citas para mostrar.
+    </div>
+</div>
+<script src="~/js/misCitas.js"></script>

@@ -1,0 +1,11 @@
+﻿@{
+    var mensaje = TempData["Mensaje"] as string;
+    var tipo = TempData["TipoMensaje"] as string ?? "Info";
+}
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-@tipo.ToLower()">
+        @mensaje
+    </div>
+}

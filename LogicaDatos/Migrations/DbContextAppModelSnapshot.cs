@@ -269,6 +269,12 @@ namespace LogicaDatos.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AdminId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ClienteId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
 
@@ -276,6 +282,9 @@ namespace LogicaDatos.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("EstablecimientoId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProfesionalId")
                         .HasColumnType("int");
 
                     b.Property<int?>("PublicacionId")
@@ -291,13 +300,19 @@ namespace LogicaDatos.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("ClienteId");
+
                     b.HasIndex("EjercicioId");
 
                     b.HasIndex("EstablecimientoId");
 
+                    b.HasIndex("ProfesionalId");
+
                     b.HasIndex("PublicacionId");
 
-                    b.ToTable("Media");
+                    b.ToTable("Medias");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Profesional", b =>
@@ -538,6 +553,14 @@ namespace LogicaDatos.Migrations
 
             modelBuilder.Entity("LogicaNegocio.Clases.Media", b =>
                 {
+                    b.HasOne("LogicaNegocio.Clases.Admin", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId");
+
+                    b.HasOne("LogicaNegocio.Clases.Cliente", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteId");
+
                     b.HasOne("LogicaNegocio.Clases.Ejercicio", "Ejercicio")
                         .WithMany("Medias")
                         .HasForeignKey("EjercicioId");
@@ -546,13 +569,23 @@ namespace LogicaDatos.Migrations
                         .WithMany("Media")
                         .HasForeignKey("EstablecimientoId");
 
+                    b.HasOne("LogicaNegocio.Clases.Profesional", "Profesional")
+                        .WithMany()
+                        .HasForeignKey("ProfesionalId");
+
                     b.HasOne("LogicaNegocio.Clases.Publicacion", "Publicacion")
                         .WithMany("ListaMedia")
                         .HasForeignKey("PublicacionId");
 
+                    b.Navigation("Admin");
+
+                    b.Navigation("Cliente");
+
                     b.Navigation("Ejercicio");
 
                     b.Navigation("Establecimiento");
+
+                    b.Navigation("Profesional");
 
                     b.Navigation("Publicacion");
                 });

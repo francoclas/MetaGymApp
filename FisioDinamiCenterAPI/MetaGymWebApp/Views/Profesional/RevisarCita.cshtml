@@ -1,35 +1,52 @@
 ﻿@using LogicaApp.DTOS
 @model CitaDTO
 
+<div class="container mt-4 bg-dark border rounded py-4">
+    <h2>Revisión de Cita</h2>
+    <hr />
 
-<div>
-	<h1>Solicitud de cita </h1>
-	<h2>Solicitante: <A>@Model.Cliente.NombreCompleto </A></h2>
-	<p>Identificador: @Model.CitaId</p>
-	<hr />
-	<div>
-		<h2>Informacion sobre solicitud</h2>
-		<div>
-			<h3>Establecimiento @Model.Establecimiento.Nombre</h3>
-			<br />
-			<p>Direccion: @Model.Establecimiento.Direccion</p>
-		</div>
-		<div>
-			<h3>Detalles</h3>
-			<br />
-			<p>@Model.Descripcion</p>
-			<p>Fecha solicitada: @Model.FechaAsistencia</p>
-		</div>
-	
-	</div>
-	<div id="AceptarSolicitud">
-		<input type="button">Aceptar</input>
-	</div>
-	<div id="Salir">
-		<input type="button">Salir</input>
-	</div>
+    <h4>Solicitante</h4>
+    <p><strong>@Model.Cliente.NombreCompleto</strong></p>
+    <p>ID de cita: @Model.CitaId</p>
+
+    <hr />
+
+    <h4>Establecimiento</h4>
+    <div class="row align-items-center">
+        <div class="col-md-4">
+            <img src="@Model.Establecimiento.Media.FirstOrDefault()?.Url" class="img-fluid rounded" alt="Imagen del establecimiento" />
+        </div>
+        <div class="col-md-8">
+            <p><strong>Nombre:</strong> @Model.Establecimiento.Nombre</p>
+            <p><strong>Dirección:</strong> @Model.Establecimiento.Direccion</p>
+        </div>
+    </div>
+
+    <hr />
+
+    <h4>Detalles de la solicitud</h4>
+    <p><strong>Especialidad:</strong> @Model.Especialidad.NombreEspecialidad</p>
+    <p><strong>Fecha solicitada:</strong> @Model.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</p>
+    <p><strong>Descripción:</strong><br /> @Model.Descripcion</p>
+
+    <hr />
+
+    <form asp-action="RevisarCita" method="post">
+        <input type="hidden" asp-for="CitaId" />
+
+        <div class="form-group">
+            <label for="FechaAsistencia">Modificar Fecha:</label>
+            <input asp-for="FechaAsistencia" type="datetime-local" class="form-control" />
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="Descripcion">Actualizar Descripción:</label>
+            <textarea asp-for="Descripcion" class="form-control"></textarea>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">Aceptar / Guardar Cambios</button>
+            <a href="@Url.Action("Gestion", "Profesional")" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
 </div>
-
-
-
-

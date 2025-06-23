@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LogicaDatos.Interfaces.Repos;
 using LogicaNegocio.Clases;
+using LogicaNegocio.Interfaces.Repositorios;
 using LogicaNegocio.Interfaces.Servicios;
 
 namespace LogicaApp.Servicios
@@ -12,10 +13,12 @@ namespace LogicaApp.Servicios
     public class ServicioRutina : IRutinaServicio
     {
         private readonly IRepositorioRutina repositorioRutina;
+        private readonly IRepositorioEjercicio repositorioEjercicio;
 
-        public ServicioRutina(IRepositorioRutina repositorioRutina)
+        public ServicioRutina(IRepositorioRutina repositorioRutina,IRepositorioEjercicio repositorio)
         {
             this.repositorioRutina = repositorioRutina;
+            this.repositorioEjercicio = repositorio;
         }
 
         public void AsignarRutina(Rutina rutina, Cliente cliente)
@@ -35,7 +38,8 @@ namespace LogicaApp.Servicios
 
         public Ejercicio GenerarNuevoEjercicio(Ejercicio ejercicio)
         {
-            throw new NotImplementedException();
+            repositorioEjercicio.Agregar(ejercicio);
+            return ejercicio ;
         }
 
         public void ModificarEjercicio(Ejercicio ejercicio)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LogicaNegocio.Clases;
+using LogicaNegocio.Extra;
 
 namespace LogicaApp.DTOS
 {
@@ -13,6 +14,7 @@ namespace LogicaApp.DTOS
         public int CitaId {  get; set; }
         public int ClienteId {  get; set; }
         public Cliente Cliente { get; set; }
+        public EstadoCita Estado { get; set; }
         public int EspecialidadId { get; set; }
         public Especialidad Especialidad { get; set; }
         public int EstablecimientoId { get; set; }

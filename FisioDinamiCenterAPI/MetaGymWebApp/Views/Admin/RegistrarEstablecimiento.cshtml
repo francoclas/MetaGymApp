@@ -1,0 +1,25 @@
+﻿@model EstablecimientoDTO
+@{
+    ViewData["Title"] = "Registrar Establecimiento";
+}
+
+<h2>Registrar nuevo establecimiento</h2>
+
+<form asp-action="RegistrarEstablecimiento" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label>Nombre del establecimiento</label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Dirección</label>
+        <input asp-for="Direccion" class="form-control" />
+        <span asp-validation-for="Direccion" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Imagen del establecimiento</label>
+        <input type="file" name="archivo" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Registrar</button>
+</form>

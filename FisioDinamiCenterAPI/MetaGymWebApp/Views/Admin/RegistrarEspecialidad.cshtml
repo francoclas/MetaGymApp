@@ -1,0 +1,20 @@
+﻿@model EspecialidadDTO
+@{
+    ViewData["Title"] = "Registrar Especialidad";
+}
+
+<h2>Registrar nueva especialidad</h2>
+
+<form asp-action="RegistrarEspecialidad" method="post">
+    <div class="form-group">
+        <label>Nombre de especialidad</label>
+        <input asp-for="NombreEspecialidad" class="form-control" />
+        <span asp-validation-for="NombreEspecialidad" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Descripción</label>
+        <textarea asp-for="DescripcionEspecialidad" class="form-control"></textarea>
+        <span asp-validation-for="DescripcionEspecialidad" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Registrar</button>
+</form>

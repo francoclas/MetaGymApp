@@ -27,6 +27,8 @@ builder.Services.AddScoped<IRepositorioCita, RepoCitas>();
 builder.Services.AddScoped<IRepositorioExtra,RepoExtras>();
 builder.Services.AddScoped<IRepositorioRutina, RepoRutinas>();
 builder.Services.AddScoped<IRepositorioEjercicio, RepoEjercicios>();
+builder.Services.AddScoped<IRepositorioMedia, RepoMedias>();
+
 // Servicios
 builder.Services.AddScoped<IClienteServicio, ServicioCliente>();
 builder.Services.AddScoped<IAdminServicio, ServicioAdmin>();
@@ -35,6 +37,8 @@ builder.Services.AddScoped<ICitaServicio, ServicioCita>();
 builder.Services.AddScoped<IExtraServicio, ServicioExtras>();
 builder.Services.AddScoped<IProfesionalServicio,ProfesionalServicio>();
 builder.Services.AddScoped<IRutinaServicio, ServicioRutina>();
+builder.Services.AddScoped<IMediaServicio, ServicioMedia>();
+
 builder.Services.AddSession();
 var app = builder.Build();
 
@@ -51,6 +55,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=AcercaDe}/{id?}");
 
 app.Run();

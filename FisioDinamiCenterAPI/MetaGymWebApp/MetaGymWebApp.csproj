@@ -21,8 +21,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="MediaWeb\Imagenes\" />
+    <Folder Include="wwwroot\MediaWeb\Imagenes\Ejercicios\" />
+    <Folder Include="wwwroot\MediaWeb\Imagenes\Establecimientos\" />
+    <Folder Include="wwwroot\MediaWeb\Imagenes\Publicaciones\" />
+    <Folder Include="wwwroot\MediaWeb\Imagenes\Usuarios\admin\" />
+    <Folder Include="wwwroot\MediaWeb\Imagenes\Usuarios\cliente\" />
+    <Folder Include="wwwroot\MediaWeb\Imagenes\Usuarios\profesional\" />
     <Folder Include="wwwroot\Media\Ejercicios\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\MediaWeb\Imagenes\gym1.jpg" />
+    <None Include="wwwroot\MediaWeb\Imagenes\gym2.jpg" />
+    <None Include="wwwroot\MediaWeb\Imagenes\gym3.jpg" />
   </ItemGroup>
 
 </Project>

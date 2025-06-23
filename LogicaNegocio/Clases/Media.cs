@@ -22,7 +22,15 @@ namespace LogicaNegocio.Clases
         //Conexion Establecimiento
         public int? EstablecimientoId { get; set; }
         public Establecimiento Establecimiento { get;set; }
-
+        //Conexion cliente
+        public int? ClienteId { get; set; }
+        public Cliente? Cliente { get; set; }
+        //Conexion Profesional
+        public int? ProfesionalId { get; set; }
+        public Profesional? Profesional { get; set; }
+        //Conexoin admin
+        public int? AdminId { get; set; }
+        public Admin? Admin { get; set; }
         public Media() { }
     }
 }

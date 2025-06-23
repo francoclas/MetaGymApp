@@ -1,34 +1,35 @@
 ﻿@model List<LogicaNegocio.Clases.Cita>
+<div class="container">
+    <h2>Citas solicitadas en espera de ser aceptadas por un profesional</h2>
 
-<h2>Citas solicitadas en espera de ser aceptadas por un profesional</h2>
-
-@if (Model.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Cliente</th>
-                <th>Especialidad</th>
-                <th>Establecimiento</th>
-                <th>Fecha Asistencia</th>
-                <th>Descripción</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var cita in Model)
-            {
+    @if (Model.Any())
+    {
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@cita.Cliente.NombreUsuario</td>
-                    <td>@cita.Especialidad.NombreEspecialidad</td>
-                    <td>@cita.Establecimiento.Nombre</td>
-                    <td>@cita.FechaAsistencia.ToString()</td>
-                    <td>@cita.Descripcion</td>
+                    <th>Cliente</th>
+                    <th>Especialidad</th>
+                    <th>Establecimiento</th>
+                    <th>Fecha Asistencia</th>
+                    <th>Descripción</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <div class="alert alert-info">No hay citas en espera.</div>
-}
+            </thead>
+            <tbody>
+                @foreach (var cita in Model)
+                {
+                    <tr>
+                        <td>@cita.Cliente.NombreUsuario</td>
+                        <td>@cita.Especialidad.NombreEspecialidad</td>
+                        <td>@cita.Establecimiento.Nombre</td>
+                        <td>@cita.FechaAsistencia.ToString()</td>
+                        <td>@cita.Descripcion</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">No hay citas en espera.</div>
+    }
+</div>
