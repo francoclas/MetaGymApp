@@ -16,15 +16,21 @@ namespace LogicaNegocio.Clases
         public int Id { get; set; }
         public string Titulo { get; set; }
         public string Descripcion { get; set; }
-        public DateTime Fecha { get; set; }
+        public DateTime FechaCreacion { get; set; }
+        public DateTime? FechaProgramada { get; set; }
 
+        public bool EsPrivada { get; set; }
+        public bool EstaActiva { get; set; } = true;
+        public int Vistas { get; set; }
+
+
+        //Relaciones
+        //Imagenes
         public List<Media> ListaMedia { get; set; } = new List<Media>();
-        //Referencia Profesional
-        [ForeignKey("Profesional")]
-        [InverseProperty("PublicacionesCreadasProfesional")]
-        public int ProfesionalId { get; set; }
-        public Profesional Profesional { get; set; }
-
+        public int? ProfesionalId { get; set; }
+        public Profesional? Profesional { get; set; }
+        //Comentarios
+        public List<Comentario> Comentarios { get; set; }
         //Referencia admin
         [ForeignKey("Admin")]
         [InverseProperty("PublicacionesAceptadasAdmin")]

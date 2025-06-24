@@ -19,11 +19,14 @@ namespace LogicaNegocio.Clases
         public string Telefono { get; set; }
         public Profesional() { }
 
+        //Relaciones
         public List<Especialidad> Especialidades { get; set; } = new List<Especialidad>();
         public List<Cita> Citas { get; set; } = new List<Cita>();
         public List<Rutina> Rutinas { get; set; } = new List<Rutina>();
         public List<Publicacion> Publicaciones { get; set; } = new List<Publicacion>();
+        public List<Ejercicio> Ejercicios { get; set; } = new List<Ejercicio>();
 
+        public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
         public Profesional(string ci, string nombreusuario, string nombreCompleto, string pass, string correo, string telefono)
         {
             this.NombreUsuario = nombreusuario;

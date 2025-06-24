@@ -10,10 +10,13 @@ namespace LogicaNegocio.Interfaces.DTOS
     public class EjercicioDTO
     {
         public int Id { get; set; }
+        public int ProfesionalId { get; set; }
+
         public string Nombre { get; set; }
         public string Tipo { get; set; }
         public string GrupoMuscular { get; set; }
         public string Instrucciones { get; set; }
         public Media? Media { get; set; }
+        public List<Media>? MediaList { get; set; }=new List<Media>();
     }
 }

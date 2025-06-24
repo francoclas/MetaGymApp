@@ -20,6 +20,7 @@ namespace LogicaNegocio.Clases
         public Admin() { }
  
         public List<Publicacion> Publicaciones { get; set; } = new List<Publicacion>();
+        public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
 
         public Admin(string ci, string nombreusuario, string nombreCompleto,string pass, string correo, string telefono)
         {

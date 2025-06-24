@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LogicaDatos.Interfaces.Repos;
 using LogicaNegocio.Clases;
+using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Repositorios;
 using LogicaNegocio.Interfaces.Servicios;
 
@@ -52,9 +53,41 @@ namespace LogicaApp.Servicios
             throw new NotImplementedException();
         }
 
-        public List<Rutina> ObtenerPorProfesional(int profesionalId)
+        public List<EjercicioDTO> ObtenerEjerciciosProfesional(int Id)
+        {
+            return null;
+        }
+
+        public List<Rutina> ObtenerRutinasProfesional(int profesionalId)
         {
            return repositorioRutina.ObtenerPorProfesional(profesionalId);
+        }
+
+        public List<Rutina> ObtenerTodasRutinas()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<EjercicioDTO> ObtenerTodosEjercicios()
+        {
+            return MapeoEjercicioDTO(repositorioEjercicio.ObtenerTodos().ToList());
+        }
+
+        private List<EjercicioDTO> MapeoEjercicioDTO(List<Ejercicio> Lista)
+        {
+            List<EjercicioDTO> salida = new List<EjercicioDTO>();
+            foreach (var item in Lista)
+            {
+                salida.Add(new EjercicioDTO
+                {
+                    Id = item.Id,
+                    Nombre = item.Nombre,
+                    Tipo = item.Tipo,
+                    GrupoMuscular = item.GrupoMuscular,
+                    Media = item.Medias.FirstOrDefault()
+                });
+            }
+            return salida;
         }
     }
 }

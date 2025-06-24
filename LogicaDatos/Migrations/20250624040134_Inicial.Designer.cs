@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LogicaDatos.Migrations
 {
     [DbContext(typeof(DbContextApp))]
-    [Migration("20250612044101_clienteSesiones")]
-    partial class clienteSesiones
+    [Migration("20250624040134_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -111,6 +111,9 @@ namespace LogicaDatos.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("FechaFinalizacion")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("ProfesionalId")
                         .HasColumnType("int");
 
@@ -164,6 +167,49 @@ namespace LogicaDatos.Migrations
                     b.ToTable("Clientes");
                 });
 
+            modelBuilder.Entity("LogicaNegocio.Clases.Comentario", b =>
+                {
+                    b.Property<int>("ComentarioId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ComentarioId"));
+
+                    b.Property<int?>("AdminId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ClienteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EstaActivo")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ProfesionalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PublicacionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ComentarioId");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("ClienteId");
+
+                    b.HasIndex("ProfesionalId");
+
+                    b.HasIndex("PublicacionId");
+
+                    b.ToTable("Comentario");
+                });
+
             modelBuilder.Entity("LogicaNegocio.Clases.Ejercicio", b =>
                 {
                     b.Property<int>("Id")
@@ -182,10 +228,15 @@ namespace LogicaDatos.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProfesionalId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Tipo")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProfesionalId");
 
                     b.ToTable("Ejercicios");
                 });
@@ -269,10 +320,22 @@ namespace LogicaDatos.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AdminId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ClienteId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("EjercicioId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EstablecimientoId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProfesionalId")
                         .HasColumnType("int");
 
                     b.Property<int?>("PublicacionId")
@@ -288,11 +351,19 @@ namespace LogicaDatos.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("ClienteId");
+
                     b.HasIndex("EjercicioId");
+
+                    b.HasIndex("EstablecimientoId");
+
+                    b.HasIndex("ProfesionalId");
 
                     b.HasIndex("PublicacionId");
 
-                    b.ToTable("Media");
+                    b.ToTable("Medias");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Profesional", b =>
@@ -347,15 +418,27 @@ namespace LogicaDatos.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Fecha")
+                    b.Property<bool>("EsPrivada")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EstaActiva")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ProfesionalId")
+                    b.Property<DateTime?>("FechaProgramada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ProfesionalId")
                         .HasColumnType("int");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Vistas")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -376,6 +459,12 @@ namespace LogicaDatos.Migrations
 
                     b.Property<int?>("ClienteId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaModificacion")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("NombreRutina")
                         .IsRequired()
@@ -506,6 +595,46 @@ namespace LogicaDatos.Migrations
                     b.Navigation("Profesional");
                 });
 
+            modelBuilder.Entity("LogicaNegocio.Clases.Comentario", b =>
+                {
+                    b.HasOne("LogicaNegocio.Clases.Admin", "Admin")
+                        .WithMany("Comentarios")
+                        .HasForeignKey("AdminId");
+
+                    b.HasOne("LogicaNegocio.Clases.Cliente", "Cliente")
+                        .WithMany("Comentarios")
+                        .HasForeignKey("ClienteId");
+
+                    b.HasOne("LogicaNegocio.Clases.Profesional", "Profesional")
+                        .WithMany("Comentarios")
+                        .HasForeignKey("ProfesionalId");
+
+                    b.HasOne("LogicaNegocio.Clases.Publicacion", "Publicacion")
+                        .WithMany("Comentarios")
+                        .HasForeignKey("PublicacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("Cliente");
+
+                    b.Navigation("Profesional");
+
+                    b.Navigation("Publicacion");
+                });
+
+            modelBuilder.Entity("LogicaNegocio.Clases.Ejercicio", b =>
+                {
+                    b.HasOne("LogicaNegocio.Clases.Profesional", "Profesional")
+                        .WithMany("Ejercicios")
+                        .HasForeignKey("ProfesionalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Profesional");
+                });
+
             modelBuilder.Entity("LogicaNegocio.Clases.EjercicioRealizado", b =>
                 {
                     b.HasOne("LogicaNegocio.Clases.Ejercicio", "Ejercicio")
@@ -527,15 +656,39 @@ namespace LogicaDatos.Migrations
 
             modelBuilder.Entity("LogicaNegocio.Clases.Media", b =>
                 {
+                    b.HasOne("LogicaNegocio.Clases.Admin", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId");
+
+                    b.HasOne("LogicaNegocio.Clases.Cliente", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteId");
+
                     b.HasOne("LogicaNegocio.Clases.Ejercicio", "Ejercicio")
                         .WithMany("Medias")
                         .HasForeignKey("EjercicioId");
+
+                    b.HasOne("LogicaNegocio.Clases.Establecimiento", "Establecimiento")
+                        .WithMany("Media")
+                        .HasForeignKey("EstablecimientoId");
+
+                    b.HasOne("LogicaNegocio.Clases.Profesional", "Profesional")
+                        .WithMany()
+                        .HasForeignKey("ProfesionalId");
 
                     b.HasOne("LogicaNegocio.Clases.Publicacion", "Publicacion")
                         .WithMany("ListaMedia")
                         .HasForeignKey("PublicacionId");
 
+                    b.Navigation("Admin");
+
+                    b.Navigation("Cliente");
+
                     b.Navigation("Ejercicio");
+
+                    b.Navigation("Establecimiento");
+
+                    b.Navigation("Profesional");
 
                     b.Navigation("Publicacion");
                 });
@@ -550,9 +703,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasOne("LogicaNegocio.Clases.Profesional", "Profesional")
                         .WithMany("Publicaciones")
-                        .HasForeignKey("ProfesionalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProfesionalId");
 
                     b.Navigation("Admin");
 
@@ -610,12 +761,16 @@ namespace LogicaDatos.Migrations
 
             modelBuilder.Entity("LogicaNegocio.Clases.Admin", b =>
                 {
+                    b.Navigation("Comentarios");
+
                     b.Navigation("Publicaciones");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Cliente", b =>
                 {
                     b.Navigation("Citas");
+
+                    b.Navigation("Comentarios");
 
                     b.Navigation("Rutinas");
 
@@ -642,11 +797,17 @@ namespace LogicaDatos.Migrations
             modelBuilder.Entity("LogicaNegocio.Clases.Establecimiento", b =>
                 {
                     b.Navigation("Citas");
+
+                    b.Navigation("Media");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Profesional", b =>
                 {
                     b.Navigation("Citas");
+
+                    b.Navigation("Comentarios");
+
+                    b.Navigation("Ejercicios");
 
                     b.Navigation("Publicaciones");
 
@@ -655,6 +816,8 @@ namespace LogicaDatos.Migrations
 
             modelBuilder.Entity("LogicaNegocio.Clases.Publicacion", b =>
                 {
+                    b.Navigation("Comentarios");
+
                     b.Navigation("ListaMedia");
                 });
 

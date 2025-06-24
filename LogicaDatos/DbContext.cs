@@ -30,6 +30,7 @@ namespace LogicaDatos
 
         //Publicaciones
         public DbSet<Publicacion> Publicaciones { get; set; }
+        public DbSet<Comentario> Comentarios { get; set; }
         //Extras
         public DbSet<Especialidad> Especialidades { get; set; }
         public DbSet<Establecimiento> Establecimientos { get; set; }
@@ -47,7 +48,12 @@ namespace LogicaDatos
             .Property(m => m.Tipo)
             .HasConversion<string>();
 
-
+            //Relacion profesionhales tienen sus ejercicios
+            modelBuilder.Entity<Ejercicio>()
+            .HasOne(e => e.Profesional)
+            .WithMany(p => p.Ejercicios)
+            .HasForeignKey(e => e.ProfesionalId)
+            .OnDelete(DeleteBehavior.Restrict);
         }
 
     }

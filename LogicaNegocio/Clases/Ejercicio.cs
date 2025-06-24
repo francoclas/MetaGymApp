@@ -19,7 +19,9 @@ namespace LogicaNegocio.Clases
         public string? Tipo { get; set; }
         public string? GrupoMuscular { get; set; }
         public string? Instrucciones { get; set; }
-
+        //Profesional
+        public int ProfesionalId { get; set; }
+        public Profesional Profesional { get; set; }
         public List<Media> Medias { get; set; } = new List<Media>();
 
         public List<SesionRutina> RutinaEjercicios { get; set; } = new List<SesionRutina> { };

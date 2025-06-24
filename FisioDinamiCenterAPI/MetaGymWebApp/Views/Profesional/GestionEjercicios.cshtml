@@ -1,0 +1,57 @@
+﻿@model List<EjercicioDTO>
+@{
+    ViewData["Title"] = "Gestión de Ejercicios";
+    var misEjercicios = Model.Where(e => e.ProfesionalId == ViewBag.ProfesionalId).ToList();
+    var otrosEjercicios = Model.Where(e => e.ProfesionalId != ViewBag.ProfesionalId).ToList();
+}
+
+<link rel="stylesheet" href="~/css/ejercicios.css" />
+
+<div class="container mt-4">
+    <h2 class="text-white mb-3">Gestión de Ejercicios</h2>
+
+    <ul class="nav nav-tabs" id="ejerciciosTabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-tab="mis-ejercicios">Mis ejercicios</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-tab="todos-ejercicios">Todos los ejercicios</a>
+        </li>
+    </ul>
+
+    <div class="busqueda mt-3">
+        <input type="text" id="buscadorEjercicios" class="form-control" placeholder="Buscar ejercicio por nombre, tipo o grupo muscular...">
+    </div>
+
+    <div id="mis-ejercicios" class="tab-content mt-4">
+        @foreach (var ejercicio in misEjercicios)
+        {
+            <div class="card ejercicio-card mb-3" data-nombre="@ejercicio.Nombre" data-tipo="@ejercicio.Tipo" data-grupo="@ejercicio.GrupoMuscular">
+                <div class="card-body">
+                    <h5 class="card-title">@ejercicio.Nombre</h5>
+                    <p class="card-text"><strong>Tipo:</strong> @ejercicio.Tipo</p>
+                    <p class="card-text"><strong>Grupo muscular:</strong> @ejercicio.GrupoMuscular</p>
+                    <a class="btn btn-sm btn-outline-warning" href="@Url.Action("EditarEjercicio", new { id = ejercicio.Id })">Editar</a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div id="todos-ejercicios" class="tab-content mt-4 d-none">
+        @foreach (var ejercicio in otrosEjercicios)
+        {
+            <div class="card ejercicio-card mb-3" data-nombre="@ejercicio.Nombre" data-tipo="@ejercicio.Tipo" data-grupo="@ejercicio.GrupoMuscular">
+                <div class="card-body">
+                    <h5 class="card-title">@ejercicio.Nombre</h5>
+                    <p class="card-text"><strong>Tipo:</strong> @ejercicio.Tipo</p>
+                    <p class="card-text"><strong>Grupo muscular:</strong> @ejercicio.GrupoMuscular</p>
+                    <a class="btn btn-sm btn-outline-primary" href="@Url.Action("DetalleEjercicio", new { id = ejercicio.Id })">Ver detalle</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/ejerciciosTabs.js"></script>
+}

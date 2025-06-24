@@ -118,7 +118,7 @@ namespace MetaGymWebApp.Controllers
         public IActionResult GestionRutinas()
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var rutinas = rutinaServicio.ObtenerPorProfesional(profesionalId);
+            var rutinas = rutinaServicio.ObtenerRutinasProfesional(profesionalId);
 
             return View(rutinas.Select(r => new RutinaDTO
             {
@@ -130,11 +130,27 @@ namespace MetaGymWebApp.Controllers
         }
         //Ejercicios
         [HttpGet]
+        public IActionResult GestionEjercicios()
+        {
+            int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+
+            var misEjercicios = rutinaServicio.ObtenerEjerciciosProfesional(profesionalId);
+            var todos = rutinaServicio.ObtenerTodosEjercicios();
+
+            var modelo = new GestionEjerciciosModelo
+            {
+                EjerciciosProfesional = misEjercicios,
+                EjerciciosSistema = todos
+            };
+
+            return View(modelo);
+        }
+        [HttpGet]
         public IActionResult RegistrarEjercicio()
         {
             return View(new EjercicioDTO());
         }
-        [HttpPost]
+        
         [HttpPost]
         public IActionResult RegistrarEjercicio(EjercicioDTO dto, IFormFile archivo)
             {
@@ -143,7 +159,9 @@ namespace MetaGymWebApp.Controllers
                 Nombre = dto.Nombre,
                 Tipo = dto.Tipo,
                 GrupoMuscular = dto.GrupoMuscular,
-                Instrucciones = dto.Instrucciones
+                Instrucciones = dto.Instrucciones,
+                ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext)
+                
             };
 
             rutinaServicio.GenerarNuevoEjercicio(nuevo);
