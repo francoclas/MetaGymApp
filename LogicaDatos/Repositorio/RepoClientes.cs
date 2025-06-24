@@ -77,6 +77,12 @@ namespace LogicaDatos.Repositorio
         {
             return _context.Clientes.FirstOrDefault(C => C.Id == id);
         }
+
+        public Cliente ObtenerPorUsuario(string usuario)
+        {
+            return _context.Clientes.SingleOrDefault(C => C.NombreUsuario == usuario);
+        }
+
         public IEnumerable<Cliente> ObtenerTodos()
         {
             return _context.Clientes.ToList();

@@ -6,6 +6,7 @@ using LogicaNegocio.Interfaces.Servicios;
 using LogicaApp.Servicios;
 using LogicaNegocio.Servicios;
 using LogicaNegocio.Interfaces.Repositorios;
+using LogicaDatos.Precarga;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -41,7 +42,8 @@ builder.Services.AddScoped<IMediaServicio, ServicioMedia>();
 
 builder.Services.AddSession();
 var app = builder.Build();
-
+//Precarga
+CargaAdmin.CargarAdminBase(app.Services);
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

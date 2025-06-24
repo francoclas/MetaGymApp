@@ -43,6 +43,10 @@ namespace LogicaDatos.Repositorio
             return _context.Administradores.FirstOrDefault(A => A.Id == id);
         }
 
+        public Admin ObtenerPorUsuario(string usuario)
+        {
+            return _context.Administradores.SingleOrDefault(A => A.NombreUsuario == usuario);
+        }
 
         public IEnumerable<Admin> ObtenerTodos()
         {

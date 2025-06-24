@@ -5,6 +5,7 @@ using LogicaNegocio.Interfaces.Servicios;
 
 using LogicaDatos.Interfaces.Repos;
 using LogicaNegocio.Interfaces.DTOS;
+using LogicaNegocio.Extra;
 namespace LogicaNegocio.Servicios
 {
     public class ServicioUsuario : IUsuarioServicio
@@ -60,7 +61,12 @@ namespace LogicaNegocio.Servicios
         public void CrearCliente(string Ci, string NombreUsuario, string NombreCompleto, string Correo, string Password, string Telefono)
         {
             //Instancio nuevo cliente
-            Cliente NuevoCliente = new Cliente(Ci,NombreUsuario,NombreCompleto,Password,Correo,Telefono);
+            Cliente NuevoCliente = new Cliente(Ci,
+                NombreUsuario,
+                NombreCompleto,
+                HashContrasena.Hashear(Password),
+                Correo,
+                Telefono);
             //Valido datos
             NuevoCliente.Validar();
             //Verificar que no existe
@@ -75,7 +81,12 @@ namespace LogicaNegocio.Servicios
         public void CrearProfesional(string Ci, string Usuario, string NombreCompleto, string Correo, string Password,string Telefono)
         {
             //Instancio nuevo profesional
-            Profesional NuevoProfesional = new Profesional(Ci,Usuario, NombreCompleto, Password, Correo, Telefono);  
+            Profesional NuevoProfesional = new Profesional(Ci,
+                Usuario,
+                NombreCompleto,
+                HashContrasena.Hashear(Password),
+                Correo,
+                Telefono);  
             //Valido datos
             NuevoProfesional.Validar();
             //Verifico que no exista el usuari
@@ -89,9 +100,9 @@ namespace LogicaNegocio.Servicios
 
         public SesionDTO IniciarSesion(LoginDTO login)
         {
-            //Reviso en admin
-            Admin admin = repoAdmin.VerificarCredenciales(login.NombreUsuario, login.Password);
-            if (admin != null)
+            // Reviso en Admin
+            var admin = repoAdmin.ObtenerPorUsuario(login.NombreUsuario);
+            if (admin != null && HashContrasena.Verificar(admin.Pass, login.Password))
             {
                 return new SesionDTO
                 {
@@ -100,9 +111,10 @@ namespace LogicaNegocio.Servicios
                     Rol = "Admin"
                 };
             }
-            //Reviso en profesional
-            Profesional profesional = repoProfesional.VerificarCredenciales(login.NombreUsuario, login.Password);
-            if (profesional != null)
+
+            // Reviso en Profesional
+            var profesional = repoProfesional.ObtenerPorUsuario(login.NombreUsuario);
+            if (profesional != null && HashContrasena.Verificar(profesional.Pass, login.Password))
             {
                 return new SesionDTO
                 {
@@ -111,9 +123,10 @@ namespace LogicaNegocio.Servicios
                     Rol = "Profesional"
                 };
             }
-            //Reviso en cliente
-            Cliente cliente = repoCliente.VerificarCredenciales(login.NombreUsuario, login.Password);
-            if (cliente != null)
+
+            // Reviso en Cliente
+            var cliente = repoCliente.ObtenerPorUsuario(login.NombreUsuario);
+            if (cliente != null && HashContrasena.Verificar(cliente.Pass, login.Password))
             {
                 return new SesionDTO
                 {
@@ -122,20 +135,8 @@ namespace LogicaNegocio.Servicios
                     Rol = "Cliente"
                 };
             }
-            //No encontre nada
-            throw new UsuarioException("Revisar credenciales ingresadas");
-        }
 
-        public Admin IniciarSesionAdmin(string NombreUsuario, string Password)
-        {
-            Admin UsuarioCliente = repoAdmin.VerificarCredenciales(NombreUsuario, Password);
-            //Valido
-            if (UsuarioCliente == null)
-            {
-                throw new UsuarioException("Verificar credenciales ingresadas.");
-            }
-            //Devuelvo user
-            return UsuarioCliente;
+            throw new UsuarioException("Revisar credenciales ingresadas");
         }
 
         public Cliente IniciarSesionCliente(LoginDTO login)
@@ -149,19 +150,6 @@ namespace LogicaNegocio.Servicios
             //Devuelvo user
             return UsuarioCliente;
         }
-
-        public Profesional IniciarSesionProfesional(string NombreUsuario, string Password)
-        {
-            Profesional UsuarioCliente = repoProfesional.VerificarCredenciales(NombreUsuario, Password);
-            //Valido
-            if (UsuarioCliente == null)
-            {
-                throw new UsuarioException("Verificar credenciales ingresadas.");
-            }
-            //Devuelvo user
-            return UsuarioCliente;
-        }
-
         public void RegistrarCliente(ClienteDTO cliente)
         {
             //Verifico que no exista uno con ese nombre de usuario
@@ -170,11 +158,17 @@ namespace LogicaNegocio.Servicios
                 throw new UsuarioException("Ya existe usuario con ese nombre de usuario");
             }
             //Instancio nuevo cliente
-            Cliente Nuevo = new Cliente(cliente.Ci, cliente.NombreUsuario, cliente.NombreCompleto, cliente.Password, cliente.Correo, cliente.Telefono);
+            Cliente Nuevo = new Cliente(cliente.Ci,
+                cliente.NombreUsuario,
+                cliente.NombreCompleto, 
+                HashContrasena.Hashear(cliente.Password),
+                cliente.Correo, 
+                cliente.Telefono);
             //Valido
             Nuevo.Validar();
             //Agrego desde repositorio
             repoCliente.Agregar(Nuevo);
         }
+
     }
 }

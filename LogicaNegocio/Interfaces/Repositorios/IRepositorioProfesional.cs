@@ -12,11 +12,8 @@ namespace LogicaDatos.Interfaces.Repos
     {
         bool ExisteUsuario(string usuario);
         Profesional VerificarCredenciales(string usuario, string pass);
-
         List<Profesional> BuscarPorCi(string ci);
         List<Profesional> BuscarPorNombre(string Nombre);
-
-
-
+        Profesional ObtenerPorUsuario(string usuario);
     }
 }

@@ -14,8 +14,7 @@ namespace LogicaNegocio.Interfaces.Servicios
 
         SesionDTO IniciarSesion(LoginDTO login);
         Cliente IniciarSesionCliente(LoginDTO login);
-        Admin IniciarSesionAdmin(string NombreUsuario, string Password);
-        Profesional IniciarSesionProfesional(string NombreUsuario, string Password);
+
         //Registro usuario
         void RegistrarCliente(ClienteDTO cliente);
         //Cambio de contraseña
@@ -30,7 +29,6 @@ namespace LogicaNegocio.Interfaces.Servicios
         void CrearAdmin(string Ci, string NombreUsuario,string NombreCompleto, string Correo, string Password,string Telefono);
         void CrearProfesional(string Ci, string NombreUsuario, string NombreCompleto, string Correo, string Password,string Telefono);
         void CrearCliente(string Ci, string NombreUsuario, string NombreCompleto, string Correo, string Password, string Telefono);
-
 
     }
 }

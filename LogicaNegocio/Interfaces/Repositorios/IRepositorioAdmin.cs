@@ -11,6 +11,6 @@ namespace LogicaDatos.Interfaces.Repos
     {
         bool ExisteUsuario(string usuario);
         Admin VerificarCredenciales(string usuario, string pass);
-
+        Admin ObtenerPorUsuario(string usuario);
     }
 }

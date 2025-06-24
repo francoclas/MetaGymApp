@@ -15,7 +15,7 @@ namespace LogicaDatos.Interfaces.Repos
         Cliente VerificarCredenciales(string usuario,string pass);
         List<Cliente> BuscarClienteNombre(string Nombre);
         List<Cliente> BuscarClienteCI(string CI);
-   
+        Cliente ObtenerPorUsuario(string usuario);
 
     }
 }

@@ -54,6 +54,8 @@ namespace LogicaDatos
             .WithMany(p => p.Ejercicios)
             .HasForeignKey(e => e.ProfesionalId)
             .OnDelete(DeleteBehavior.Restrict);
+            //Precarga
+      
         }
 
     }

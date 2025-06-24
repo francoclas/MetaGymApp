@@ -71,6 +71,11 @@ namespace LogicaDatos.Repositorio
                 .Include(p => p.Publicaciones).FirstOrDefault(C => C.Id == id);
         }
 
+        public Profesional ObtenerPorUsuario(string usuario)
+        {
+            return _context.Profesionales.SingleOrDefault(P => P.NombreUsuario == usuario);
+        }
+
         public IEnumerable<Profesional> ObtenerTodos()
         {
             return _context.Profesionales

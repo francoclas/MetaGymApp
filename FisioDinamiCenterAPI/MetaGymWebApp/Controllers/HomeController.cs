@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using LogicaNegocio.Clases;
+using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
 using MetaGymWebApp.Models;
