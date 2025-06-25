@@ -26,8 +26,5 @@ namespace LogicaNegocio.Clases
         //Ejercicios
         public List<EjercicioRealizado> EjericiosRealizados { get; set; }
 
-
-
-
     }
 }

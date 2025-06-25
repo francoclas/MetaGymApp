@@ -9,6 +9,8 @@ namespace LogicaNegocio.Interfaces.Servicios
 {
     public interface IClienteServicio
     {
+        Cliente ObtenerPorId(int id);
+
         //Datos personales
 
         List<Cliente> ObtenerTodos();

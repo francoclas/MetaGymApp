@@ -1,0 +1,58 @@
+﻿@model RutinaRegistroDTO
+@{
+    ViewData["Title"] = "Registrar Rutina";
+    var ejercicios = ViewBag.Ejercicios as List<EjercicioDTO>;
+    var clientes = ViewBag.Clientes as List<Cliente>;
+}
+
+<div class="container mt-4 text-white">
+    <h2>Registrar nueva rutina</h2>
+    <form asp-action="RegistrarRutina" method="post">
+        <div class="mb-3">
+            <input asp-for="NombreRutina" class="form-control" placeholder="Nombre de la rutina" />
+        </div>
+        <div class="mb-3">
+            <input asp-for="Tipo" class="form-control" placeholder="Tipo de rutina" />
+        </div>
+
+        <hr />
+        <h5>Seleccionar ejercicios</h5>
+        <input type="text" id="buscadorEj" class="form-control mb-2" placeholder="Buscar ejercicio...">
+
+        <div id="lista-ejercicios" class="mb-3">
+            @foreach (var ej in ejercicios)
+            {
+                <div class="form-check ejercicio-item" data-nombre="@ej.Nombre.ToLower()">
+                    <input class="form-check-input" type="checkbox" name="IdsEjerciciosSeleccionados" value="@ej.Id" id="ej-@ej.Id" />
+                    <label class="form-check-label" for="ej-@ej.Id">@ej.Nombre (@ej.GrupoMuscular)</label>
+                </div>
+            }
+        </div>
+
+        <hr />
+        <h5>Asignar clientes</h5>
+        <div class="mb-3">
+            @foreach (var cliente in clientes)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="IdsClientesAsignados" value="@cliente.Id" id="cl-@cliente.Id" />
+                    <label class="form-check-label" for="cl-@cliente.Id">@cliente.NombreCompleto (@cliente.NombreUsuario)</label>
+                </div>
+            }
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar rutina</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("buscadorEj").addEventListener("input", function () {
+            const termino = this.value.toLowerCase();
+            document.querySelectorAll(".ejercicio-item").forEach(e => {
+                const nombre = e.dataset.nombre;
+                e.style.display = nombre.includes(termino) ? "block" : "none";
+            });
+        });
+    </script>
+}

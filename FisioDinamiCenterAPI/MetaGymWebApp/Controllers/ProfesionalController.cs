@@ -20,8 +20,8 @@ namespace MetaGymWebApp.Controllers
         private readonly IExtraServicio extraServicio;
         private readonly IRutinaServicio rutinaServicio;
         private readonly IMediaServicio mediaServicio;
-
-        public ProfesionalController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio, IProfesionalServicio proservicio, IRutinaServicio rutina, IMediaServicio mediaServicio)
+        private readonly IClienteServicio clienteServicio;
+        public ProfesionalController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio, IProfesionalServicio proservicio, IRutinaServicio rutina, IMediaServicio mediaServicio, IClienteServicio clienteServicio)
         {
             this.usuarioServicio = usuarioServicio;
             this.citaServicio = citaServicio;
@@ -29,6 +29,7 @@ namespace MetaGymWebApp.Controllers
             this.profesionalServicio = proservicio;
             this.rutinaServicio = rutina;
             this.mediaServicio = mediaServicio;
+            this.clienteServicio = clienteServicio;
         }
         [HttpGet]
         public IActionResult VerSolicitudCitas()
@@ -279,6 +280,35 @@ namespace MetaGymWebApp.Controllers
 
             rutinaServicio.ModificarEjercicio(ejercicio);
             return RedirectToAction("GestionEjercicios");
+        }
+
+        [HttpGet]
+        public IActionResult RegistrarRutina()
+        {
+            ViewBag.Ejercicios = rutinaServicio.ObtenerTodosEjercicios(); // EjercicioDTO
+            ViewBag.Clientes = clienteServicio.ObtenerTodos(); // Cliente simple
+
+            return View(new RutinaRegistroDTO());
+        }
+
+        [HttpPost]
+        public IActionResult RegistrarRutina(RutinaRegistroDTO dto)
+        {
+            var rutina = new Rutina
+            {
+                NombreRutina = dto.NombreRutina,
+                Tipo = dto.Tipo,
+                ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext),
+                FechaCreacion = DateTime.Now,
+                FechaModificacion = DateTime.Now,
+                RutinaEjercicios = dto.IdsEjerciciosSeleccionados
+                    .Select(id => new SesionRutina { EjercicioId = id }).ToList(),
+                Asignados = dto.IdsClientesAsignados
+                    .Select(id => clienteServicio.ObtenerPorId(id)).ToList()
+            };
+
+            rutinaServicio.GenerarNuevaRutina(rutina);
+            return RedirectToAction("GestionRutinas");
         }
     }
     }
