@@ -45,7 +45,7 @@ namespace LogicaApp.Servicios
 
         public void ModificarEjercicio(Ejercicio ejercicio)
         {
-            throw new NotImplementedException();
+            repositorioEjercicio.Actualizar(ejercicio);
         }
 
         public void ModificarRutina(Rutina rutina)
@@ -53,9 +53,30 @@ namespace LogicaApp.Servicios
             throw new NotImplementedException();
         }
 
+        public EjercicioDTO ObtenerEjercicioDTOId(int id)
+        {
+            Ejercicio ejercicio = repositorioEjercicio.ObtenerPorId(id);
+            EjercicioDTO e = new EjercicioDTO
+            {
+                Id = ejercicio.Id,
+                ProfesionalId = ejercicio.ProfesionalId,
+                Nombre = ejercicio.Nombre,
+                Tipo = ejercicio.Tipo,
+                GrupoMuscular = ejercicio.GrupoMuscular,
+                Medias = ejercicio.Medias
+            };
+            return e;
+
+        }
+
+        public Ejercicio ObtenerEjercicioId(int id)
+        {
+            return repositorioEjercicio.ObtenerPorId(id);
+        }
+
         public List<EjercicioDTO> ObtenerEjerciciosProfesional(int Id)
         {
-            return null;
+            return MapeoEjercicioDTO(repositorioEjercicio.ObtenerPorProfesional(Id));
         }
 
         public List<Rutina> ObtenerRutinasProfesional(int profesionalId)
@@ -84,7 +105,9 @@ namespace LogicaApp.Servicios
                     Nombre = item.Nombre,
                     Tipo = item.Tipo,
                     GrupoMuscular = item.GrupoMuscular,
-                    Media = item.Medias.FirstOrDefault()
+                    Media = item.Medias.FirstOrDefault(),
+                    ProfesionalId = item.ProfesionalId
+                    
                 });
             }
             return salida;

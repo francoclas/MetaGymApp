@@ -1,40 +1,45 @@
-﻿<div class="container">
-    <h1>Entorno de pruebas - Administrador</h1>
-    <hr />
-    <form asp-action="CrearUsuario" method="post">
-        <h2>Crear usuarios</h2>
-        <input  name="Ci" placeholder="CI" />
-        <input  name="Usuario" placeholder="Usuario" />
-        <input name="NombreCompleto" placeholder="Nombre completo" />
-        <input  name ="Password" placeholder="Contraseña" type="password" />
-        <input  name="Correo" placeholder="Correo" />
-        <input name="Telefono" placeholder="Telefono" />
-        <select  name="Rol">
-            <option value="Admin">Admin</option>
-            <option value="Profesional">Profesional</option>
-            <option value="Cliente">Cliente</option>
-        </select>
-        <button type="submit">Crear usuario</button>
-    </form>
-    <hr />
-    <form asp-action="CrearEstablecimiento" method="post">
-        <h2>Registrar establecimiento</h2>
-        <input name="NombreEstablecimiento" placeholder="Nombre" />
-        <input name="Direccion" placeholder="Direccion" />
-        <button type="submit">Crear establecimiento</button>
-    </form>
-    <hr />
-    <form asp-action="CrearEspecialidad" method="post">
-        <h2>Registrar especialidad</h2>
-        <input name="NombreEspecialidad" placeholder="NombreEspecialidad" />
-        <input name="DescripcionEspecialidad" placeholder="Descripcion" />
-        <button type="submit">Crear especialidad</button>
-    </form>
+﻿@model CrearUsuarioDTO
+@{
+    ViewData["Title"] = "Crear Usuario";
+}
 
-    @if (TempData["Error"] != null)
+<div class="container mt-4 text-white">
+    <h2>Crear nuevo usuario</h2>
+    <hr />
+
+    @if (TempData["Mensaje"] != null)
     {
-        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 10px; border: 1px solid #f5c6cb;">
-            @TempData["Error"]
-        </div>
+        <div class="alert alert-@TempData["TipoMensaje"]">@TempData["Mensaje"]</div>
     }
+
+    <form asp-action="CrearUsuario" method="post" class="bg-dark p-4 rounded border border-secondary">
+        <div class="mb-2">
+            <input asp-for="Ci" class="form-control" placeholder="CI" />
+        </div>
+        <div class="mb-2">
+            <input asp-for="Usuario" class="form-control" placeholder="Usuario" />
+        </div>
+        <div class="mb-2">
+            <input asp-for="NombreCompleto" class="form-control" placeholder="Nombre completo" />
+        </div>
+        <div class="mb-2">
+            <input asp-for="Correo" class="form-control" placeholder="Correo" type="email" />
+        </div>
+        <div class="mb-2">
+            <input asp-for="Password" class="form-control" placeholder="Contraseña" type="password" />
+        </div>
+        <div class="mb-2">
+            <input asp-for="Telefono" class="form-control" placeholder="Teléfono" />
+        </div>
+        <div class="mb-3">
+            <select asp-for="Rol" class="form-select">
+                <option disabled selected>Seleccione rol</option>
+                <option value="Admin">Admin</option>
+                <option value="Profesional">Profesional</option>
+                <option value="Cliente">Cliente</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Crear usuario</button>
+    </form>
 </div>

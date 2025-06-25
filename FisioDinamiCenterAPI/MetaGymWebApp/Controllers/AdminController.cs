@@ -39,27 +39,28 @@ namespace MetaGymWebApp.Controllers
         {
             return View();
         }
-
         [HttpPost]
-        public IActionResult CrearUsuario(string Ci, string Usuario, string NombreCompleto, string Correo, string Password, string Rol, string Telefono)
+        public IActionResult CrearUsuario(CrearUsuarioDTO dto)
         {
-            //Valido
-            if (!ModelState.IsValid) return View();
-            //Menu para cada rol
+            if (!ModelState.IsValid) return View(dto);
+
             try
             {
-                switch (Rol)
+                switch (dto.Rol)
                 {
                     case "Admin":
-                        _usuarioServicio.CrearAdmin(Ci, Usuario, NombreCompleto, Correo, Password, Telefono);
+                        _usuarioServicio.CrearAdmin(dto.Ci, dto.Usuario, dto.NombreCompleto, dto.Correo, dto.Password, dto.Telefono);
                         break;
                     case "Profesional":
-                        _usuarioServicio.CrearProfesional(Ci, Usuario, NombreCompleto, Correo, Password, Telefono);
+                        _usuarioServicio.CrearProfesional(dto.Ci, dto.Usuario, dto.NombreCompleto, dto.Correo, dto.Password, dto.Telefono);
                         break;
                     case "Cliente":
-                        _usuarioServicio.CrearCliente(Ci, Usuario, NombreCompleto, Correo, Password, Telefono);
+                        _usuarioServicio.CrearCliente(dto.Ci, dto.Usuario, dto.NombreCompleto, dto.Correo, dto.Password, dto.Telefono);
                         break;
                 }
+
+                TempData["Mensaje"] = "Usuario creado correctamente.";
+                TempData["TipoMensaje"] = "success";
                 return RedirectToAction("CrearUsuario");
             }
             catch (Exception e)
@@ -67,7 +68,6 @@ namespace MetaGymWebApp.Controllers
                 TempData["Mensaje"] = e.Message;
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("CrearUsuario");
-
             }
         }
         [HttpPost]

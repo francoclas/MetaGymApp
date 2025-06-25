@@ -13,7 +13,6 @@ namespace LogicaNegocio.Interfaces.Repositorios
         public List<Ejercicio> BuscarEjerciciosNombre(string Nombre);
         public List<Ejercicio> BuscarPorGrupoMuscular(string GrupoMuscular);
         public List<Ejercicio> BuscarPorTipo(string Tipo);
-
-
+        List<Ejercicio> ObtenerPorProfesional(int id);
     }
 }

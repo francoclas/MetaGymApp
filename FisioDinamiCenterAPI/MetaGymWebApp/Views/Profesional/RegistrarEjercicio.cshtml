@@ -1,31 +1,25 @@
 ﻿@model EjercicioDTO
-@{
-    ViewData["Title"] = "Registrar nuevo ejercicio";
-}
 
-<h2>Registrar nuevo ejercicio</h2>
+<div class="container">
+    <form asp-action="RegistrarEjercicio" method="post" enctype="multipart/form-data">
+        <div class="mb-2">
+            <input asp-for="Nombre" class="form-control" placeholder="Nombre del ejercicio" />
+        </div>
+        <div class="mb-2">
+            <input asp-for="Tipo" class="form-control" placeholder="Tipo" />
+        </div>
+        <div class="mb-2">
+            <input asp-for="GrupoMuscular" class="form-control" placeholder="Grupo muscular" />
+        </div>
+        <div class="mb-2">
+            <textarea asp-for="Instrucciones" class="form-control" placeholder="Instrucciones"></textarea>
+        </div>
 
-<form asp-action="RegistrarEjercicio" method="post" enctype="multipart/form-data">
-    <div class="form-group">
-        <label>Nombre</label>
-        <input asp-for="Nombre" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Tipo</label>
-        <input asp-for="Tipo" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Grupo Muscular</label>
-        <input asp-for="GrupoMuscular" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Instrucciones</label>
-        <textarea asp-for="Instrucciones" class="form-control"></textarea>
-    </div>
-    <div class="form-group">
-        <label>Imagen o video</label>
-        <input type="file" name="archivo" class="form-control" />
-    </div>
+        <div class="mb-2">
+            <label>Archivos multimedia (imágenes o videos)</label>
+            <input type="file" name="archivos" multiple class="form-control" />
+        </div>
 
-    <button type="submit" class="btn btn-success mt-3">Registrar</button>
-</form>
+        <button type="submit" class="btn btn-primary">Registrar ejercicio</button>
+    </form>
+</div>

@@ -21,7 +21,5 @@ namespace LogicaDatos.Interfaces.Repos
         void RegistrarSesion(SesionRutina sesion);
         List<SesionRutina> ObtenerSesionesPorCliente(int clienteId);
         SesionRutina? ObtenerSesionPorId(int sesionId);
-       
-
     }
 }

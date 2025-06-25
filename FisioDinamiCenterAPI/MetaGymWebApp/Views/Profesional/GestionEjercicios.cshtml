@@ -1,8 +1,6 @@
-﻿@model List<EjercicioDTO>
+﻿@model GestionEjerciciosModelo
 @{
     ViewData["Title"] = "Gestión de Ejercicios";
-    var misEjercicios = Model.Where(e => e.ProfesionalId == ViewBag.ProfesionalId).ToList();
-    var otrosEjercicios = Model.Where(e => e.ProfesionalId != ViewBag.ProfesionalId).ToList();
 }
 
 <link rel="stylesheet" href="~/css/ejercicios.css" />
@@ -20,32 +18,32 @@
     </ul>
 
     <div class="busqueda mt-3">
-        <input type="text" id="buscadorEjercicios" class="form-control" placeholder="Buscar ejercicio por nombre, tipo o grupo muscular...">
+        <input type="text" id="buscadorEjercicios" class="form-control" placeholder="Buscar por nombre, tipo o grupo muscular...">
     </div>
 
     <div id="mis-ejercicios" class="tab-content mt-4">
-        @foreach (var ejercicio in misEjercicios)
+        @foreach (var ej in Model.EjerciciosProfesional)
         {
-            <div class="card ejercicio-card mb-3" data-nombre="@ejercicio.Nombre" data-tipo="@ejercicio.Tipo" data-grupo="@ejercicio.GrupoMuscular">
+            <div class="card ejercicio-card mb-3" data-nombre="@ej.Nombre" data-tipo="@ej.Tipo" data-grupo="@ej.GrupoMuscular">
                 <div class="card-body">
-                    <h5 class="card-title">@ejercicio.Nombre</h5>
-                    <p class="card-text"><strong>Tipo:</strong> @ejercicio.Tipo</p>
-                    <p class="card-text"><strong>Grupo muscular:</strong> @ejercicio.GrupoMuscular</p>
-                    <a class="btn btn-sm btn-outline-warning" href="@Url.Action("EditarEjercicio", new { id = ejercicio.Id })">Editar</a>
+                    <h5 class="card-title">@ej.Nombre</h5>
+                    <p class="card-text"><strong>Tipo:</strong> @ej.Tipo</p>
+                    <p class="card-text"><strong>Grupo muscular:</strong> @ej.GrupoMuscular</p>
+                    <a href="@Url.Action("EditarEjercicio", "Profesional", new { id = ej.Id })" class="btn btn-sm btn-warning">Editar</a>
                 </div>
             </div>
         }
     </div>
 
     <div id="todos-ejercicios" class="tab-content mt-4 d-none">
-        @foreach (var ejercicio in otrosEjercicios)
+        @foreach (var ej in Model.EjerciciosSistema)
         {
-            <div class="card ejercicio-card mb-3" data-nombre="@ejercicio.Nombre" data-tipo="@ejercicio.Tipo" data-grupo="@ejercicio.GrupoMuscular">
+            <div class="card ejercicio-card mb-3" data-nombre="@ej.Nombre" data-tipo="@ej.Tipo" data-grupo="@ej.GrupoMuscular">
                 <div class="card-body">
-                    <h5 class="card-title">@ejercicio.Nombre</h5>
-                    <p class="card-text"><strong>Tipo:</strong> @ejercicio.Tipo</p>
-                    <p class="card-text"><strong>Grupo muscular:</strong> @ejercicio.GrupoMuscular</p>
-                    <a class="btn btn-sm btn-outline-primary" href="@Url.Action("DetalleEjercicio", new { id = ejercicio.Id })">Ver detalle</a>
+                    <h5 class="card-title">@ej.Nombre</h5>
+                    <p class="card-text"><strong>Tipo:</strong> @ej.Tipo</p>
+                    <p class="card-text"><strong>Grupo muscular:</strong> @ej.GrupoMuscular</p>
+                    <a href="@Url.Action("DetalleEjercicio", "Profesional", new { id = ej.Id })" class="btn btn-sm btn-outline-light">Ver detalles</a>
                 </div>
             </div>
         }
@@ -53,5 +51,5 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/ejerciciosTabs.js"></script>
+    <script src="~/js/gestionEjerciciosTabs.js"></script>
 }

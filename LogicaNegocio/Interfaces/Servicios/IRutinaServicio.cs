@@ -24,6 +24,7 @@ namespace LogicaNegocio.Interfaces.Servicios
             void ModificarRutina (Rutina rutina);
             void AsignarRutina(Rutina rutina, Cliente cliente);
             void DesasignarRutina(Rutina rutina, Cliente cliente);
-
+        EjercicioDTO ObtenerEjercicioDTOId(int id);
+        Ejercicio ObtenerEjercicioId(int id);
     }
 }

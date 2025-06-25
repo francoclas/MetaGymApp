@@ -1,0 +1,41 @@
+﻿@using LogicaNegocio.Extra
+@model EjercicioDTO
+@{
+    ViewData["Title"] = "Detalle del ejercicio";
+}
+
+<div class="container mt-4 text-white">
+    <h2 class="mb-3">@Model.Nombre</h2>
+
+    <div class="mb-3">
+        <strong>Tipo:</strong> @Model.Tipo <br />
+        <strong>Grupo muscular:</strong> @Model.GrupoMuscular
+    </div>
+
+    <div class="mb-4">
+        <h5>Instrucciones:</h5>
+        <p>@Model.Instrucciones</p>
+    </div>
+
+    <h5>Multimedia:</h5>
+    <div class="row">
+        @foreach (var media in Model.Medias)
+        {
+            <div class="col-md-4 mb-3">
+                @if (media.Tipo == Enum_TipoMedia.Imagen)
+                {
+                    <img src="@media.Url" class="img-fluid rounded border" alt="Imagen ejercicio" />
+                }
+                else if (media.Tipo == Enum_TipoMedia.Video)
+                {
+                    <video controls class="w-100 border rounded">
+                        <source src="@media.Url" type="video/mp4" />
+                        Tu navegador no soporta el video.
+                    </video>
+                }
+            </div>
+        }
+    </div>
+
+    <a href="@Url.Action("GestionEjercicios", "Profesional")" class="btn btn-outline-light mt-3">Volver</a>
+</div>

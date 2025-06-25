@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LogicaDatos.Migrations
 {
     /// <inheritdoc />
-    public partial class Inicial : Migration
+    public partial class inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -247,7 +247,7 @@ namespace LogicaDatos.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Comentario",
+                name: "Comentarios",
                 columns: table => new
                 {
                     ComentarioId = table.Column<int>(type: "int", nullable: false)
@@ -262,24 +262,24 @@ namespace LogicaDatos.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Comentario", x => x.ComentarioId);
+                    table.PrimaryKey("PK_Comentarios", x => x.ComentarioId);
                     table.ForeignKey(
-                        name: "FK_Comentario_Administradores_AdminId",
+                        name: "FK_Comentarios_Administradores_AdminId",
                         column: x => x.AdminId,
                         principalTable: "Administradores",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Comentario_Clientes_ClienteId",
+                        name: "FK_Comentarios_Clientes_ClienteId",
                         column: x => x.ClienteId,
                         principalTable: "Clientes",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Comentario_Profesionales_ProfesionalId",
+                        name: "FK_Comentarios_Profesionales_ProfesionalId",
                         column: x => x.ProfesionalId,
                         principalTable: "Profesionales",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Comentario_Publicaciones_PublicacionId",
+                        name: "FK_Comentarios_Publicaciones_PublicacionId",
                         column: x => x.PublicacionId,
                         principalTable: "Publicaciones",
                         principalColumn: "Id",
@@ -442,23 +442,23 @@ namespace LogicaDatos.Migrations
                 column: "ProfesionalId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comentario_AdminId",
-                table: "Comentario",
+                name: "IX_Comentarios_AdminId",
+                table: "Comentarios",
                 column: "AdminId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comentario_ClienteId",
-                table: "Comentario",
+                name: "IX_Comentarios_ClienteId",
+                table: "Comentarios",
                 column: "ClienteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comentario_ProfesionalId",
-                table: "Comentario",
+                name: "IX_Comentarios_ProfesionalId",
+                table: "Comentarios",
                 column: "ProfesionalId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comentario_PublicacionId",
-                table: "Comentario",
+                name: "IX_Comentarios_PublicacionId",
+                table: "Comentarios",
                 column: "PublicacionId");
 
             migrationBuilder.CreateIndex(
@@ -559,7 +559,7 @@ namespace LogicaDatos.Migrations
                 name: "Citas");
 
             migrationBuilder.DropTable(
-                name: "Comentario");
+                name: "Comentarios");
 
             migrationBuilder.DropTable(
                 name: "EspecialidadProfesional");

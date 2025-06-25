@@ -71,5 +71,10 @@ namespace LogicaDatos.Repositorio
                 .Where(e => e.Tipo.ToLower().Contains(tipo.ToLower()))
                 .ToList();
         }
+
+        public List<Ejercicio> ObtenerPorProfesional(int id)
+        {
+            return _context.Ejercicios.Include(e => e.Medias).Where(e => e.ProfesionalId == id).ToList();
+        }
     }
 }
