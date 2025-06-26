@@ -1,0 +1,47 @@
+﻿@model List<PublicacionDTO>
+@{
+    ViewData["Title"] = "Mis Publicaciones";
+}
+
+<h2>Mis Publicaciones</h2>
+
+<div class="mb-3">
+    <a asp-action="SolicitarPublicacion" class="btn btn-success">➕ Nueva publicación</a>
+</div>
+
+<ul class="nav nav-tabs mb-3" id="tabFiltro">
+    <li class="nav-item">
+        <a class="nav-link active" data-estado="Pendiente" href="#">Pendientes</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-estado="Aprobada" href="#">Aprobadas</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-estado="Rechazada" href="#">Rechazadas</a>
+    </li>
+</ul>
+
+<table class="table table-bordered table-striped" id="tablaPublicaciones">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Estado</th>
+            <th>Fecha creación</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pub in Model)
+        {
+            <tr data-estado="@pub.Estado">
+                <td>@pub.Titulo</td>
+                <td>@pub.Estado</td>
+                <td>@pub.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+                    <a asp-action="DetallePublicacion" asp-route-id="@pub.Id" class="btn btn-sm btn-outline-primary">Ver</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script src="/js/misPublicacionesProfesional.js"></script>

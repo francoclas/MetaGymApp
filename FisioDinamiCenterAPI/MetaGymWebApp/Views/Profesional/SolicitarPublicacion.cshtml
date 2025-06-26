@@ -1,0 +1,44 @@
+﻿@model CrearPublicacionDTO
+
+@{
+    ViewData["Title"] = "Solicitar Publicación";
+}
+
+<h2>Solicitar nueva publicación</h2>
+
+<form asp-action="SolicitarPublicacion" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="Titulo">Título</label>
+        <input asp-for="Titulo" class="form-control" />
+        <span asp-validation-for="Titulo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Descripcion">Descripción</label>
+        <textarea asp-for="Descripcion" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Descripcion" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="FechaProgramada">Fecha de publicación (opcional)</label>
+        <input asp-for="FechaProgramada" type="datetime-local" class="form-control" />
+    </div>
+
+    <div class="form-group form-check">
+        <input asp-for="EsPrivada" class="form-check-input" />
+        <label class="form-check-label" for="EsPrivada">Es privada</label>
+    </div>
+
+    <div class="form-group">
+        <label for="ArchivosMedia">Subir archivos (opcional)</label>
+        <input asp-for="ArchivosMedia" type="file" class="form-control" multiple />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

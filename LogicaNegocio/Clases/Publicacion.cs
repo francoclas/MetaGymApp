@@ -31,12 +31,15 @@ namespace LogicaNegocio.Clases
         public List<Media> ListaMedia { get; set; } = new();
         public List<Comentario> Comentarios { get; set; } = new();
 
+        // Quien la crea (opcional: Profesional o Admin)
         public int? ProfesionalId { get; set; }
         public Profesional? Profesional { get; set; }
 
-        [ForeignKey("Admin")]
-        [InverseProperty("PublicacionesAceptadasAdmin")]
-        public int AdminId { get; set; }
-        public Admin Admin { get; set; }
+        public int? AdminCreadorId { get; set; }
+        public Admin? AdminCreador { get; set; }
+
+        // Quien la aprueba (solo si fue creada por profesional)
+        public int? AdminAprobadorId { get; set; }
+        public Admin? AdminAprobador { get; set; }
     }
 }

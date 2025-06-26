@@ -43,7 +43,7 @@ namespace LogicaDatos.Repositorio
             if (pub == null) return;
 
             pub.Estado = nuevoEstado;
-            pub.AdminId = adminId;
+            pub.AdminAprobadorId = adminId;
             pub.MotivoRechazo = motivoRechazo;
             pub.FechaModificacion = DateTime.Now;
 

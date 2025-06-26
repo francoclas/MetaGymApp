@@ -18,8 +18,13 @@ namespace LogicaNegocio.Interfaces.DTOS
         public bool EsPrivada { get; set; }
         public int Vistas { get; set; }
         public int CantLikes { get; set; }
+
         public string? NombreAutor { get; set; }
-        public string RolAutor { get; set; } // "Admin" o "Profesional"
+        public string RolAutor { get; set; }
+
+        public string? NombreAprobador { get; set; }
+        public string? NombreCreadorAdmin { get; set; }
+
         public List<string> UrlsMedia { get; set; }
         public List<ComentarioDTO> Comentarios { get; set; }
     }

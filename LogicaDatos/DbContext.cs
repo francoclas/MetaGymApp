@@ -45,18 +45,29 @@ namespace LogicaDatos
            .Property(c => c.Estado)
            .HasConversion<string>();
             //Enum de tipo multimedia
-            modelBuilder.Entity<Media>()
-            .Property(m => m.Tipo)
-            .HasConversion<string>();
+                modelBuilder.Entity<Media>()
+                .Property(m => m.Tipo)
+                .HasConversion<string>();
 
             //Relacion profesionhales tienen sus ejercicios
-            modelBuilder.Entity<Ejercicio>()
-            .HasOne(e => e.Profesional)
-            .WithMany(p => p.Ejercicios)
-            .HasForeignKey(e => e.ProfesionalId)
-            .OnDelete(DeleteBehavior.Restrict);
-            //Precarga
-      
+                modelBuilder.Entity<Ejercicio>()
+                .HasOne(e => e.Profesional)
+                .WithMany(p => p.Ejercicios)
+                .HasForeignKey(e => e.ProfesionalId)
+                .OnDelete(DeleteBehavior.Restrict);
+            //Relacion publicacion
+            modelBuilder.Entity<Publicacion>()
+                .HasOne(p => p.AdminCreador)
+                .WithMany()
+                .HasForeignKey(p => p.AdminCreadorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Publicacion>()
+                .HasOne(p => p.AdminAprobador)
+                .WithMany()
+                .HasForeignKey(p => p.AdminAprobadorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
 
     }

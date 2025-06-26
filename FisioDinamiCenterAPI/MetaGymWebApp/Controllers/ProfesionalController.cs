@@ -340,10 +340,8 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult MisPublicaciones()
         {
-            int ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var publicaciones = publicacionServicio.ObtenerTodas()
-                .Where(p => p.ProfesionalId == ProfesionalId)
-                .ToList();
+            int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            List<PublicacionDTO> publicaciones = publicacionServicio.ObtenerPorProfesionalId(profesionalId);
 
             return View(publicaciones);
         }

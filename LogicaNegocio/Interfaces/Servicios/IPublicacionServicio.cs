@@ -15,5 +15,6 @@ namespace LogicaNegocio.Interfaces.Servicios
         void ModerarPublicacion(ModerarPublicacionDTO dto);
         List<PublicacionDTO> ObtenerPendientes();
         List<PublicacionDTO> ObtenerTodas();
+        List<PublicacionDTO> ObtenerPorProfesionalId(int profesionalId);
     }
 }

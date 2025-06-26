@@ -87,18 +87,41 @@ namespace LogicaApp.Servicios
                 EsPrivada = pub.EsPrivada,
                 Vistas = pub.Vistas,
                 CantLikes = pub.CantLikes,
+
                 Comentarios = pub.Comentarios?.Select(c => new ComentarioDTO
                 {
                     ComentarioId = c.ComentarioId,
                     Contenido = c.Contenido,
                     FechaCreacion = c.FechaCreacion,
+                    FechaEdicion = c.FechaEdicion,
                     AutorId = c.ProfesionalId ?? c.ClienteId ?? c.AdminId ?? 0,
                     AutorNombre = c.Profesional?.NombreCompleto ?? c.Cliente?.NombreCompleto ?? c.Admin?.NombreCompleto ?? "Desconocido",
-                    RolAutor = c.Profesional != null ? "Profesional" : c.Cliente != null ? "Cliente" : "Admin"
-                }).ToList() ?? new List<ComentarioDTO>(),
-                UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new List<string>(),
-                NombreAutor = pub.Profesional?.NombreCompleto ?? pub.Admin?.NombreCompleto ?? "Desconocido",
-                RolAutor = pub.Profesional != null ? "Profesional" : "Admin"
+                    RolAutor = c.Profesional != null ? "Profesional" : c.Cliente != null ? "Cliente" : "Admin",
+                    CantLikes = c.CantLikes,
+                    ComentarioPadreId = c.ComentarioPadreId,
+                    Respuestas = c.Respuestas?
+                        .Where(r => r.EstaActivo)
+                        .Select(r => new ComentarioDTO
+                        {
+                            ComentarioId = r.ComentarioId,
+                            Contenido = r.Contenido,
+                            FechaCreacion = r.FechaCreacion,
+                            FechaEdicion = r.FechaEdicion,
+                            AutorId = r.ProfesionalId ?? r.ClienteId ?? r.AdminId ?? 0,
+                            AutorNombre = r.Profesional?.NombreCompleto ?? r.Cliente?.NombreCompleto ?? r.Admin?.NombreCompleto ?? "Desconocido",
+                            RolAutor = r.Profesional != null ? "Profesional" : r.Cliente != null ? "Cliente" : "Admin",
+                            CantLikes = r.CantLikes,
+                            ComentarioPadreId = r.ComentarioPadreId
+                        }).ToList() ?? new()
+                }).ToList() ?? new(),
+
+                UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new(),
+
+                NombreAutor = pub.Profesional?.NombreCompleto ?? pub.AdminCreador?.NombreCompleto ?? "Desconocido",
+                RolAutor = pub.Profesional != null ? "Profesional" : "Admin",
+
+                NombreAprobador = pub.AdminAprobador?.NombreCompleto,
+                NombreCreadorAdmin = pub.AdminCreador?.NombreCompleto
             };
         }
 
@@ -111,6 +134,21 @@ namespace LogicaApp.Servicios
                 salida.Add(ConvertirAPublicacionDTO(o));
             }
             return salida;
+        }
+
+        public List<PublicacionDTO> ObtenerPorProfesionalId(int profesionalId)
+        {
+            var publicaciones = _repo.ObtenerTodas()
+            .Where(p => p.ProfesionalId == profesionalId)
+            .ToList();
+
+            var result = new List<PublicacionDTO>();
+            foreach (var pub in publicaciones)
+            {
+                result.Add(ConvertirAPublicacionDTO(pub));
+            }
+
+            return result;
         }
     }
 }
