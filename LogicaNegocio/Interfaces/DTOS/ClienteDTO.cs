@@ -8,6 +8,7 @@ namespace LogicaNegocio.Interfaces.DTOS
 {
     public class ClienteDTO 
     {
+        public int Id { get; set; }
         public string Ci {  get; set; }
         public string NombreUsuario { get; set; }
         public string NombreCompleto { get; set; }

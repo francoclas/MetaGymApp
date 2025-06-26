@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LogicaDatos.Interfaces.Repos;
 using LogicaNegocio.Clases;
+using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Repositorios;
 using LogicaNegocio.Interfaces.Servicios;
@@ -34,7 +35,8 @@ namespace LogicaApp.Servicios
 
         public Rutina GenerarNuevaRutina(Rutina rutina)
         {
-            throw new NotImplementedException();
+            repositorioRutina.Agregar(rutina);
+            return rutina;
         }
 
         public Ejercicio GenerarNuevoEjercicio(Ejercicio ejercicio)
@@ -105,7 +107,8 @@ namespace LogicaApp.Servicios
                     Nombre = item.Nombre,
                     Tipo = item.Tipo,
                     GrupoMuscular = item.GrupoMuscular,
-                    Media = item.Medias.FirstOrDefault(),
+                    Medias = item.Medias,
+                    Media = item.Medias.FirstOrDefault(m => m.Tipo == Enum_TipoMedia.Imagen),
                     ProfesionalId = item.ProfesionalId
                     
                 });

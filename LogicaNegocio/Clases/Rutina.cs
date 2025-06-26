@@ -26,7 +26,7 @@ namespace LogicaNegocio.Clases
         public List<SesionRutina> RutinaEjercicios { get; set; }
 
         public List<Cliente> Asignados = new List<Cliente>();
-
+        public List<RutinaEjercicio> Ejercicios { get; set; } = new();
         public DateTime FechaCreacion { get; set; }
         public DateTime FechaModificacion{ get; set; }
 

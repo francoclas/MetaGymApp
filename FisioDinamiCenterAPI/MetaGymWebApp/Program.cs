@@ -29,6 +29,8 @@ builder.Services.AddScoped<IRepositorioExtra,RepoExtras>();
 builder.Services.AddScoped<IRepositorioRutina, RepoRutinas>();
 builder.Services.AddScoped<IRepositorioEjercicio, RepoEjercicios>();
 builder.Services.AddScoped<IRepositorioMedia, RepoMedias>();
+builder.Services.AddScoped<IRepositorioComentario, RepoComentario>();
+builder.Services.AddScoped<IRepositorioPublicacion, RepoPublicacion>();
 
 // Servicios
 builder.Services.AddScoped<IClienteServicio, ServicioCliente>();
@@ -36,9 +38,12 @@ builder.Services.AddScoped<IAdminServicio, ServicioAdmin>();
 builder.Services.AddScoped<IUsuarioServicio, ServicioUsuario>();
 builder.Services.AddScoped<ICitaServicio, ServicioCita>();
 builder.Services.AddScoped<IExtraServicio, ServicioExtras>();
-builder.Services.AddScoped<IProfesionalServicio,ProfesionalServicio>();
+builder.Services.AddScoped<IProfesionalServicio,ServicioProfesional>();
 builder.Services.AddScoped<IRutinaServicio, ServicioRutina>();
 builder.Services.AddScoped<IMediaServicio, ServicioMedia>();
+builder.Services.AddScoped<IComentarioServicio,ServicioComentario>();
+builder.Services.AddScoped<IPublicacionServicio,ServicioPublicacion>();
+
 
 builder.Services.AddSession();
 var app = builder.Build();

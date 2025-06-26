@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LogicaDatos.Interfaces.Repos;
 using LogicaNegocio.Clases;
+using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
 
 namespace LogicaApp.Servicios
@@ -16,9 +17,29 @@ namespace LogicaApp.Servicios
             _repoCliente = repocli;
         }
 
+        public Cliente ObtenerPorId(int id)
+        {
+            return _repoCliente.ObtenerPorId(id);
+        }
+
         public List<Cliente> ObtenerTodos()
         {
             return _repoCliente.ObtenerTodos().ToList();
+        }
+
+        public List<ClienteDTO> ObtenerTodosDTO()
+        {
+            return _repoCliente.ObtenerTodos()
+        .Select(c => new ClienteDTO
+        {
+            Id = c.Id,
+            Ci = c.CI,
+            NombreUsuario = c.NombreUsuario,
+            NombreCompleto = c.NombreCompleto,
+            Password = c.Pass,
+            Correo = c.Correo,
+            Telefono = c.Telefono
+        }).ToList();
         }
     }
 }

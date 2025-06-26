@@ -4,6 +4,7 @@ using LogicaDatos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LogicaDatos.Migrations
 {
     [DbContext(typeof(DbContextApp))]
-    partial class DbContextAppModelSnapshot : ModelSnapshot
+    [Migration("20250626033934_actualizarPublicacion")]
+    partial class actualizarPublicacion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,13 +178,7 @@ namespace LogicaDatos.Migrations
                     b.Property<int?>("AdminId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CantLikes")
-                        .HasColumnType("int");
-
                     b.Property<int?>("ClienteId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ComentarioPadreId")
                         .HasColumnType("int");
 
                     b.Property<string>("Contenido")
@@ -192,9 +189,6 @@ namespace LogicaDatos.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaEdicion")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("ProfesionalId")
@@ -208,8 +202,6 @@ namespace LogicaDatos.Migrations
                     b.HasIndex("AdminId");
 
                     b.HasIndex("ClienteId");
-
-                    b.HasIndex("ComentarioPadreId");
 
                     b.HasIndex("ProfesionalId");
 
@@ -648,10 +640,6 @@ namespace LogicaDatos.Migrations
                         .WithMany("Comentarios")
                         .HasForeignKey("ClienteId");
 
-                    b.HasOne("LogicaNegocio.Clases.Comentario", "ComentarioPadre")
-                        .WithMany("Respuestas")
-                        .HasForeignKey("ComentarioPadreId");
-
                     b.HasOne("LogicaNegocio.Clases.Profesional", "Profesional")
                         .WithMany("Comentarios")
                         .HasForeignKey("ProfesionalId");
@@ -665,8 +653,6 @@ namespace LogicaDatos.Migrations
                     b.Navigation("Admin");
 
                     b.Navigation("Cliente");
-
-                    b.Navigation("ComentarioPadre");
 
                     b.Navigation("Profesional");
 
@@ -843,11 +829,6 @@ namespace LogicaDatos.Migrations
                     b.Navigation("Rutinas");
 
                     b.Navigation("SesionesEntrenadas");
-                });
-
-            modelBuilder.Entity("LogicaNegocio.Clases.Comentario", b =>
-                {
-                    b.Navigation("Respuestas");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Ejercicio", b =>

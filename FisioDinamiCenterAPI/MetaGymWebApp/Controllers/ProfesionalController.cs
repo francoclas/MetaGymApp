@@ -1,4 +1,5 @@
-﻿using LogicaApp.DTOS;
+﻿using Humanizer;
+using LogicaApp.DTOS;
 using LogicaApp.Servicios;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
@@ -21,7 +22,8 @@ namespace MetaGymWebApp.Controllers
         private readonly IRutinaServicio rutinaServicio;
         private readonly IMediaServicio mediaServicio;
         private readonly IClienteServicio clienteServicio;
-        public ProfesionalController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio, IProfesionalServicio proservicio, IRutinaServicio rutina, IMediaServicio mediaServicio, IClienteServicio clienteServicio)
+        private readonly IPublicacionServicio publicacionServicio;
+        public ProfesionalController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio, IProfesionalServicio proservicio, IRutinaServicio rutina, IMediaServicio mediaServicio, IClienteServicio clienteServicio, IPublicacionServicio publicacionServicio)
         {
             this.usuarioServicio = usuarioServicio;
             this.citaServicio = citaServicio;
@@ -30,6 +32,7 @@ namespace MetaGymWebApp.Controllers
             this.rutinaServicio = rutina;
             this.mediaServicio = mediaServicio;
             this.clienteServicio = clienteServicio;
+            this.publicacionServicio = publicacionServicio;
         }
         [HttpGet]
         public IActionResult VerSolicitudCitas()
@@ -146,7 +149,7 @@ namespace MetaGymWebApp.Controllers
 
             return View(modelo);
         }
-        [HttpGet]
+        
         [HttpGet]
         public IActionResult DetalleEjercicio(int id)
         {
@@ -285,13 +288,16 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult RegistrarRutina()
         {
-            ViewBag.Ejercicios = rutinaServicio.ObtenerTodosEjercicios(); // EjercicioDTO
-            ViewBag.Clientes = clienteServicio.ObtenerTodos(); // Cliente simple
+            //ViewBag.Ejercicios = rutinaServicio.ObtenerTodosEjercicios(); // EjercicioDTO
+            var modelo = new RutinaRegistroDTO
+            {
+                EjerciciosDisponibles = rutinaServicio.ObtenerTodosEjercicios(),
+                ClientesDisponibles = clienteServicio.ObtenerTodosDTO()
+            };
 
-            return View(new RutinaRegistroDTO());
+            return View(modelo);
         }
-
-        [HttpPost]
+            [HttpPost]
         public IActionResult RegistrarRutina(RutinaRegistroDTO dto)
         {
             var rutina = new Rutina
@@ -301,14 +307,54 @@ namespace MetaGymWebApp.Controllers
                 ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext),
                 FechaCreacion = DateTime.Now,
                 FechaModificacion = DateTime.Now,
-                RutinaEjercicios = dto.IdsEjerciciosSeleccionados
-                    .Select(id => new SesionRutina { EjercicioId = id }).ToList(),
-                Asignados = dto.IdsClientesAsignados
-                    .Select(id => clienteServicio.ObtenerPorId(id)).ToList()
+                Ejercicios = dto.IdsEjerciciosSeleccionados.Select((id, index) => new RutinaEjercicio
+                {
+                    EjercicioId = id,
+                    Orden = index + 1
+                }).ToList(),
+                Asignados = dto.IdsClientesAsignados.Select(id => clienteServicio.ObtenerPorId(id)).ToList()
             };
 
             rutinaServicio.GenerarNuevaRutina(rutina);
             return RedirectToAction("GestionRutinas");
+        }
+        //Publicaciones
+
+        //Solicitar publicacion
+        [HttpGet]
+        public IActionResult SolicitarPublicacion()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult SolicitarPublicacion(CrearPublicacionDTO dto)
+        {
+            dto.ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+
+            publicacionServicio.CrearPublicacion(dto);
+
+            return RedirectToAction("MisPublicaciones");
+        }
+        //Mis publicaciones
+        [HttpGet]
+        public IActionResult MisPublicaciones()
+        {
+            int ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            var publicaciones = publicacionServicio.ObtenerTodas()
+                .Where(p => p.ProfesionalId == ProfesionalId)
+                .ToList();
+
+            return View(publicaciones);
+        }
+        //Detales
+        [HttpGet]
+        public IActionResult DetallePublicacion(int id)
+        {
+            var publicacion = publicacionServicio.ObtenerPorId(id);
+            if (publicacion == null) return NotFound();
+
+            return View(publicacion);
         }
     }
     }

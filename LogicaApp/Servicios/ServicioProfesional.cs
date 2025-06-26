@@ -9,12 +9,12 @@ using LogicaNegocio.Interfaces.Servicios;
 
 namespace LogicaApp.Servicios
 {
-    public class ProfesionalServicio : IProfesionalServicio
+    public class ServicioProfesional : IProfesionalServicio
 
     {
         private readonly IRepositorioProfesional _repoProfesional;
 
-        public ProfesionalServicio (IRepositorioProfesional repoProfesional)
+        public ServicioProfesional (IRepositorioProfesional repoProfesional)
         {
             _repoProfesional = repoProfesional;
         }
