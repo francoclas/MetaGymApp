@@ -147,7 +147,12 @@ namespace MetaGymWebApp.Controllers
                 {
                     return View();
                 }
+        [HttpPost]
+        public IActionResult GuardarEdicionCliente(UsuarioGenericoDTO dto)
+        {
 
+            return View(dto);
+        }
         //Editar pro
                 [HttpGet]
                 public IActionResult EditarProfesional(int id)

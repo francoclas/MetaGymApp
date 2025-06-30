@@ -1,0 +1,69 @@
+﻿@using LogicaNegocio.Extra
+<h2>Detalle de Publicación</h2>
+
+<div class="mb-3">
+    <a asp-action="MisPublicaciones" class="btn btn-secondary">← Volver</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">@Model.Titulo</h4>
+        <p class="card-text">@Model.Descripcion</p>
+
+        <dl class="row">
+            <dt class="col-sm-4">Estado</dt>
+            <dd class="col-sm-8">@Model.Estado</dd>
+
+            <dt class="col-sm-4">Fecha de creación</dt>
+            <dd class="col-sm-8">@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</dd>
+
+            @if (Model.FechaProgramada != null)
+            {
+                <dt class="col-sm-4">Fecha programada</dt>
+                <dd class="col-sm-8">@Model.FechaProgramada?.ToString("dd/MM/yyyy HH:mm")</dd>
+            }
+
+            <dt class="col-sm-4">Privacidad</dt>
+            <dd class="col-sm-8">@((Model.EsPrivada ? "Privada" : "Pública"))</dd>
+
+            @if (Model.Estado == Enum_EstadoPublicacion.Rechazada && !string.IsNullOrEmpty(Model.MotivoRechazo))
+            {
+                <dt class="col-sm-4 text-danger">Motivo del rechazo</dt>
+                <dd class="col-sm-8 text-danger">@Model.MotivoRechazo</dd>
+            }
+        </dl>
+
+            <h5>Contenido multimedia de la publicacion</h5>
+            <div class="row">
+                @foreach (var url in Model.UrlsMedia)
+                {
+                    <div class="col-md-3 mb-2">
+                        <img src="@url" class="img-fluid rounded" alt="media" />
+                    </div>
+                }
+            </div>
+        
+
+        @if (Model.Estado == Enum_EstadoPublicacion.Aprobada)
+        {
+            <h5 class="mt-4">Comentarios</h5>
+            @if (Model.Comentarios.Any())
+            {
+                <ul class="list-group">
+                    @foreach (var c in Model.Comentarios)
+                    {
+                        <li class="list-group-item">
+                            <strong>@c.AutorNombre</strong> (@c.RolAutor) dijo:
+                            <p>@c.Contenido</p>
+                            <small class="text-muted">@c.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</small>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No hay comentarios.</p>
+            }
+        }
+    </div>
+</div>

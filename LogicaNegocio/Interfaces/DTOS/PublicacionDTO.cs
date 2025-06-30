@@ -18,7 +18,8 @@ namespace LogicaNegocio.Interfaces.DTOS
         public bool EsPrivada { get; set; }
         public int Vistas { get; set; }
         public int CantLikes { get; set; }
-
+        
+        public int AutorId { get; set; }
         public string? NombreAutor { get; set; }
         public string RolAutor { get; set; }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LogicaDatos.Repositorio;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
@@ -87,7 +88,7 @@ namespace LogicaApp.Servicios
                 EsPrivada = pub.EsPrivada,
                 Vistas = pub.Vistas,
                 CantLikes = pub.CantLikes,
-
+                AutorId = pub.ProfesionalId ?? pub.AdminCreadorId ?? 0,
                 Comentarios = pub.Comentarios?.Select(c => new ComentarioDTO
                 {
                     ComentarioId = c.ComentarioId,
@@ -149,6 +150,11 @@ namespace LogicaApp.Servicios
             }
 
             return result;
+        }
+
+        public void CrearPublicacionImagenes(Publicacion publicacion)
+        {
+            _repo.Crear(publicacion);
         }
     }
 }

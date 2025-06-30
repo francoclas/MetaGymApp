@@ -1,9 +1,11 @@
 ﻿using Humanizer;
 using LogicaApp.DTOS;
 using LogicaApp.Servicios;
+using LogicaDatos.Repositorio;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
+using LogicaNegocio.Interfaces.Repositorios;
 using LogicaNegocio.Interfaces.Servicios;
 using MetaGymWebApp.Filtros;
 using MetaGymWebApp.Models;
@@ -328,12 +330,32 @@ namespace MetaGymWebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult SolicitarPublicacion(CrearPublicacionDTO dto)
+        public IActionResult SolicitarPublicacion(CrearPublicacionDTO dto, List<IFormFile> ArchivosMedia)
         {
-            dto.ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
 
-            publicacionServicio.CrearPublicacion(dto);
+            var publicacion = new Publicacion
+            {
+                Titulo = dto.Titulo,
+                Descripcion = dto.Descripcion,
+                FechaCreacion = DateTime.Now,
+                FechaProgramada = dto.FechaProgramada,
+                EsPrivada = dto.EsPrivada,
+                Estado = dto.FechaProgramada.HasValue ? Enum_EstadoPublicacion.Programada : Enum_EstadoPublicacion.Pendiente,
+                ProfesionalId = profesionalId,
+                ListaMedia = new List<Media>()
+            };
+            //Lo creo
+            publicacionServicio.CrearPublicacionImagenes(publicacion);
 
+            //Si hay imagenes las registro
+            if (ArchivosMedia != null && ArchivosMedia.Count > 0)
+            {
+                foreach (var archivo in ArchivosMedia)
+                {
+                    mediaServicio.GuardarArchivo(archivo,Enum_TipoEntidad.Publicacion,publicacion.Id);
+                }
+            }
             return RedirectToAction("MisPublicaciones");
         }
         //Mis publicaciones
@@ -350,7 +372,13 @@ namespace MetaGymWebApp.Controllers
         public IActionResult DetallePublicacion(int id)
         {
             var publicacion = publicacionServicio.ObtenerPorId(id);
-            if (publicacion == null) return NotFound();
+            if (publicacion == null)
+                return NotFound();
+
+            // Validación: debe pertenecer al profesional logueado
+            int idSesion = GestionSesion.ObtenerUsuarioId(HttpContext);
+            if (publicacion.RolAutor == "Profesional" && publicacion.AutorId != idSesion)
+                return Forbid(); // o RedirectToAction("MisPublicaciones");
 
             return View(publicacion);
         }

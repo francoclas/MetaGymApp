@@ -13,7 +13,7 @@ namespace LogicaNegocio.Interfaces.DTOS
         public string Descripcion { get; set; }
         public DateTime? FechaProgramada { get; set; }
         public bool EsPrivada { get; set; }
-        public List<IFormFile> ArchivosMedia { get; set; } // o IDs si ya están subidos
-        public int? ProfesionalId { get; set; } // null si la crea el admin
+        public List<IFormFile> ArchivosMedia { get; set; } = new();
+        public int? ProfesionalId { get; set; }
     }
 }

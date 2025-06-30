@@ -1,8 +1,35 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model UsuarioGenericoDTO
+
 <div class="container">
-    <h2>Todavia sin implementar</h2>
-    </div>
+    <h2>Editar Profesional</h2>
+
+    <form asp-action="GuardarEdicionProfesional" asp-controller="Admin" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Rol" />
+
+        <div class="form-group">
+            <label asp-for="Nombre"></label>
+            <input asp-for="Nombre" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Usuario">Usuario</label>
+            <input asp-for="Usuario" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Correo"></label>
+            <input asp-for="Correo" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Pass">Contraseña</label>
+            <input asp-for="Pass" type="password" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Telefono"></label>
+            <input asp-for="Telefono" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-success mt-3">Guardar cambios</button>
+    </form>

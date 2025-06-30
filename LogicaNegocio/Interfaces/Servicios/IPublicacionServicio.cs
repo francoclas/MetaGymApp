@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LogicaNegocio.Clases;
 using LogicaNegocio.Interfaces.DTOS;
 
 namespace LogicaNegocio.Interfaces.Servicios
@@ -16,5 +17,6 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<PublicacionDTO> ObtenerPendientes();
         List<PublicacionDTO> ObtenerTodas();
         List<PublicacionDTO> ObtenerPorProfesionalId(int profesionalId);
+        void CrearPublicacionImagenes(Publicacion publicacion);
     }
 }
