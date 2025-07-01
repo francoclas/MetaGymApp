@@ -10,6 +10,7 @@ namespace LogicaNegocio.Interfaces.Servicios
 {
     public interface IClienteServicio
     {
+        void ActualizarCliente(Cliente cliente);
         Cliente ObtenerPorId(int id);
 
         //Datos personales

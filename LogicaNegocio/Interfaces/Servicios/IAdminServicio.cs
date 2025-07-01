@@ -14,6 +14,8 @@ namespace LogicaNegocio.Interfaces.Servicios
         void RegistrarProfesional(string Administrador, string Usuario, string Correo, string Password, string ConfPassword);
         void RegistrarAdministrador(string Administrador, string Usuario, string Correo, string Password, string ConfPassword);
 
-        List<Admin> ObtenerTodos(); 
+        List<Admin> ObtenerTodos();
+        Admin ObtenerPorId(int id);
+        void ActualizarAdmin(Admin admin);
     }
 }

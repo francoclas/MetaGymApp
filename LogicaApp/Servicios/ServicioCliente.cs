@@ -17,6 +17,11 @@ namespace LogicaApp.Servicios
             _repoCliente = repocli;
         }
 
+        public void ActualizarCliente(Cliente cliente)
+        {
+            _repoCliente.Actualizar(cliente);
+        }
+
         public Cliente ObtenerPorId(int id)
         {
             return _repoCliente.ObtenerPorId(id);

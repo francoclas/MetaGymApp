@@ -17,9 +17,20 @@ namespace LogicaApp.Servicios
         {
             _repositorioAdmin = repo;
         }
+
+        public void ActualizarAdmin(Admin admin)
+        {
+            _repositorioAdmin.Actualizar(admin);
+        }
+
         public void CambiarCI(string UsuarioPeticion, string UsuarioACambiar, string CI)
         {
             throw new NotImplementedException();
+        }
+
+        public Admin ObtenerPorId(int id)
+        {
+            return _repositorioAdmin.ObtenerPorId(id);
         }
 
         public List<Admin> ObtenerTodos()

@@ -1,4 +1,5 @@
-﻿using LogicaApp.Servicios;
+﻿using Humanizer;
+using LogicaApp.Servicios;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
@@ -7,6 +8,7 @@ using MetaGymWebApp.Filtros;
 using MetaGymWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MetaGymWebApp.Controllers
 {
@@ -71,7 +73,7 @@ namespace MetaGymWebApp.Controllers
             }
         }
         [HttpPost]
-        public IActionResult CrearEstablecimiento(string NombreEstablecimiento, String Direccion)
+        public IActionResult CrearEstablecimiento(string NombreEstablecimiento, string Direccion)
         {
             try
             {
@@ -95,7 +97,7 @@ namespace MetaGymWebApp.Controllers
 
         }
         [HttpPost]
-        public IActionResult CrearEspecialidad(string NombreEspecialidad, String DescripcionEspecialidad)
+        public IActionResult CrearEspecialidad(string NombreEspecialidad, string DescripcionEspecialidad)
         {
             if (string.IsNullOrEmpty(NombreEspecialidad) || string.IsNullOrEmpty(DescripcionEspecialidad))
             {
@@ -143,19 +145,52 @@ namespace MetaGymWebApp.Controllers
         }
         //Editar cliente
         [HttpGet]
-                public IActionResult EditarCliente(int id)
-                {
-                    return View();
-                }
+        public IActionResult EditarCliente(int id)
+        {
+            Cliente cliente = _clienteServicio.ObtenerPorId(id);
+            UsuarioGenericoDTO dto = new UsuarioGenericoDTO
+            {
+                Id = id,
+                Nombre = cliente.NombreCompleto,
+                Usuario = cliente.NombreUsuario,
+                Correo = cliente.Correo,
+                Telefono = cliente.Telefono,
+                Rol = "Cliente"
+            };
+            return View(dto);
+        }
         [HttpPost]
         public IActionResult GuardarEdicionCliente(UsuarioGenericoDTO dto)
         {
+            if(dto.Rol != "Cliente")
+            {
+                TempData["Mensaje"] = "Vuelva a intentarlo mas tarde";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionUsuarios");
+            }
 
-            return View(dto);
+            //Obtengo cliente
+            Cliente cliente = _clienteServicio.ObtenerPorId(dto.Id);
+            //valido la info
+            if(!string.Equals(cliente.NombreCompleto,dto.Nombre))
+                cliente.NombreCompleto = dto.Nombre;
+            if(!string.Equals(cliente.Correo,dto.Correo))
+                cliente.Correo = dto.Correo;
+            if (!string.Equals(cliente.Telefono, dto.Telefono))
+                cliente.Telefono = dto.Telefono;
+                if (!string.IsNullOrEmpty(dto.Pass))
+            {
+                cliente.Pass = HashContrasena.Hashear(dto.Pass);
+            }
+            //Actualizo
+            TempData["Mensaje"] = "Se actualizo usuario: " + cliente.Correo;
+            TempData["TipoMensaje"] = "success";
+            _clienteServicio.ActualizarCliente(cliente);
+            return RedirectToAction("GestionUsuarios");
         }
-        //Editar pro
-                [HttpGet]
-                public IActionResult EditarProfesional(int id)
+        //Editar profesional
+        [HttpGet]
+        public IActionResult EditarProfesional(int id)
                 {
                     //Obtengo especialidades        
                     ViewBag.EspecialidadesDisponibles = _extraServicio.ObtenerEspecialidades();
@@ -167,23 +202,34 @@ namespace MetaGymWebApp.Controllers
                         Correo = aux.Correo,
                         Pass = aux.Pass,
                         Telefono = aux.Telefono,
-                        Especialidades = aux.Especialidades};
+                        Especialidades = aux.Especialidades,
+                        Rol = "Profesional"
+                    };
+                        
                     return View(profesional);
                 }
-                [HttpPost]
-                public IActionResult GuardarEdicionProfesional(UsuarioGenericoDTO dto, int especialidadId)
+        [HttpPost]
+        public IActionResult GuardarEdicionProfesional(UsuarioGenericoDTO dto, int especialidadId)
                 {
-                    var profesional = _profesionalServicio.ObtenerProfesional(dto.Id); // Traélo con sus especialidades
-
-                    // Mapear cambios
-                    profesional.NombreCompleto = dto.Nombre;
-                    profesional.Correo = dto.Correo;
-                    if (!string.IsNullOrEmpty(dto.Pass))
+                    if (dto.Rol != "Profesional")
                     {
-                        profesional.Pass = dto.Pass;
-
+                        TempData["Mensaje"] = "Vuelva a intentarlo mas tarde";
+                        TempData["TipoMensaje"] = "danger";
+                        return RedirectToAction("GestionUsuarios");
                     }
-                    profesional.Telefono = dto.Telefono;
+                    Profesional profesional = _profesionalServicio.ObtenerProfesional(dto.Id); // Traélo con sus especialidades
+
+                    // Mapear cambios solo si es diferente del original
+                    if(!string.Equals(profesional.NombreCompleto,dto.Nombre))
+                        profesional.NombreCompleto = dto.Nombre;
+                    if(!string.Equals(profesional.Correo,dto.Correo))
+                        profesional.Correo = dto.Correo;
+                    if (!string.IsNullOrEmpty(dto.Pass))
+                    { 
+                        profesional.Pass = HashContrasena.Hashear(dto.Pass);
+                    }
+                    if (!string.Equals(profesional.Telefono, dto.Telefono))
+                        profesional.Telefono = dto.Telefono;
                     if (especialidadId != 0)
                     {
                         var especialidad = _extraServicio.ObtenerEspecialidad(especialidadId);
@@ -192,10 +238,58 @@ namespace MetaGymWebApp.Controllers
                     else
                     {
                         _profesionalServicio.ActualizarProfesional(profesional);
-                    }
+                        TempData["Mensaje"] = "Se actualizo usuario: " + profesional.Correo;
+                        TempData["TipoMensaje"] = "success";
+            }
 
                     return RedirectToAction("GestionUsuarios");
                 }
+        //Editar admin
+        [HttpGet]
+        public IActionResult EditarAdmin(int id)
+        {
+            Admin admin = _adminServicio.ObtenerPorId(id);
+            UsuarioGenericoDTO dto = new UsuarioGenericoDTO
+            {
+                Id = id,
+                Nombre = admin.NombreCompleto,
+                Usuario = admin.NombreUsuario,
+                Correo = admin.Correo,
+                Telefono = admin.Telefono,
+                Rol = "Admin"
+            };
+            return View(dto);
+        }
+        [HttpPost]
+        public IActionResult GuardarEdicionAdmin(UsuarioGenericoDTO dto)
+        {
+            if (dto.Rol != "Admin")
+            {
+                TempData["Mensaje"] = "Vuelva a intentarlo mas tarde";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionUsuarios");
+            }
+            //Obtengo cliente
+            Admin admin = _adminServicio.ObtenerPorId(dto.Id);
+            //valido la info
+            if (!string.Equals(admin.NombreCompleto, dto.Nombre))
+                admin.NombreCompleto = dto.Nombre;
+            if (!string.Equals(admin.Correo, dto.Correo))
+                admin.Correo = dto.Correo;
+            if (!string.Equals(admin.Telefono, dto.Telefono))
+                admin.Telefono = dto.Telefono;
+            if (!string.IsNullOrEmpty(dto.Pass))
+            {
+                admin.Pass = HashContrasena.Hashear(dto.Pass);
+            }
+            _adminServicio.ActualizarAdmin(admin);
+            //Actualizo
+            TempData["Mensaje"] = "Se actualizo usuario: " + admin.Correo;
+            TempData["TipoMensaje"] = "success";
+            return RedirectToAction("GestionUsuarios");
+
+        }
+
 
         //Seccion extras
         [HttpGet]
@@ -336,12 +430,6 @@ namespace MetaGymWebApp.Controllers
 
             return RedirectToAction("EditarUsuario", new { id = profesionalId, rol = "Profesional" });
         }
-        //Editar admin
-        [HttpGet]
-                public IActionResult EditarAdmin(int id)
-                {
-                    return View();
-                }
         private List<UsuarioGenericoDTO> ObtenerUsuariosListado()
         {
             var clientes = _clienteServicio.ObtenerTodos()
