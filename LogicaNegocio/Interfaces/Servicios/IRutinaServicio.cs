@@ -10,8 +10,6 @@ namespace LogicaNegocio.Interfaces.Servicios
 {
     public interface IRutinaServicio
     {
-
-
         //Gestion de Ejercicios
         Ejercicio GenerarNuevoEjercicio(Ejercicio ejercicio);
         void ModificarEjercicio (Ejercicio ejercicio);

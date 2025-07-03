@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace LogicaNegocio.Clases
 {
+    //Rutina a modo de plantilla
     public class RutinaEjercicio
     {
         public int Id { get; set; }

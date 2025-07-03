@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace LogicaNegocio.Clases
 {
+    //Es el ejercicio base
     public class Ejercicio
     {
         public Ejercicio() { }
@@ -23,9 +24,6 @@ namespace LogicaNegocio.Clases
         public int ProfesionalId { get; set; }
         public Profesional Profesional { get; set; }
         public List<Media> Medias { get; set; } = new List<Media>();
-
         public List<SesionRutina> RutinaEjercicios { get; set; } = new List<SesionRutina> { };
-
-
     }
 }

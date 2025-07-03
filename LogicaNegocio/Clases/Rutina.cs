@@ -10,26 +10,17 @@ namespace LogicaNegocio.Clases
 {
     public class Rutina
     {
-        public Rutina() { }
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string NombreRutina { get; set; }
-
-        [ForeignKey("Profesional")]
-        [InverseProperty("RutinasCreadasProfesional")]
         public int ProfesionalId { get; set; }
         public Profesional Profesional { get; set; }
-
         public string Tipo { get; set; }
 
-        public List<SesionRutina> RutinaEjercicios { get; set; }
-
-        public List<Cliente> Asignados = new List<Cliente>();
-        public List<RutinaEjercicio> Ejercicios { get; set; } = new();
         public DateTime FechaCreacion { get; set; }
-        public DateTime FechaModificacion{ get; set; }
+        public DateTime FechaModificacion { get; set; }
 
-
+        public List<RutinaEjercicio> Ejercicios { get; set; } = new();
+        public List<RutinaAsignada> Asignaciones { get; set; } = new();
     }
 }
