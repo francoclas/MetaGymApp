@@ -1,64 +1,91 @@
 ﻿@model MisPublicacionesAdminModelo
-
 @{
     ViewData["Title"] = "Mis Publicaciones";
 }
 <link rel="stylesheet" href="~/css/misPublicacionesAdmin.css" />
 
-<h2 class="text-white mb-3">Mis Publicaciones (Administrador)</h2>
+<h2 class="text-white">Mis Publicaciones</h2>
 
-<ul class="nav nav-tabs mb-3" id="tabsPublicaciones">
+<ul class="nav nav-tabs mt-4" id="tabsPublicaciones">
     <li class="nav-item">
-        <a class="nav-link active" data-tab="creadas">Creadas por mí</a>
+        <a class="nav-link active" data-tab="creadas">Creadas</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-tab="autorizadas">Autorizadas</a>
+        <a class="nav-link" data-tab="aprobadas">Aprobadas</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-tab="rechazadas">Rechazadas</a>
     </li>
 </ul>
 
-<div id="creadas" class="tab-content-publicaciones">
-    @if (!Model.PublicacionesCreadas.Any())
-    {
-        <p class="text-muted">No has creado ninguna publicación todavía.</p>
-    }
-    else
-    {
-        <div class="contenedor-publicaciones">
-            @foreach (var pub in Model.PublicacionesCreadas)
-            {
-                <div class="card tarjeta-publicacion" data-titulo="@pub.Titulo.ToLower()" data-fecha="@pub.FechaCreacion.ToString("yyyy-MM-dd")">
-                    <div class="card-body">
-                        <h5 class="card-title">@pub.Titulo</h5>
-                        <p><strong>Fecha:</strong> @pub.FechaCreacion.ToShortDateString()</p>
-                        <a href="/Admin/DetallesPublicacion?id=@pub.Id" class="btn btn-danger">Ver</a>
+<div class="tab-section mt-4">
+    <div id="creadas" class="tab-content">
+        @if (Model.PublicacionesCreadas.Any())
+        {
+            <div class="d-flex flex-wrap gap-3">
+                @foreach (var pub in Model.PublicacionesCreadas)
+                {
+                    <div class="card card-publicacion">
+                        <div class="card-body">
+                            <h5 class="card-title">@pub.Titulo</h5>
+                            <p class="card-text">@pub.Descripcion</p>
+                            <a href="@Url.Action("DetallePublicacion", "Admin", new { id = pub.Id })" class="btn btn-outline-light btn-sm">Ver detalles</a>
+                        </div>
                     </div>
-                </div>
-            }
-        </div>
-    }
-</div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">No hay publicaciones creadas.</p>
+        }
+    </div>
 
-<div id="autorizadas" class="tab-content-publicaciones d-none">
-    @if (!Model.PublicacionesAutorizadas.Any())
-    {
-        <p class="text-muted">No has autorizado publicaciones aún.</p>
-    }
-    else
-    {
-        <div class="contenedor-publicaciones">
-            @foreach (var pub in Model.PublicacionesAutorizadas)
-            {
-                <div class="card tarjeta-publicacion" data-titulo="@pub.Titulo.ToLower()" data-fecha="@pub.FechaCreacion.ToString("yyyy-MM-dd")">
-                    <div class="card-body">
-                        <h5 class="card-title">@pub.Titulo</h5>
-                        <p><strong>Autor:</strong> @pub.NombreAutor</p>
-                        <p><strong>Fecha de aprobación:</strong> @pub.FechaCreacion.ToShortDateString()</p>
-                        <a href="/Admin/DetallesPublicacion?id=@pub.Id" class="btn btn-danger">Ver</a>
+    <div id="aprobadas" class="tab-content d-none">
+        @if (Model.PublicacionesAutorizadas.Any())
+        {
+            <div class="d-flex flex-wrap gap-3">
+                @foreach (var pub in Model.PublicacionesAutorizadas)
+                {
+                    <div class="card card-publicacion">
+                        <div class="card-body">
+                            <h5 class="card-title">@pub.Titulo</h5>
+                            <p class="card-text">@pub.Descripcion</p>
+                            <a href="@Url.Action("DetallePublicacion", "Admin", new { id = pub.Id })" class="btn btn-outline-light btn-sm">Ver detalles</a>
+                        </div>
                     </div>
-                </div>
-            }
-        </div>
-    }
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">No hay publicaciones aprobadas.</p>
+        }
+    </div>
+
+    <div id="rechazadas" class="tab-content d-none">
+        @if (Model.PublicacionesRechazadas.Any())
+        {
+            <div class="d-flex flex-wrap gap-3">
+                @foreach (var pub in Model.PublicacionesRechazadas)
+                {
+                    <div class="card card-publicacion border-danger">
+                        <div class="card-body">
+                            <h5 class="card-title text-danger">@pub.Titulo</h5>
+                            <p class="card-text">@pub.Descripcion</p>
+                            <hr />
+                            <p><strong>Motivo del rechazo:</strong> <span class="text-warning">@pub.MotivoRechazo</span></p>
+                            <a href="@Url.Action("DetallePublicacion", "Admin", new { id = pub.Id })" class="btn btn-outline-danger btn-sm">Ver detalles</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">No hay publicaciones rechazadas.</p>
+        }
+    </div>
 </div>
 
 @section Scripts {

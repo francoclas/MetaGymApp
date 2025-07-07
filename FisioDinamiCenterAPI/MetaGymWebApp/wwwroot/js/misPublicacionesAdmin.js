@@ -1,15 +1,14 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
-    const tabs = document.querySelectorAll("#tabsPublicaciones .nav-link");
-    const contents = document.querySelectorAll(".tab-content-publicaciones");
+﻿document.addEventListener("DOMContentLoaded", () => {
+    const tabs = document.querySelectorAll("[data-tab]");
+    const contents = document.querySelectorAll(".tab-content");
 
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
             tabs.forEach(t => t.classList.remove("active"));
-            contents.forEach(c => c.classList.add("d-none"));
-
             tab.classList.add("active");
-            const target = tab.dataset.tab;
-            document.getElementById(target).classList.remove("d-none");
+
+            contents.forEach(c => c.classList.add("d-none"));
+            document.getElementById(tab.dataset.tab).classList.remove("d-none");
         });
     });
 });

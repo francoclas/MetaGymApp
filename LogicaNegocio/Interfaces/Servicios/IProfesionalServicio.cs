@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LogicaNegocio.Clases;
+using LogicaNegocio.Interfaces.DTOS;
 
 namespace LogicaNegocio.Interfaces.Servicios
 {
@@ -25,7 +26,5 @@ namespace LogicaNegocio.Interfaces.Servicios
            
         //Relacionado a publicacion
             void EnviarPublicacion (Publicacion publicacion);
-             
-
     }
 }

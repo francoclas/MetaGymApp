@@ -466,7 +466,8 @@ namespace MetaGymWebApp.Controllers
             var modelo = new MisPublicacionesAdminModelo
             {
                 PublicacionesCreadas = _publicacionServicio.ObtenerCreadasPorAdmin(adminId),
-                PublicacionesAutorizadas = _publicacionServicio.ObtenerAutorizadasPorAdmin(adminId)
+                PublicacionesAutorizadas = _publicacionServicio.ObtenerAutorizadasPorAdmin(adminId),
+                PublicacionesRechazadas = _publicacionServicio.ObtenerRechazadasPorAdmin(adminId)
             };
 
             return View(modelo);

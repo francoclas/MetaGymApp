@@ -179,7 +179,16 @@ namespace LogicaApp.Servicios
             }
             return salida;
         }
-
+        public List<PublicacionDTO> ObtenerRechazadasPorAdmin(int adminId)
+        {
+            List<PublicacionDTO> salida = new List<PublicacionDTO>();
+            List<Publicacion> lista = _repo.ObtenerRechazadasAdmin(adminId);
+            foreach (var o in lista)
+            {
+                salida.Add(ConvertirAPublicacionDTO(o));
+            }
+            return salida;
+        }
         public void AprobarPublicacion(int publicacionId, int adminId)
         {
             Publicacion publicacion = _repo.ObtenerPorId(publicacionId);
@@ -208,5 +217,7 @@ namespace LogicaApp.Servicios
 
             _repo.Actualizar(publicacion);
         }
+
+       
     }
 }

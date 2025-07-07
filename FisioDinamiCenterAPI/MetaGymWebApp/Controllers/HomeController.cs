@@ -23,9 +23,14 @@ namespace MetaGymWebApp.Controllers
             return View("AcercaDe");
         }
 
-        public IActionResult Privacy()
+        public IActionResult PoliticaPrivacidad()
         {
-            return View();
+            return View("~/Views/Legal/PoliticaPrivacidad.cshtml");
+        }
+
+        public IActionResult TerminosUso()
+        {
+            return View("~/Views/Legal/TerminosUso.cshtml");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

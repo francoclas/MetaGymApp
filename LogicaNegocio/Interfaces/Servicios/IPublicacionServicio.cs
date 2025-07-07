@@ -22,5 +22,6 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<PublicacionDTO> ObtenerAutorizadasPorAdmin(int adminId);
         void AprobarPublicacion(int publicacionId, int v);
         void RechazarPublicacion(int publicacionId, string motivoRechazo, int v);
+        List<PublicacionDTO> ObtenerRechazadasPorAdmin(int adminId);
     }
 }

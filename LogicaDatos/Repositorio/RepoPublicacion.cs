@@ -82,7 +82,15 @@ namespace LogicaDatos.Repositorio
             return _context.Publicaciones
                 .Include(p => p.ListaMedia)
                 .Include(p => p.Profesional)
-                .Where(p => p.AdminAprobadorId == adminId)
+                .Where(p => p.AdminAprobadorId == adminId && p.Estado == Enum_EstadoPublicacion.Aprobada)
+                .ToList();
+        }
+        public List<Publicacion> ObtenerRechazadasAdmin(int adminId)
+        {
+            return _context.Publicaciones
+                .Include(p => p.ListaMedia)
+                .Include(p => p.Profesional)
+                .Where(p => p.AdminAprobadorId == adminId && p.Estado == Enum_EstadoPublicacion.Rechazada )
                 .ToList();
         }
         public void Actualizar(Publicacion entidad)
@@ -90,5 +98,7 @@ namespace LogicaDatos.Repositorio
             _context.Publicaciones.Update(entidad);
             _context.SaveChanges();
         }
+
+        
     }
 }

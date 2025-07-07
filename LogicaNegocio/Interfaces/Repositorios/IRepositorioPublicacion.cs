@@ -19,5 +19,6 @@ namespace LogicaNegocio.Interfaces.Repositorios
         List<Publicacion> ObtenerCreadasAdmin(int adminId);
         List<Publicacion> ObtenerAprobadasAdmin(int adminId);
         void Actualizar(Publicacion publicacion);
+        List<Publicacion> ObtenerRechazadasAdmin(int adminId);
     }
 }
