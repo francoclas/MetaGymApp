@@ -108,6 +108,7 @@ namespace LogicaNegocio.Servicios
                 {
                     UsuarioId = admin.Id,
                     Nombre = admin.NombreUsuario,
+                    NombreCompleto = admin.NombreCompleto,
                     Rol = "Admin"
                 };
             }
@@ -120,6 +121,7 @@ namespace LogicaNegocio.Servicios
                 {
                     UsuarioId = profesional.Id,
                     Nombre = profesional.NombreUsuario,
+                    NombreCompleto = profesional.NombreCompleto,
                     Rol = "Profesional"
                 };
             }
@@ -132,6 +134,7 @@ namespace LogicaNegocio.Servicios
                 {
                     UsuarioId = cliente.Id,
                     Nombre = cliente.NombreUsuario,
+                    NombreCompleto = cliente.NombreCompleto,
                     Rol = "Cliente"
                 };
             }

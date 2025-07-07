@@ -1,1 +1,34 @@
-﻿<h2>Sin implementar</h2>
+﻿@using LogicaNegocio.Clases
+@model List<RutinaAsignada>
+
+@{
+    ViewData["Title"] = "Mis Rutinas";
+}
+<div>
+    <div class="justify-content-between">
+        <h2>Mis Rutinas Asignadas</h2>
+        <div class="text-start mt-4 py-2">
+            <a href="@Url.Action("HistoricoSesionesEntrenamiento", "Cliente")" class="btn btn-outline-danger">
+                Ver historial de entrenamientos
+            </a>
+        </div>
+    </div>
+    @if (!Model.Any())
+    {
+        <p>No tenés rutinas asignadas actualmente.</p>
+    }
+    else
+    {
+        <div class="lista-rutinas">
+            @foreach (var rutina in Model)
+            {
+                <div class="card mb-3 p-3 border">
+                    <h4>@rutina.Rutina.NombreRutina</h4>
+                    <p><strong>Tipo:</strong> @rutina.Rutina.Tipo</p>
+                    <p><strong>Asignada el:</strong> @rutina.FechaAsignacion.ToShortDateString()</p>
+                    <a class="btn btn-primary" asp-action="DetallesRutinaAsignada" asp-route-id="@rutina.Id">Ver rutina</a>
+                </div>
+            }
+        </div>
+    }
+</div>

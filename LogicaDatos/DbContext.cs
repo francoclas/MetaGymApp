@@ -25,7 +25,8 @@ namespace LogicaDatos
         public DbSet<Ejercicio> Ejercicios { get; set; }
         public DbSet<Rutina> Rutinas { get; set; }  
         public DbSet<RutinaEjercicio> RutinaEjercicios { get; set; }
-        public DbSet<SesionRutina> RutinasRealizadasClientes { get; set; }
+        public DbSet<RutinaAsignada> RutinasAsignadas { get; set; }        
+        public DbSet<SesionRutina> SesionesRutina { get; set; }          
         public DbSet<EjercicioRealizado> EjercicioRealizadosPorClientes { get; set; }
         public DbSet<SerieRealizada> SeriesParaEjerciciosDeCliente { get; set; }
 

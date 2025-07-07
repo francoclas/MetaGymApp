@@ -10,19 +10,38 @@ namespace LogicaNegocio.Interfaces.Servicios
 {
     public interface IRutinaServicio
     {
-        //Gestion de Ejercicios
-        Ejercicio GenerarNuevoEjercicio(Ejercicio ejercicio);
-        void ModificarEjercicio (Ejercicio ejercicio);
-        List<EjercicioDTO> ObtenerTodosEjercicios();
-        List<EjercicioDTO> ObtenerEjerciciosProfesional(int Id);
-        //Gestion de rutinas
+        // Rutinas
         List<Rutina> ObtenerRutinasProfesional(int profesionalId);
-        List<Rutina> ObtenerTodasRutinas();
-        Rutina GenerarNuevaRutina (Rutina rutina);
-            void ModificarRutina (Rutina rutina);
-            void AsignarRutina(Rutina rutina, Cliente cliente);
-            void DesasignarRutina(Rutina rutina, Cliente cliente);
-        EjercicioDTO ObtenerEjercicioDTOId(int id);
+        Rutina GenerarNuevaRutina(Rutina rutina);
+        void ModificarRutina(Rutina rutina);
+        Rutina ObtenerRutinaPorId(int id);
+        List<SesionRutina> ObtenerSesionesPorAsignacion(int rutinaAsignadaId);
+        // Ejercicios
+        Ejercicio GenerarNuevoEjercicio(Ejercicio ejercicio);
+        void ModificarEjercicio(Ejercicio ejercicio);
+        List<EjercicioDTO> ObtenerTodosEjercicios();
+        List<EjercicioDTO> ObtenerEjerciciosProfesional(int profesionalId);
         Ejercicio ObtenerEjercicioId(int id);
+        EjercicioDTO ObtenerEjercicioDTOId(int id);
+
+        // Asignaciones
+        void AsignarRutinaACliente(int clienteId, int rutinaId);
+        List<RutinaAsignada> ObtenerRutinasAsignadasCliente(int clienteId);
+        void RemoverAsignacion(int rutinaAsignadaId);
+        bool ClienteTieneRutinaAsignada(int clienteId, int rutinaId);
+        void ReemplazarAsignaciones(int rutinaId, List<int> nuevosClienteIds);
+
+        // Sesiones
+        SesionRutina RegistrarSesion(SesionRutina sesion);
+        List<SesionRutina> ObtenerHistorialCliente(int clienteId);
+        SesionRutina? ObtenerSesionPorId(int sesionId);
+       
+        List<Rutina> ObtenerTodasRutinas();
+        void AsignarRutina(Rutina rutina, Cliente cliente);
+        void DesasignarRutina(Rutina rutina, Cliente cliente);
+        List<RutinaAsignada> ObtenerAsignacionesPorRutina(int rutinaId);
+        //DTOs
+        RutinaAsignadaDTO ObtenerDetalleRutinaAsignadaDTO(int rutinaAsignadaId, int clienteId);
+
     }
 }

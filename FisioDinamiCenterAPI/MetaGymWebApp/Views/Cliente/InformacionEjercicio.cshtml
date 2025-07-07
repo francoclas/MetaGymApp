@@ -1,0 +1,59 @@
+﻿@using LogicaNegocio.Extra
+@model EjercicioDTO
+@{
+    ViewData["Title"] = "Información del Ejercicio";
+}
+<link rel="stylesheet" href="~/css/infoEjercicio.css" />
+<script src="~/js/infoEjercicio.js"></script>
+<div class="container">
+    <h2>@Model.Nombre</h2>
+    <p class="autor">(Creado por Profesional ID: @Model.ProfesionalId)</p>
+    <p class="info">@Model.Tipo | Grupo muscular: @Model.GrupoMuscular</p>
+
+    <hr />
+    <h3>Instrucciones</h3>
+    @if (!string.IsNullOrWhiteSpace(Model.Instrucciones))
+    {
+            <div class="instrucciones">
+            @Model.Instrucciones
+            </div>
+    }
+    else
+    {
+            <p class="no-instrucciones">Este ejercicio no cuenta con instrucciones, pero podés mirar los videos a continuación.</p>
+    }
+
+    <hr />
+    <h3>Videos</h3>
+    @if (Model.Medias.Any(m => m.Tipo == Enum_TipoMedia.Video))
+    {
+            <div class="contenedor-videos">
+            @foreach (var media in Model.Medias.Where(m => m.Tipo == Enum_TipoMedia.Video))
+            {
+                        <video controls src="@media.Url" class="video"></video>
+            }
+            </div>
+    }
+    else
+    {
+            <p class="no-videos">No hay videos disponibles para este ejercicio.</p>
+    }
+
+    <hr />
+    <h3>Imágenes</h3>
+    @if (Model.Medias.Any(m => m.Tipo == Enum_TipoMedia.Imagen))
+    {
+            <div class="slideshow-container" id="slideshow">
+            @foreach (var media in Model.Medias.Where(m => m.Tipo == Enum_TipoMedia.Imagen))
+            {
+                        <div class="slide">
+                            <img src="@media.Url" alt="Imagen del ejercicio" class="slide-img" />
+                        </div>
+            }
+            </div>
+    }
+    else
+    {
+            <p class="no-imagenes">No hay imágenes disponibles para este ejercicio.</p>
+    }
+</div>

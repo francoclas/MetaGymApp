@@ -1,68 +1,59 @@
+/* ========== Reset & base ========== */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+    body > main {
+        flex: 1;
+    }
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    background-color: #121212;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
 }
-/* Fuentes */
 
-/* Titulados*/
+/* ========== Fuentes ========== */
 h1, h2, h3, .titulo {
     font-family: 'Anton', sans-serif;
     letter-spacing: 1px;
     text-transform: uppercase;
 }
 
-/* Textos */
 body, p, span, a, .texto {
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
     line-height: 1.6;
-    color: #fff;
     font-size: 1.1rem;
+    color: #fff;
 }
 
+/* ========== Hero Banner ========== */
 .hero-banner {
     background-image: url('/MediaWeb/Imagenes/banner-motivacion.jpg');
     background-size: cover;
     background-position: center;
-    height: 70vh; 
-    width: 100vw;
+    height: 100vh;
     padding: 0 20px;
     position: relative;
     margin: 0;
     overflow: hidden;
 }
-
-    /* Estilos del navegador */
-.nav-link.menu-link {
-    font-size: 1.4rem;
-    color: #e50914;
-    padding: 8px 12px;
-    transition: background-color 0.3s, color 0.3s;
-    border-radius: 5px;
-}
-
-    .nav-link.menu-link:hover {
-        color: white;
-        background-color: rgba(229, 9, 20, 0.6); /* rojo translúcido */
-    }
 
     .hero-banner::before {
         content: '';
@@ -76,13 +67,22 @@ body, p, span, a, .texto {
         position: relative;
         z-index: 2;
     }
-body {
-    background-color: #121212;
-    color: #fff;
-    font-family: 'Segoe UI', sans-serif;
+
+/* ========== Navbar ========== */
+.nav-link.menu-link {
+    font-size: 1.4rem;
+    color: #e50914;
+    padding: 8px 12px;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 5px;
 }
 
-/* Links */
+    .nav-link.menu-link:hover {
+        color: white;
+        background-color: rgba(229, 9, 20, 0.6);
+    }
+
+/* ========== Enlaces & botones ========== */
 a, .nav-link {
     color: #e50914;
     text-decoration: none;
@@ -92,19 +92,29 @@ a, .nav-link {
         color: #ff4b4b;
     }
 
-/* Botones */
 .btn-primary {
     background-color: #e50914;
     border: none;
+    border-radius: 2px;
 }
 
     .btn-primary:hover {
         background-color: #ff1a1a;
     }
 
-/* Tarjetas */
+.btn-login {
+    background-color: #e50914;
+    color: white;
+    font-weight: bold;
+}
+
+    .btn-login:hover {
+        background-color: #ff1f1f;
+    }
+
+/* ========== Tarjetas ========== */
 .card {
-    background-color: 	#1e1e1e;
+    background-color: #1e1e1e;
     color: #fff;
     border: 1px solid #333;
 }
@@ -118,35 +128,19 @@ a, .nav-link {
             background-color: #c40612;
         }
 
-/* Hero seccion inicio */
-.hero-banner {
-    background-size: cover;
-    background-position: center;
-    height: 100vh;
-    padding: 0 20px;
-    position: relative;
-    color: #fff;
+/* ========== Tablas y formularios ========== */
+.tabla-clientes {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
 }
 
-    .hero-banner::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 1;
+    .tabla-clientes th, .tabla-clientes td {
+        border: 1px solid #333;
+        padding: 5px;
     }
 
-    .hero-banner > div {
-        position: relative;
-        z-index: 2;
-    }
-
-/* Secciones */
-.section {
-    padding: 60px 0;
-}
-/* Seccion inicio de sesion */
-
+/* ========== Login Section ========== */
 .login-wrapper {
     min-height: 100vh;
     background-color: black;
@@ -159,7 +153,7 @@ a, .nav-link {
 }
 
 .login-card {
-    background-color: 	#1e1e1e;
+    background-color: #1e1e1e;
     border-radius: 8px;
     max-width: 400px;
     width: 100%;
@@ -167,16 +161,7 @@ a, .nav-link {
     color: white;
 }
 
-.btn-login {
-    background-color: #e50914;
-    color: white;
-    font-weight: bold;
-}
-
-    .btn-login:hover {
-        background-color: #ff1f1f;
-    }
-/*Cartas tabla*/
+/* ========== Cartas de ejercicios ========== */
 .card-ejercicio {
     width: 150px;
     padding: 10px;
@@ -194,13 +179,67 @@ a, .nav-link {
         border-radius: 5px;
     }
 
-.tabla-clientes {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 15px;
+/* Listas con botones (ej: ejercicios seleccionados) */
+ul {
+    list-style-type: none;
+    padding: 0;
 }
 
-    .tabla-clientes th, .tabla-clientes td {
-        border: 1px solid #333;
-        padding: 5px;
+    ul li button {
+        margin-left: 10px;
+        background-color: red;
+        color: white;
+        border: none;
+        padding: 1px 6px;
+        border-radius: 50%;
+        cursor: pointer;
     }
+
+/* ========== Footer ========== */
+.footer-container {
+    background-color: #1c1c1c;
+    color: #ccc;
+    padding: 10px 0 4px 0;
+    font-size: 0.7rem;
+    border-top: 1px solid #77000055;
+    text-align: center;
+    line-height: 1.4;
+}
+
+    .footer-container .row {
+        margin-bottom: 4px;
+    }
+
+    .footer-container h6 {
+        font-size: 0.75rem;
+        margin-bottom: 2px;
+        color: #e50914;
+        font-weight: bold;
+    }
+
+    .footer-container p,
+    .footer-container a {
+        margin: 0;
+        font-size: 0.75rem;
+        color: #ccc;
+    }
+
+        .footer-container a:hover {
+            color: #fff;
+        }
+
+.footer-bottom {
+    border-top: 1px solid #333;
+    padding-top: 4px;
+    margin-top: 4px;
+    font-size: 0.7rem;
+    color: #777;
+}
+
+
+/* Hero banners y footer full-width */
+.hero-banner, footer .footer-container {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    position: relative;
+}

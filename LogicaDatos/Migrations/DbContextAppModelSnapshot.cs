@@ -263,17 +263,20 @@ namespace LogicaDatos.Migrations
                     b.Property<string>("Observaciones")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RutinaEjercicioId")
+                    b.Property<int?>("Orden")
                         .HasColumnType("int");
 
                     b.Property<bool>("SeRealizo")
                         .HasColumnType("bit");
 
+                    b.Property<int>("SesionRutinaId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EjercicioId");
 
-                    b.HasIndex("RutinaEjercicioId");
+                    b.HasIndex("SesionRutinaId");
 
                     b.ToTable("EjercicioRealizadosPorClientes");
                 });
@@ -484,9 +487,6 @@ namespace LogicaDatos.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ClienteId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
@@ -506,11 +506,35 @@ namespace LogicaDatos.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClienteId");
-
                     b.HasIndex("ProfesionalId");
 
                     b.ToTable("Rutinas");
+                });
+
+            modelBuilder.Entity("LogicaNegocio.Clases.RutinaAsignada", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaAsignacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RutinaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClienteId");
+
+                    b.HasIndex("RutinaId");
+
+                    b.ToTable("RutinasAsignadas");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.RutinaEjercicio", b =>
@@ -547,9 +571,6 @@ namespace LogicaDatos.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ClienteId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("DuracionMin")
                         .HasColumnType("int");
 
@@ -559,18 +580,16 @@ namespace LogicaDatos.Migrations
                     b.Property<DateTime>("FechaRealizada")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("RutinaId")
+                    b.Property<int>("RutinaAsignadaId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClienteId");
-
                     b.HasIndex("EjercicioId");
 
-                    b.HasIndex("RutinaId");
+                    b.HasIndex("RutinaAsignadaId");
 
-                    b.ToTable("RutinasRealizadasClientes");
+                    b.ToTable("SesionesRutina");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Extra.SerieRealizada", b =>
@@ -582,9 +601,6 @@ namespace LogicaDatos.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("EjercicioRealizadoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NumeroSerie")
                         .HasColumnType("int");
 
                     b.Property<float?>("PesoUtilizado")
@@ -702,15 +718,15 @@ namespace LogicaDatos.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogicaNegocio.Clases.SesionRutina", "RutinaEjercicio")
+                    b.HasOne("LogicaNegocio.Clases.SesionRutina", "SesionRutina")
                         .WithMany("EjericiosRealizados")
-                        .HasForeignKey("RutinaEjercicioId")
+                        .HasForeignKey("SesionRutinaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Ejercicio");
 
-                    b.Navigation("RutinaEjercicio");
+                    b.Navigation("SesionRutina");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Media", b =>
@@ -781,10 +797,6 @@ namespace LogicaDatos.Migrations
 
             modelBuilder.Entity("LogicaNegocio.Clases.Rutina", b =>
                 {
-                    b.HasOne("LogicaNegocio.Clases.Cliente", null)
-                        .WithMany("Rutinas")
-                        .HasForeignKey("ClienteId");
-
                     b.HasOne("LogicaNegocio.Clases.Profesional", "Profesional")
                         .WithMany("Rutinas")
                         .HasForeignKey("ProfesionalId")
@@ -792,6 +804,25 @@ namespace LogicaDatos.Migrations
                         .IsRequired();
 
                     b.Navigation("Profesional");
+                });
+
+            modelBuilder.Entity("LogicaNegocio.Clases.RutinaAsignada", b =>
+                {
+                    b.HasOne("LogicaNegocio.Clases.Cliente", "Cliente")
+                        .WithMany("RutinasAsignadas")
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LogicaNegocio.Clases.Rutina", "Rutina")
+                        .WithMany("Asignaciones")
+                        .HasForeignKey("RutinaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
+
+                    b.Navigation("Rutina");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.RutinaEjercicio", b =>
@@ -815,25 +846,17 @@ namespace LogicaDatos.Migrations
 
             modelBuilder.Entity("LogicaNegocio.Clases.SesionRutina", b =>
                 {
-                    b.HasOne("LogicaNegocio.Clases.Cliente", "Cliente")
-                        .WithMany("SesionesEntrenadas")
-                        .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("LogicaNegocio.Clases.Ejercicio", null)
                         .WithMany("RutinaEjercicios")
                         .HasForeignKey("EjercicioId");
 
-                    b.HasOne("LogicaNegocio.Clases.Rutina", "Rutina")
-                        .WithMany("RutinaEjercicios")
-                        .HasForeignKey("RutinaId")
+                    b.HasOne("LogicaNegocio.Clases.RutinaAsignada", "RutinaAsignada")
+                        .WithMany("Sesiones")
+                        .HasForeignKey("RutinaAsignadaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Cliente");
-
-                    b.Navigation("Rutina");
+                    b.Navigation("RutinaAsignada");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Extra.SerieRealizada", b =>
@@ -860,9 +883,7 @@ namespace LogicaDatos.Migrations
 
                     b.Navigation("Comentarios");
 
-                    b.Navigation("Rutinas");
-
-                    b.Navigation("SesionesEntrenadas");
+                    b.Navigation("RutinasAsignadas");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Comentario", b =>
@@ -916,9 +937,14 @@ namespace LogicaDatos.Migrations
 
             modelBuilder.Entity("LogicaNegocio.Clases.Rutina", b =>
                 {
-                    b.Navigation("Ejercicios");
+                    b.Navigation("Asignaciones");
 
-                    b.Navigation("RutinaEjercicios");
+                    b.Navigation("Ejercicios");
+                });
+
+            modelBuilder.Entity("LogicaNegocio.Clases.RutinaAsignada", b =>
+                {
+                    b.Navigation("Sesiones");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.SesionRutina", b =>

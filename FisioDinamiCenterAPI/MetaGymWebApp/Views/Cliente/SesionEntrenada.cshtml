@@ -1,0 +1,70 @@
+﻿@using LogicaNegocio.Clases
+@using LogicaNegocio.Extra
+@model SesionRutina
+
+@{
+    ViewData["Title"] = "Detalle de Sesión Entrenada";
+}
+
+<link rel="stylesheet" href="~/css/sesionEntrenada.css" />
+
+<h2>@ViewBag.RutinaNombre</h2>
+
+<div class="info-sesion">
+    <span><strong>Duración:</strong> @(Model.DuracionMin ?? 0) min</span>
+    <span><strong>Fecha:</strong> @Model.FechaRealizada.ToShortDateString()</span>
+</div>
+
+<hr />
+
+@if (!Model.EjerciciosRealizados.Any())
+{
+    <p>No hay ejercicios registrados para esta sesión.</p>
+}
+else
+{
+    <div class="contenedor-ejercicios">
+        @foreach (var realizado in Model.EjerciciosRealizados.OrderBy(e => e.EjercicioId))
+        {
+            var ejercicio = realizado.Ejercicio;
+            var img = ejercicio?.Medias?.FirstOrDefault(m => m.Tipo == Enum_TipoMedia.Imagen)?.Url ?? "/img/default.png";
+
+            <div class="tarjeta-ejercicio">
+                <img src="@img" class="img-ejercicio" />
+                <h4>@ejercicio?.Nombre</h4>
+                <hr />
+
+                @if (realizado.SeRealizo)
+                {
+                    <table>
+                        <thead>
+                            <tr><th>Serie</th><th>Repeticiones</th><th>Peso</th></tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < realizado.Series.Count; i++)
+                            {
+                                var s = realizado.Series[i];
+                                <tr>
+                                    <td>Serie @(i + 1)</td>
+                                    <td>@s.Repeticiones</td>
+                                    <td>@(s.PesoUtilizado.HasValue ? $"{s.PesoUtilizado} kg" : "-")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    @if (!string.IsNullOrWhiteSpace(realizado.Observaciones))
+                    {
+                        <hr />
+                        <p><strong>Observaciones:</strong></p>
+                        <p>@realizado.Observaciones</p>
+                    }
+                }
+                else
+                {
+                    <p class="no-realizado">Este ejercicio no se realizó en esta sesión.</p>
+                }
+            </div>
+        }
+    </div>
+}

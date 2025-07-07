@@ -1,0 +1,50 @@
+﻿@model ControlPublicacionesModelo
+
+@{
+    ViewData["Title"] = "Control de Publicaciones";
+}
+
+<link rel="stylesheet" href="~/css/controlPublicaciones.css" />
+<div class="container">
+    <h2 class="text-white mb-3">Solicitudes de Publicaciones</h2>
+    <a href="/Admin/MisPublicaciones" class="btn btn-outline-light mb-3">Ver Mis Publicaciones</a>
+
+    <div class="filtros mb-3">
+        <div class="row g-2">
+            <div class="col-md-3">
+                <label class="text-white">Buscar por texto</label>
+                <input type="text" id="buscadorTexto" class="form-control" placeholder="Solicitante o título..." />
+            </div>
+            <div class="col-md-3">
+                <label class="text-white">Desde</label>
+                <input type="date" id="fechaDesde" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="text-white">Hasta</label>
+                <input type="date" id="fechaHasta" class="form-control" />
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button class="btn btn-light me-2" onclick="ordenarPorFecha('asc')">↑ Fecha</button>
+                <button class="btn btn-light" onclick="ordenarPorFecha('desc')">↓ Fecha</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="contenedorPublicaciones" class="d-flex flex-row overflow-auto gap-3 p-2">
+        @foreach (var pub in Model.PublicacionesPendientes)
+        {
+            <div class="card tarjeta-publicacion" data-fecha="@pub.FechaCreacion.ToString("yyyy-MM-dd")" data-solicitante="@pub.NombreAutor.ToLower()" data-titulo="@pub.Titulo.ToLower()">
+                <div class="card-body">
+                    <h5 class="card-title">@pub.Titulo</h5>
+                    <p><strong>Solicitante:</strong> @pub.NombreAutor</p>
+                    <p><strong>Fecha de solicitud:</strong> @pub.FechaCreacion.ToShortDateString()</p>
+                    <p>@(pub.Descripcion.Length > 100 ? pub.Descripcion.Substring(0, 90) + "..." : pub.Descripcion)</p>
+                    <a href="/Admin/RevisionPublicacion?id=@pub.Id" class="btn btn-danger">Ver solicitud</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/controlPublicaciones.js"></script>
+}

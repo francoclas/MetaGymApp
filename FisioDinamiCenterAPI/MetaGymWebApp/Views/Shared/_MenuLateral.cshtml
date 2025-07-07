@@ -1,27 +1,81 @@
 ﻿@model SesionDTO
 
-<ul class="list-group">
+<link rel="stylesheet" href="~/css/menuLateral.css" />
+
+<ul class="menu-lateral">
+    <li>
+        <a href="/Home/Comunidad">
+            <img src="/MediaWeb/iconos/usuarios.png" alt="icono" class="icono-menu" />
+            @Model.NombreCompleto
+        </a>
+    </li>
+    <li>
+        <a href="/Home/Comunidad">
+            <img src="/MediaWeb/iconos/panelcontrol.png" alt="icono" class="icono-menu" />
+            Inicio
+        </a>
+    </li>
     @if (Model.Rol == "Admin")
     {
-        <li class="list-group-item"><a href="/Home/Comunidad">Comunidad</a></li>
-        <li class="list-group-item"><a href="/Admin/PanelControl">Control administrador</a></li>
-        <li class="list-group-item"><a href="/Admin/GestionUsuarios">Gestionar de usuarios</a></li>
-        <li class="list-group-item"><a href="/Admin/Publicaciones">Gestion de publicaciones</a></li>
+        <li>
+            <a href="/Admin/PanelControl">
+                <img src="/MediaWeb/iconos/panelcontrol.png" alt="icono" class="icono-menu" />
+                Control administrador
+            </a>
+        </li>
+        <li>
+            <a href="/Admin/GestionUsuarios">
+                <img src="/MediaWeb/iconos/usuarios.png" alt="icono" class="icono-menu" />
+                Gestionar usuarios
+            </a>
+        </li>
+        <li>
+            <a href="/Admin/ControlPublicaciones">
+                <img src="/MediaWeb/iconos/publicaciones.png" alt="icono" class="icono-menu" />
+                Gestion publicaciones
+            </a>
+        </li>
     }
     else if (Model.Rol == "Profesional")
     {
-        <li class="list-group-item"><a href="/Home/Comunidad">Comunidad</a></li>
-        <li class="list-group-item"><a href="/Profesional/GestionCitas">Gestion de citas</a></li>
-        <li class="list-group-item"><a href="/Profesional/GestionRutinas">Gestion de rutinas</a></li>
-        <li class="list-group-item"><a href="/Profesional/MisPublicaciones">Mis publicaciones</a></li>
-
+        <li>
+            <a href="/Profesional/GestionCitas">
+                <img src="/MediaWeb/iconos/cita.png" alt="icono" class="icono-menu" />
+                Gestion citas
+            </a>
+        </li>
+        <li>
+            <a href="/Profesional/GestionRutinas">
+                <img src="/MediaWeb/iconos/rutinacalendario.png" alt="icono" class="icono-menu" />
+                Gestion rutinas
+            </a>
+        </li>
+        <li>
+            <a href="/Profesional/MisPublicaciones">
+                <img src="/MediaWeb/iconos/publicaciones.png" alt="icono" class="icono-menu" />
+                Mis publicaciones
+            </a>
+        </li>
     }
     else if (Model.Rol == "Cliente")
     {
-        <li class="list-group-item"><a href="/Home/Comunidad">Comunidad</a></li>
-        <li class="list-group-item"><a href="/Cliente/MisCitas">Mis citas</a></li>
-        <li class="list-group-item"><a href="/Cliente/MisRutinas">Mis rutinas</a></li>
+        <li>
+            <a href="/Cliente/MisCitas">
+                <img src="/MediaWeb/iconos/cita.png" alt="icono" class="icono-menu" />
+                Mis citas
+            </a>
+        </li>
+        <li>
+            <a href="/Cliente/MisRutinas">
+                <img src="/MediaWeb/iconos/rutinacalendario.png" alt="icono" class="icono-menu" />
+                Mis rutinas
+            </a>
+        </li>
     }
-
-    <li class="list-group-item"><a href="/Home/Logout">Cerrar sesión</a></li>
+    <li>
+        <a href="/Home/Logout">
+            <img src="/MediaWeb/iconos/logout.png" alt="icono" class="icono-menu" />
+            Cerrar sesión
+        </a>
+    </li>
 </ul>

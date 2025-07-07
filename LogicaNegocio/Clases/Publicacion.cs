@@ -28,8 +28,8 @@ namespace LogicaNegocio.Clases
         public bool EsPrivada { get; set; }
         public int Vistas { get; set; }
         public int CantLikes { get; set; }
-        public List<Media> ListaMedia { get; set; } = new();
-        public List<Comentario> Comentarios { get; set; } = new();
+        public List<Media> ListaMedia { get; set; } = new List<Media>();
+        public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
 
         // Quien la crea (opcional: Profesional o Admin)
         public int? ProfesionalId { get; set; }

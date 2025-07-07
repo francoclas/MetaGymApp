@@ -23,7 +23,13 @@ namespace LogicaDatos.Repositorio
 
         public Publicacion ObtenerPorId(int id)
         {
-            return _context.Publicaciones.Include(p => p.Comentarios).Include(p => p.ListaMedia).FirstOrDefault(p => p.Id == id);
+            return _context.Publicaciones
+                 .Include(p => p.ListaMedia)
+                 .Include(p => p.Profesional)
+                 .Include(p => p.AdminCreador)
+                 .Include(p => p.AdminAprobador)
+                 .Include(p => p.Comentarios)
+                 .FirstOrDefault(p => p.Id == id);
         }
 
         public void Crear(Publicacion publicacion)
@@ -52,13 +58,37 @@ namespace LogicaDatos.Repositorio
 
         public List<Publicacion> ObtenerPendientes()
         {
-            return _context.Publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Pendiente).ToList();
+            return _context.Publicaciones
+                .Include(p => p.Profesional)
+                .Where(p => p.Estado == Enum_EstadoPublicacion.Pendiente).ToList();
         }
         public List<Publicacion> ObtenerAprobadasPublicas()
         { 
             return _context.Publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Aprobada && !p.EsPrivada)
                                      .OrderByDescending(p => p.FechaCreacion)
                                      .ToList();
+        }
+
+        public List<Publicacion> ObtenerCreadasAdmin(int adminId)
+        {
+            return _context.Publicaciones
+                .Include(p => p.ListaMedia)
+                .Where(p => p.AdminCreadorId == adminId)
+                .ToList();
+        }
+
+        public List<Publicacion> ObtenerAprobadasAdmin(int adminId)
+        {
+            return _context.Publicaciones
+                .Include(p => p.ListaMedia)
+                .Include(p => p.Profesional)
+                .Where(p => p.AdminAprobadorId == adminId)
+                .ToList();
+        }
+        public void Actualizar(Publicacion entidad)
+        {
+            _context.Publicaciones.Update(entidad);
+            _context.SaveChanges();
         }
     }
 }

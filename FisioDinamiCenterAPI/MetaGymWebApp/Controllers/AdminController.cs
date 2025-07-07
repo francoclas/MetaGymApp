@@ -21,7 +21,8 @@ namespace MetaGymWebApp.Controllers
         private readonly IProfesionalServicio _profesionalServicio;
         private readonly IClienteServicio _clienteServicio;
         private readonly IMediaServicio _mediaServicio;
-        public AdminController(IUsuarioServicio u, IExtraServicio extraServicio, IAdminServicio adminServicio, IProfesionalServicio profesionalServicio, IClienteServicio clienteServicio, IMediaServicio mediaServicio)
+        private readonly IPublicacionServicio  _publicacionServicio;
+        public AdminController(IUsuarioServicio u, IExtraServicio extraServicio, IAdminServicio adminServicio, IProfesionalServicio profesionalServicio, IClienteServicio clienteServicio, IMediaServicio mediaServicio, IPublicacionServicio publicacionServicio)
         {
             _usuarioServicio = u;
             _extraServicio = extraServicio;
@@ -29,6 +30,7 @@ namespace MetaGymWebApp.Controllers
             _profesionalServicio = profesionalServicio;
             _clienteServicio = clienteServicio;
             _mediaServicio = mediaServicio;
+            _publicacionServicio = publicacionServicio;
         }
         public IActionResult Index()
         {
@@ -289,8 +291,6 @@ namespace MetaGymWebApp.Controllers
             return RedirectToAction("GestionUsuarios");
 
         }
-
-
         //Seccion extras
         [HttpGet]
         public IActionResult RegistrarEspecialidad()
@@ -444,5 +444,87 @@ namespace MetaGymWebApp.Controllers
             var modelo = clientes.Concat(profesionales).Concat(admins).ToList();
             return modelo;
         }
+        //Publicaciones
+        [HttpGet]
+        public IActionResult ControlPublicaciones()
+        {
+            var solicitudes = _publicacionServicio.ObtenerPendientes(); // Debe devolver publicaciones con Estado = Pendiente
+
+            var modelo = new ControlPublicacionesModelo
+            {
+                PublicacionesPendientes = solicitudes
+            };
+
+            return View(modelo);
+        }
+        [HttpGet]
+
+        public IActionResult MisPublicaciones()
+        {
+            int adminId = GestionSesion.ObtenerUsuarioId(HttpContext);
+
+            var modelo = new MisPublicacionesAdminModelo
+            {
+                PublicacionesCreadas = _publicacionServicio.ObtenerCreadasPorAdmin(adminId),
+                PublicacionesAutorizadas = _publicacionServicio.ObtenerAutorizadasPorAdmin(adminId)
+            };
+
+            return View(modelo);
+        }
+        [HttpGet]
+        public IActionResult DetallesPublicacion(int id)
+        {
+                
+            return View();
+        }
+        //Revision de publicacion
+        [HttpGet]
+        public IActionResult RevisionPublicacion(int id)
+        {
+            var publicacion = _publicacionServicio.ObtenerPorId(id);
+            if (publicacion == null || publicacion.Estado != Enum_EstadoPublicacion.Pendiente)
+            {
+                TempData["Mensaje"] = "La publicación no existe o ya fue revisada.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("ControlPublicaciones");
+            }
+
+            return View("RevisionPublicacion", publicacion);
+        }
+
+        [HttpPost]
+        public IActionResult ConfirmarRevision(int PublicacionId, string Accion, string? MotivoRechazo)
+        {
+            try
+            {
+                if (Accion == "Aceptar")
+                {
+                    _publicacionServicio.AprobarPublicacion(PublicacionId, GestionSesion.ObtenerUsuarioId(HttpContext));
+                    TempData["Mensaje"] = "Publicación aprobada correctamente.";
+                }
+                else if (Accion == "Rechazar")
+                {
+                    if (string.IsNullOrWhiteSpace(MotivoRechazo))
+                        throw new Exception("Debe especificar el motivo del rechazo.");
+
+                    _publicacionServicio.RechazarPublicacion(PublicacionId, MotivoRechazo, GestionSesion.ObtenerUsuarioId(HttpContext));
+                    TempData["Mensaje"] = "Publicación rechazada correctamente.";
+                }
+                else
+                {
+                    throw new Exception("Acción no reconocida.");
+                }
+
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("ControlPublicaciones");
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("RevisionPublicacion", new { id = PublicacionId });
+            }
+        }
+
     }
 }

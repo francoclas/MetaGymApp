@@ -1,0 +1,116 @@
+﻿.ejercicio-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    color: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 0 6px rgba(255, 0, 0, 0.15);
+    overflow: hidden;
+    padding: 10px;
+    gap: 15px;
+}
+
+    .ejercicio-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 12px rgba(255, 66, 66, 0.5);
+        border-color: #f54242;
+    }
+
+.img-ejercicio-lista {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    background-color: #111;
+    flex-shrink: 0;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0;
+    gap: 5px;
+}
+
+    .card-body .card-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: white;
+    }
+
+    .card-body .card-text {
+        font-size: 0.9rem;
+        color: #ccc;
+    }
+
+    .card-body .btn {
+        align-self: start;
+        background-color: #f54242;
+        border: none;
+        font-size: 0.85rem;
+        padding: 4px 10px;
+    }
+    .img-ejercicio-lista {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 10px;
+        background-color: #111;
+        margin-right: 15px;
+    }
+
+    .ejercicio-card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 10px;
+        color: white;
+        transition: all 0.2s ease;
+    }
+
+        .ejercicio-card:hover {
+            transform: scale(1.01);
+            border-color: #f54242;
+            box-shadow: 0 0 10px rgba(255, 66, 66, 0.3);
+        }
+    .card-ejercicio {
+        width: 160px;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-ejercicio:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 10px rgba(255, 66, 66, 0.3);
+    border-color: #f54242;
+}
+
+.img-ejercicio {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-color: #111;
+}
+
+.btn-primary {
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #c53030;
+}

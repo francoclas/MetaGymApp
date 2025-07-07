@@ -17,12 +17,14 @@ namespace MetaGymWebApp.Controllers
         private readonly IUsuarioServicio usuarioServicio;
         private readonly ICitaServicio citaServicio;
         private readonly IExtraServicio extraServicio;
+        private readonly IRutinaServicio rutinaServicio;
 
-        public ClienteController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio)
+        public ClienteController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio, IRutinaServicio rutinaServicio)
         {
             this.usuarioServicio = usuarioServicio;
             this.citaServicio = citaServicio;
             this.extraServicio = extraServicio;
+            this.rutinaServicio = rutinaServicio;
         }
 
         public IActionResult Index()
@@ -188,7 +190,65 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult MisRutinas()
         {
-            return View();
+            int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            var asignaciones = rutinaServicio.ObtenerRutinasAsignadasCliente(clienteId);
+
+            return View(asignaciones);
+        }
+        [HttpGet]
+        public IActionResult DetallesRutinaAsignada(int id)
+        {
+            int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            var dto = rutinaServicio.ObtenerDetalleRutinaAsignadaDTO(id, clienteId);
+
+            if (dto == null)
+            {
+                TempData["Mensaje"] = "No tenés acceso a esta rutina.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("MisRutinas");
+            }
+
+            return View(dto);
+        }
+        //Sesiones de entrenamiento
+        [HttpGet]
+        public IActionResult SesionEntrenada(int id)
+        {
+            int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            var sesion = rutinaServicio.ObtenerSesionPorId(id);
+
+            // Cargar datos necesarios para vista (Rutina y Ejercicios completos)
+            var rutina = rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignadaId);
+
+            foreach (var er in sesion.EjerciciosRealizados)
+            {
+                er.Ejercicio = rutina.Ejercicios
+                    .FirstOrDefault(re => re.EjercicioId == er.EjercicioId)?.Ejercicio;
+            }
+
+            ViewBag.RutinaNombre = rutina.NombreRutina;
+            return View(sesion);
+        }
+        [HttpGet]
+        public IActionResult HistoricoSesionesEntrenamiento()
+        {
+            int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            var sesiones = rutinaServicio.ObtenerHistorialCliente(clienteId);
+            return View(sesiones);
+        }
+
+        //Ver detalles de ejercicio
+        [HttpGet]
+        public IActionResult InformacionEjercicio(int id)
+        {
+            var dto = rutinaServicio.ObtenerEjercicioDTOId(id);
+            if (dto == null)
+            {
+                TempData["Mensaje"] = "El ejercicio no fue encontrado.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("MisRutinas");
+            }
+            return View(dto);
         }
     }
 }

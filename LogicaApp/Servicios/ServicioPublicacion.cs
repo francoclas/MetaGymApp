@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using LogicaDatos.Repositorio;
@@ -115,12 +116,12 @@ namespace LogicaApp.Servicios
                             ComentarioPadreId = r.ComentarioPadreId
                         }).ToList() ?? new()
                 }).ToList() ?? new(),
-
+                
                 UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new(),
-
+                Medias = pub.ListaMedia,
                 NombreAutor = pub.Profesional?.NombreCompleto ?? pub.AdminCreador?.NombreCompleto ?? "Desconocido",
                 RolAutor = pub.Profesional != null ? "Profesional" : "Admin",
-
+                MotivoRechazo = pub.MotivoRechazo,
                 NombreAprobador = pub.AdminAprobador?.NombreCompleto,
                 NombreCreadorAdmin = pub.AdminCreador?.NombreCompleto
             };
@@ -155,6 +156,57 @@ namespace LogicaApp.Servicios
         public void CrearPublicacionImagenes(Publicacion publicacion)
         {
             _repo.Crear(publicacion);
+        }
+
+        public List<PublicacionDTO> ObtenerCreadasPorAdmin(int adminId)
+        {
+            List<PublicacionDTO> salida = new List<PublicacionDTO>();
+            List<Publicacion> lista = _repo.ObtenerCreadasAdmin(adminId);
+            foreach (var o in lista)
+            {
+                salida.Add(ConvertirAPublicacionDTO(o));
+            }
+            return salida;
+        }
+
+        public List<PublicacionDTO> ObtenerAutorizadasPorAdmin(int adminId)
+        {
+            List<PublicacionDTO> salida = new List<PublicacionDTO>();
+            List<Publicacion> lista = _repo.ObtenerAprobadasAdmin(adminId);
+            foreach (var o in lista)
+            {
+                salida.Add(ConvertirAPublicacionDTO(o));
+            }
+            return salida;
+        }
+
+        public void AprobarPublicacion(int publicacionId, int adminId)
+        {
+            Publicacion publicacion = _repo.ObtenerPorId(publicacionId);
+
+            if (publicacion == null || publicacion.Estado != Enum_EstadoPublicacion.Pendiente)
+                throw new Exception("La publicación no existe o ya fue revisada.");
+
+            publicacion.Estado = Enum_EstadoPublicacion.Aprobada;
+            publicacion.FechaModificacion = DateTime.Now;
+            publicacion.AdminAprobadorId = adminId;
+
+            _repo.Actualizar(publicacion);
+        }
+
+        public void RechazarPublicacion(int publicacionId, string motivoRechazo, int adminId)
+        {
+            Publicacion publicacion = _repo.ObtenerPorId(publicacionId);
+
+            if (publicacion == null || publicacion.Estado != Enum_EstadoPublicacion.Pendiente)
+                throw new Exception("La publicación no existe o ya fue revisada.");
+
+            publicacion.Estado = Enum_EstadoPublicacion.Rechazada;
+            publicacion.MotivoRechazo = motivoRechazo;
+            publicacion.FechaModificacion = DateTime.Now;
+            publicacion.AdminAprobadorId = adminId;
+
+            _repo.Actualizar(publicacion);
         }
     }
 }

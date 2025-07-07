@@ -1,0 +1,49 @@
+﻿@using LogicaNegocio.Clases
+@model List<SesionRutina>
+@{
+    ViewData["Title"] = "Historial de Entrenamientos";
+    var sesiones = Model;
+    var ultimaSesion = sesiones.OrderByDescending(s => s.FechaRealizada).FirstOrDefault();
+    var promedioDuracion = sesiones.Where(s => s.DuracionMin.HasValue).Select(s => s.DuracionMin.Value).DefaultIfEmpty(0).Average();
+}
+
+<link rel="stylesheet" href="~/css/sesionesEntrenamientoHistorial.css" />
+<script src="~/js/busquedaHistorialSesiones.js"></script>
+
+<div class="container mt-4">
+    <h2 class="text-white">Historial de entrenamientos</h2>
+    @if (ultimaSesion != null)
+    {
+        <p class="text-secondary">Último entrenamiento hace: @ultimaSesion.FechaRealizada.ToString("dd/MM/yyyy")</p>
+    }
+    <p class="text-light">Promedio de duración: @Math.Round(promedioDuracion) minutos</p>
+
+    <hr class="text-white" />
+
+    <div class="busqueda-filtros mb-4">
+        <label class="text-white">Buscar por nombre de rutina:</label>
+        <input type="text" id="buscadorRutina" class="form-control" placeholder="Ej: Piernas, Fullbody..." />
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <label class="text-white">Desde:</label>
+                <input type="date" id="fechaDesde" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label class="text-white">Hasta:</label>
+                <input type="date" id="fechaHasta" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <div id="contenedorSesiones" class="lista-sesiones">
+        @foreach (var sesion in sesiones.OrderByDescending(s => s.FechaRealizada))
+        {
+            <div class="card-sesion" data-nombre="@sesion.RutinaAsignada.Rutina.NombreRutina" data-fecha="@sesion.FechaRealizada.ToString("yyyy-MM-dd")">
+                <h4>@sesion.RutinaAsignada.Rutina.NombreRutina</h4>
+                <p class="text-muted">Fecha: @sesion.FechaRealizada.ToString("dd/MM/yyyy") | Duración: @(sesion.DuracionMin.HasValue ? sesion.DuracionMin + " min" : "No registrada")</p>
+                <a href="@Url.Action("SesionEntrenada", "Cliente", new { id = sesion.Id })" class="btn btn-sm btn-outline-danger">Ver detalles</a>
+            </div>
+        }
+    </div>
+</div>

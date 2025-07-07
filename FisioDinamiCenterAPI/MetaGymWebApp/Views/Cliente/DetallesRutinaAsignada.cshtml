@@ -1,0 +1,50 @@
+﻿@model RutinaAsignadaDTO
+<div class="container">
+    <h2>@Model.NombreRutina</h2>
+    <p><strong>Tipo:</strong> @Model.Tipo</p>
+    <p><strong>Fecha de asignación:</strong> @Model.FechaAsignacion.ToShortDateString()</p>
+
+    <hr />
+    <h3>Ejercicios</h3>
+
+    @if (!Model.Ejercicios.Any())
+    {
+        <p>No hay ejercicios en esta rutina.</p>
+    }
+    else
+    {
+        <div id="contenedor-ejercicios-scroll">
+            @foreach (var ej in Model.Ejercicios)
+            {
+                var img = ej.Media?.Url ?? "/img/default.png";
+                <div class="tarjeta-ejercicio">
+                    <img src="@img" class="img-ejercicio" alt="Imagen ejercicio" />
+                    <strong>@ej.Nombre</strong><br />
+                    <a class="btn btn-sm btn-outline-secondary mt-1" asp-action="InformacionEjercicio" asp-route-id="@ej.Id">Ver</a>
+                </div>
+            }
+        </div>
+    }
+
+    <hr />
+    <h3>Sesiones realizadas</h3>
+
+    @if (!Model.Sesiones.Any())
+    {
+        <p>No has registrado sesiones aún para esta rutina.</p>
+    }
+    else
+    {
+        <div style="display: flex; overflow-x: auto; gap: 20px;">
+            @foreach (var sesion in Model.Sesiones)
+            {
+                <div class="card p-3 border" style="min-width: 200px;">
+                    <h5>@sesion.FechaRealizada.ToShortDateString()</h5>
+                    <p><strong>Duración:</strong> @(sesion.DuracionMin ?? 0) min</p>
+                    <a class="btn btn-primary btn-sm" asp-action="SesionEntrenada" asp-route-id="@sesion.Id">Ver sesión</a>
+                </div>
+            }
+        </div>
+    }
+</div>
+<link rel="stylesheet" href="~/css/detallesRutina.css" />

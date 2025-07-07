@@ -1,0 +1,66 @@
+﻿@model MisPublicacionesAdminModelo
+
+@{
+    ViewData["Title"] = "Mis Publicaciones";
+}
+<link rel="stylesheet" href="~/css/misPublicacionesAdmin.css" />
+
+<h2 class="text-white mb-3">Mis Publicaciones (Administrador)</h2>
+
+<ul class="nav nav-tabs mb-3" id="tabsPublicaciones">
+    <li class="nav-item">
+        <a class="nav-link active" data-tab="creadas">Creadas por mí</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-tab="autorizadas">Autorizadas</a>
+    </li>
+</ul>
+
+<div id="creadas" class="tab-content-publicaciones">
+    @if (!Model.PublicacionesCreadas.Any())
+    {
+        <p class="text-muted">No has creado ninguna publicación todavía.</p>
+    }
+    else
+    {
+        <div class="contenedor-publicaciones">
+            @foreach (var pub in Model.PublicacionesCreadas)
+            {
+                <div class="card tarjeta-publicacion" data-titulo="@pub.Titulo.ToLower()" data-fecha="@pub.FechaCreacion.ToString("yyyy-MM-dd")">
+                    <div class="card-body">
+                        <h5 class="card-title">@pub.Titulo</h5>
+                        <p><strong>Fecha:</strong> @pub.FechaCreacion.ToShortDateString()</p>
+                        <a href="/Admin/DetallesPublicacion?id=@pub.Id" class="btn btn-danger">Ver</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<div id="autorizadas" class="tab-content-publicaciones d-none">
+    @if (!Model.PublicacionesAutorizadas.Any())
+    {
+        <p class="text-muted">No has autorizado publicaciones aún.</p>
+    }
+    else
+    {
+        <div class="contenedor-publicaciones">
+            @foreach (var pub in Model.PublicacionesAutorizadas)
+            {
+                <div class="card tarjeta-publicacion" data-titulo="@pub.Titulo.ToLower()" data-fecha="@pub.FechaCreacion.ToString("yyyy-MM-dd")">
+                    <div class="card-body">
+                        <h5 class="card-title">@pub.Titulo</h5>
+                        <p><strong>Autor:</strong> @pub.NombreAutor</p>
+                        <p><strong>Fecha de aprobación:</strong> @pub.FechaCreacion.ToShortDateString()</p>
+                        <a href="/Admin/DetallesPublicacion?id=@pub.Id" class="btn btn-danger">Ver</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/misPublicacionesAdmin.js"></script>
+}

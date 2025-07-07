@@ -8,6 +8,7 @@ namespace LogicaNegocio.Interfaces.DTOS
 {
     public class RutinaRegistroDTO
     {
+        public int Id { get; set; }
         public string NombreRutina { get; set; }
         public string Tipo { get; set; }
         public List<int> IdsEjerciciosSeleccionados { get; set; } = new();

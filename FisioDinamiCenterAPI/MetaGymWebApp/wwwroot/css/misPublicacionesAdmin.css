@@ -1,0 +1,22 @@
+﻿.tarjeta-publicacion {
+    min-width: 280px;
+    max-width: 280px;
+    flex-shrink: 0;
+    background-color: #1e1e1e;
+    color: white;
+    border: 1px solid #333;
+    margin: 8px;
+    transition: transform 0.2s;
+}
+
+    .tarjeta-publicacion:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 8px rgba(255, 0, 0, 0.3);
+    }
+
+.contenedor-publicaciones {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding-bottom: 10px;
+}

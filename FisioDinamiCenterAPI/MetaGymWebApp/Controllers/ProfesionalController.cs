@@ -136,7 +136,6 @@ namespace MetaGymWebApp.Controllers
         }
         //Ejercicios
         [HttpGet]
-        [HttpGet]
         public IActionResult GestionEjercicios()
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
@@ -180,48 +179,20 @@ namespace MetaGymWebApp.Controllers
                 Medias = new List<Media>()
             };
 
+            rutinaServicio.GenerarNuevoEjercicio(ejercicio); // primero guardamos para obtener el ID
+
             if (archivos != null && archivos.Count > 0)
             {
                 foreach (var archivo in archivos)
                 {
-                    if (archivo.Length > 0)
-                    {
-                        var extension = Path.GetExtension(archivo.FileName).ToLower();
-                        var tipo = extension switch
-                        {
-                            ".jpg" or ".jpeg" or ".png" => Enum_TipoMedia.Imagen,
-                            ".mp4" or ".webm" => Enum_TipoMedia.Video,
-                            _ => Enum_TipoMedia.Imagen // por defecto
-                        };
-
-                        var nombreArchivo = $"{Guid.NewGuid()}{extension}";
-                        var rutaGuardado = Path.Combine("wwwroot", "Media", "Ejercicios", ejercicio.Id.ToString());
-
-                        if (!Directory.Exists(rutaGuardado))
-                            Directory.CreateDirectory(rutaGuardado);
-
-                        var rutaFinal = Path.Combine(rutaGuardado, nombreArchivo);
-
-                        using (var stream = new FileStream(rutaFinal, FileMode.Create))
-                        {
-                            archivo.CopyTo(stream);
-                        }
-
-                        var media = new Media
-                        {
-                            Url = $"/Media/Ejercicios/{ejercicio.Id}/{nombreArchivo}",
-                            Tipo = tipo,
-                            Ejercicio = ejercicio
-                        };
-
-                        ejercicio.Medias.Add(media);
-                    }
+                    var media = mediaServicio.GuardarArchivo(archivo, Enum_TipoEntidad.Ejercicio, ejercicio.Id);
+                    ejercicio.Medias.Add(media);
                 }
             }
 
-            rutinaServicio.GenerarNuevoEjercicio(ejercicio);
             return RedirectToAction("GestionEjercicios");
         }
+
         //Editar ejercicio
         [HttpGet]
         public IActionResult EditarEjercicio(int id)
@@ -238,48 +209,19 @@ namespace MetaGymWebApp.Controllers
             Ejercicio ejercicio = rutinaServicio.ObtenerEjercicioId(dto.Id);
             if (ejercicio == null) return NotFound();
 
-            // Actualizar campos
+            // Actualizar datos principales
             ejercicio.Nombre = dto.Nombre;
             ejercicio.Tipo = dto.Tipo;
             ejercicio.GrupoMuscular = dto.GrupoMuscular;
             ejercicio.Instrucciones = dto.Instrucciones;
 
-            // Agregar nuevas medias si hay archivos
+            // Agregar nuevos archivos 
             if (archivos != null && archivos.Count > 0)
             {
                 foreach (var archivo in archivos)
                 {
-                    if (archivo.Length > 0)
-                    {
-                        var extension = Path.GetExtension(archivo.FileName).ToLower();
-                        var tipo = extension switch
-                        {
-                            ".jpg" or ".jpeg" or ".png" => Enum_TipoMedia.Imagen,
-                            ".mp4" or ".webm" => Enum_TipoMedia.Video,
-                            _ => Enum_TipoMedia.Imagen
-                        };
-
-                        var nombreArchivo = $"{Guid.NewGuid()}{extension}";
-                        var ruta = Path.Combine("wwwroot", "Media", "Ejercicios", ejercicio.Id.ToString());
-
-                        if (!Directory.Exists(ruta))
-                            Directory.CreateDirectory(ruta);
-
-                        var rutaFinal = Path.Combine(ruta, nombreArchivo);
-                        using (var stream = new FileStream(rutaFinal, FileMode.Create))
-                        {
-                            archivo.CopyTo(stream);
-                        }
-
-                        var media = new Media
-                        {
-                            Url = $"/Media/Ejercicios/{ejercicio.Id}/{nombreArchivo}",
-                            Tipo = tipo,
-                            EjercicioId = ejercicio.Id
-                        };
-
-                        ejercicio.Medias.Add(media);
-                    }
+                    var media = mediaServicio.GuardarArchivo(archivo, Enum_TipoEntidad.Ejercicio, ejercicio.Id);
+                    ejercicio.Medias.Add(media);
                 }
             }
 
@@ -300,7 +242,7 @@ namespace MetaGymWebApp.Controllers
             return View(modelo);
         }
             [HttpPost]
-        public IActionResult RegistrarRutina(RutinaRegistroDTO dto)
+            public IActionResult RegistrarRutina(RutinaRegistroDTO dto)
         {
             var rutina = new Rutina
             {
@@ -313,11 +255,57 @@ namespace MetaGymWebApp.Controllers
                 {
                     EjercicioId = id,
                     Orden = index + 1
-                }).ToList(),
-                Asignados = dto.IdsClientesAsignados.Select(id => clienteServicio.ObtenerPorId(id)).ToList()
+                }).ToList()
             };
 
+            // Guardar la rutina primero
             rutinaServicio.GenerarNuevaRutina(rutina);
+            // Asignar a cada cliente
+            foreach (var clienteId in dto.IdsClientesAsignados)
+            {
+                rutinaServicio.AsignarRutinaACliente(clienteId, rutina.Id);
+            }
+            return RedirectToAction("GestionRutinas");
+        }
+        [HttpGet]
+        public IActionResult EditarRutina(int id)
+        {
+            var rutina = rutinaServicio.ObtenerRutinaPorId(id);
+            if (rutina == null) return NotFound();
+
+            var dto = new RutinaRegistroDTO
+            {
+                Id = rutina.Id,
+                NombreRutina = rutina.NombreRutina,
+                Tipo = rutina.Tipo,
+                IdsEjerciciosSeleccionados = rutina.Ejercicios.Select(e => e.EjercicioId).ToList(),
+                IdsClientesAsignados = rutinaServicio.ObtenerAsignacionesPorRutina(id).Select(a => a.ClienteId).ToList(),
+                EjerciciosDisponibles = rutinaServicio.ObtenerTodosEjercicios(),
+                ClientesDisponibles = clienteServicio.ObtenerTodosDTO()
+            };
+
+            return View(dto);
+        }
+        [HttpPost]
+        public IActionResult EditarRutina(RutinaRegistroDTO dto)
+        {
+            var rutina = rutinaServicio.ObtenerRutinaPorId(dto.Id);
+            if (rutina == null) return NotFound();
+
+            rutina.NombreRutina = dto.NombreRutina;
+            rutina.Tipo = dto.Tipo;
+            rutina.FechaModificacion = DateTime.Now;
+            rutina.Ejercicios = dto.IdsEjerciciosSeleccionados.Select((id, index) => new RutinaEjercicio
+            {
+                EjercicioId = id,
+                Orden = index + 1
+            }).ToList();
+
+            rutinaServicio.ModificarRutina(rutina);
+
+            // Reemplazar asignaciones
+            rutinaServicio.ReemplazarAsignaciones(rutina.Id, dto.IdsClientesAsignados);
+
             return RedirectToAction("GestionRutinas");
         }
         //Publicaciones

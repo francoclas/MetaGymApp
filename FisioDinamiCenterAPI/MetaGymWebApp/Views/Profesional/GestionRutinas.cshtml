@@ -22,8 +22,7 @@
                 <span class="tipo">Tipo: @rutina.Tipo</span><br />
                 <small class="text-muted">Última modificación: @rutina.UltimaModificacion.ToShortDateString()</small>
                 <div class="mt-2">
-                    <a href="@Url.Action("GestionClientesRutina", "Profesional", new { id = rutina.Id })" class="btn btn-primary btn-sm">Gestionar clientes</a>
-                    <a href="@Url.Action("ModificarRutina", "Profesional", new { id = rutina.Id })" class="btn btn-secondary btn-sm">Modificar rutina</a>
+                    <a href="@Url.Action("EditarRutina", "Profesional", new { id = rutina.Id })" class="btn btn-secondary btn-sm">Modificar / Gestionar clientes</a>
                 </div>
             </div>
         </div>

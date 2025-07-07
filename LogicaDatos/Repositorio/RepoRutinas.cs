@@ -30,33 +30,52 @@ namespace LogicaDatos.Repositorio
             _context.SaveChanges();
         }
 
-        public void AsignarRutinaACliente(Cliente cliente, Rutina rutina)
+        public void AsignarRutinaACliente(RutinaAsignada asignacion)
         {
-            if (!cliente.Rutinas.Contains(rutina))
-            {
-                cliente.Rutinas.Add(rutina);
-                _context.SaveChanges();
-            }
+            _context.RutinasAsignadas.Add(asignacion);
+            _context.SaveChanges();
         }
+
 
         public List<Rutina> BuscarPorNombre(string nombre)
         {
-            throw new NotImplementedException();
+            return _context.Rutinas
+                .Where(r => r.NombreRutina.Contains(nombre))
+                .ToList();
         }
-
-        public bool ClienteTieneRutina(Cliente cliente, Rutina rutina)
+        public bool ClienteTieneRutinaAsignada(int clienteId, int rutinaId)
         {
-            throw new NotImplementedException();
+            return _context.RutinasAsignadas
+                .Any(ra => ra.ClienteId == clienteId && ra.RutinaId == rutinaId);
         }
 
         public void Eliminar(int id)
         {
-            throw new NotImplementedException();
+            var rutina = _context.Rutinas.Find(id);
+            if (rutina != null)
+            {
+                _context.Rutinas.Remove(rutina);
+                _context.SaveChanges();
+            }
+        }
+
+        public List<RutinaAsignada> ObtenerAsignacionesPorCliente(int clienteId)
+        {
+            return _context.RutinasAsignadas
+                .Include(ra => ra.Rutina)
+                .Include(ra => ra.Sesiones)
+                .Where(ra => ra.ClienteId == clienteId)
+                .ToList();
         }
 
         public Rutina ObtenerPorId(int id)
         {
-            return _context.Rutinas.FirstOrDefault(R => R.Id == id);
+            return _context.Rutinas
+        .Include(r => r.Ejercicios)
+            .ThenInclude(re => re.Ejercicio)
+            .ThenInclude(ej => ej.Medias)
+        .FirstOrDefault(r => r.Id == id);
+
         }
 
         public List<Rutina> ObtenerPorProfesional(int profesionalId)
@@ -66,36 +85,60 @@ namespace LogicaDatos.Repositorio
                     .ToList();
         }
 
-        public List<Rutina> ObtenerRutinasAsignadasACliente(int clienteId)
+        public List<SesionRutina> ObtenerSesionesPorAsignacion(int rutinaAsignadaId)
         {
-            throw new NotImplementedException();
+            return _context.SesionesRutina
+                .Where(sr => sr.RutinaAsignadaId == rutinaAsignadaId)
+                .Include(sr => sr.EjerciciosRealizados)
+                .ToList();
+        }
+        public List<RutinaAsignada> ObtenerAsignacionesPorRutina(int rutinaId)
+        {
+            return _context.RutinasAsignadas
+                .Where(ra => ra.RutinaId == rutinaId)
+                .ToList();
         }
 
         public List<SesionRutina> ObtenerSesionesPorCliente(int clienteId)
         {
-            throw new NotImplementedException();
+            return _context.SesionesRutina
+                .Include(sr => sr.RutinaAsignada)
+                    .ThenInclude(ra => ra.Rutina)
+                .Where(sr => sr.RutinaAsignada.ClienteId == clienteId)
+                .ToList();
         }
 
         public SesionRutina? ObtenerSesionPorId(int sesionId)
         {
-            throw new NotImplementedException();
+            return _context.SesionesRutina
+               .Include(sr => sr.RutinaAsignada)
+               .Include(sr => sr.EjerciciosRealizados)
+                   .ThenInclude(er => er.Series)
+               .Include(sr => sr.EjerciciosRealizados)
+                   .ThenInclude(er => er.Ejercicio)
+               .FirstOrDefault(sr => sr.Id == sesionId);
         }
 
         public IEnumerable<Rutina> ObtenerTodos()
         {
-            throw new NotImplementedException();
+            return _context.Rutinas
+                .Include(r => r.Profesional)
+                .Include(r => r.Ejercicios)
+                .ToList();
         }
 
         public void RegistrarSesion(SesionRutina sesion)
         {
-            throw new NotImplementedException();
+            _context.SesionesRutina.Add(sesion);
+            _context.SaveChanges();
         }
 
-        public void RemoverRutinaDeCliente(Cliente cliente, Rutina rutina)
+        public void RemoverAsignacion(int rutinaAsignadaId)
         {
-            if (cliente.Rutinas.Contains(rutina))
+            var asignacion = _context.RutinasAsignadas.Find(rutinaAsignadaId);
+            if (asignacion != null)
             {
-                cliente.Rutinas.Remove(rutina);
+                _context.RutinasAsignadas.Remove(asignacion);
                 _context.SaveChanges();
             }
         }

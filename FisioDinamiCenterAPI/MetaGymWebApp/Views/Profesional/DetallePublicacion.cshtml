@@ -47,7 +47,7 @@
         @if (Model.Estado == Enum_EstadoPublicacion.Aprobada)
         {
             <h5 class="mt-4">Comentarios</h5>
-            @if (Model.Comentarios.Any())
+            @if (Model.Comentarios != null && Model.Comentarios.Count > 0)
             {
                 <ul class="list-group">
                     @foreach (var c in Model.Comentarios)

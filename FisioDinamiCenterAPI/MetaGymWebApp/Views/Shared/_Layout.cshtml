@@ -9,78 +9,77 @@
 <html lang="es">
 <head>
     <meta charset="utf-8" />
-    <title>@ViewData["Title"] - Metagym</title>
+    <title>@ViewData["Title"] - MetaGym</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="icon" type="image/x-icon" href="~/MediaWeb/favicon.ico" />
-    <!--Fuentes usadas-->
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    @RenderSection("Styles", required: false)
 
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    @RenderSection("Styles", required: false)
 </head>
+
 <body>
+    <!-- Header -->
     <header class="bg-black p-2 border-bottom border-dark">
         <div class="container d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <a class="navbar-brand d-flex align-items-center text-white" href="@Url.Action("Index", "Home")">
-                    <img src="@Url.Content("~/MediaWeb/Imagenes/logo.png")" alt="Logo" style="height: 50px; margin-right: 10px;" />
-                </a>
-            </div>
+            <a class="navbar-brand d-flex align-items-center text-white" href="@Url.Action("Index", "Home")">
+                <img src="@Url.Content("~/MediaWeb/Imagenes/logo.png")" alt="Logo" style="height: 50px; margin-right: 10px;" />
+            </a>
             <nav>
                 <ul class="nav">
-                    <li class="nav-item">
-                        <a class="nav-link menu-link" href="@Url.Action("Publicaciones", "Home")">Noticias</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link menu-link" href="@Url.Action("AcercaDe", "Home")">Acerca de MetaGym</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link menu-link" href="https://www.instagram.com/metagym.uy/" target="_blank">Instagram</a>
-                    </li>
-
+                    <li class="nav-item"><a class="nav-link menu-link" href="@Url.Action("Publicaciones", "Home")">Noticias</a></li>
+                    <li class="nav-item"><a class="nav-link menu-link" href="@Url.Action("AcercaDe", "Home")">Acerca de MetaGym</a></li>
+                    <li class="nav-item"><a class="nav-link menu-link" href="https://www.instagram.com/metagym.uy/" target="_blank">Instagram</a></li>
                     @if (!estaLogueado)
                     {
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="@Url.Action("Login", "Home")">Iniciar Sesión</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="@Url.Action("RegistrarUsuario", "Home")">¡Hacerse miembro!</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link menu-link" href="@Url.Action("Login", "Home")">Iniciar Sesión</a></li>
+                        <li class="nav-item"><a class="nav-link menu-link" href="@Url.Action("RegistrarUsuario", "Home")">¡Hacerse miembro!</a></li>
                     }
                     else
                     {
-                        <li class="nav-item">
-                            <span class="nav-link menu-link">Hola, @sesion.Nombre</span>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="@Url.Action("Logout", "Home")">Cerrar sesión</a>
-                        </li>
+                        <li class="nav-item"><span class="nav-link menu-link">Hola, @sesion.Nombre</span></li>
+                        <li class="nav-item"><a class="nav-link menu-link" href="@Url.Action("Logout", "Home")">Cerrar sesión</a></li>
                     }
                 </ul>
             </nav>
         </div>
     </header>
+
+    <!-- Mensaje temporal -->
     @Html.Partial("_MensajeTemporal")
 
-    <main class="container mt-4">
-        <div class="row">
-            @if (estaLogueado)
-            {
-                <div class="col-3">
-                    @Html.Partial("_MenuLateral", sesion)
-                </div>
-                <div class="col-9">
-                    @RenderBody()
-                </div>
-            }
-            else
-            {
-                <div class="col-12">
-                    @RenderBody()
-                </div>
-            }
+    <!-- Hero opcional -->
+    @RenderSection("Hero", required: false)
+
+    <!-- Cuerpo principal -->
+    <main>
+        <div class="container mt-4">
+            <div class="row">
+                @if (estaLogueado)
+                {
+                    <div class="col-md-3">
+                        @Html.Partial("_MenuLateral", sesion)
+                    </div>
+                    <div class="col-md-9">
+                        @RenderBody()
+                    </div>
+                }
+                else
+                {
+                    <div class="col-12">
+                        @RenderBody()
+                    </div>
+                }
+            </div>
         </div>
     </main>
+    <!-- Footer fuera del container -->
+    <footer>
+        @await Html.PartialAsync("_Footer")
+    </footer>
+
+    <!-- Scripts -->
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>

@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Registrar Rutina";
 }
+<link rel="stylesheet" href="~/css/ejercicios.css" />
+<div class="container">
 
 <h2>Registrar Rutina</h2>
 
@@ -21,14 +23,14 @@
     <h3>Buscar ejercicio</h3>
     <input type="text" id="buscadorEjercicios" placeholder="Buscar por nombre o tipo..." />
 
-    <div style="display: flex; gap: 20px; flex-wrap: wrap;" id="ejerciciosDisponibles">
+        <div style="display: flex; gap: 20px; padding-top:5px; flex-wrap: wrap;" id="ejerciciosDisponibles">
         @foreach (var ejercicio in Model.EjerciciosDisponibles)
         {
-            var img = ejercicio.Media.Url;
+            var img = ejercicio.Media?.Url ?? "/img/default.png";
             <div class="card-ejercicio" data-nombre="@ejercicio.Nombre" data-tipo="@ejercicio.Tipo" data-id="@ejercicio.Id">
                 <img src="@img" alt="Imagen ejercicio" class="img-ejercicio" />
-                <strong>@ejercicio.Nombre</strong>
-                <button type="button" onclick="agregarEjercicio(@ejercicio.Id, '@ejercicio.Nombre')">Agregar</button>
+                <strong>@ejercicio.Nombre</strong><br />
+                <button class="btn-primary" type="button" onclick="agregarEjercicio(@ejercicio.Id, '@ejercicio.Nombre')">Agregar</button>
             </div>
         }
     </div>
@@ -36,10 +38,12 @@
     <hr />
     <h3>Ejercicios seleccionados</h3>
     <ul id="listaEjerciciosSeleccionados"></ul>
-    <input type="hidden" name="IdsEjerciciosSeleccionados" id="IdsEjerciciosSeleccionados" />
+    <div id="contenedorEjerciciosInputs"></div>
 
     <hr />
-    <h3>Clientes disponibles</h3>
+    <h3>Buscar cliente</h3>
+    <input type="text" id="buscadorClientes" placeholder="Buscar por nombre, usuario o CI..." />
+
     <table class="tabla-clientes">
         <thead>
             <tr><th>Nombre</th><th>Usuario</th><th>CI</th><th>Acción</th></tr>
@@ -47,11 +51,11 @@
         <tbody>
             @foreach (var cliente in Model.ClientesDisponibles)
             {
-                <tr data-id="@cliente.Id">
+                <tr data-id="@cliente.Id" data-nombre="@cliente.NombreCompleto" data-usuario="@cliente.NombreUsuario" data-ci="@cliente.Ci">
                     <td>@cliente.NombreCompleto</td>
                     <td>@cliente.NombreUsuario</td>
                     <td>@cliente.Ci</td>
-                    <td><button type="button" onclick="agregarCliente(@cliente.Id, '@cliente.NombreCompleto')">Agregar</button></td>
+                    <td><button class="btn-primary" type="button" onclick="agregarCliente(@cliente.Id, '@cliente.NombreCompleto')">Agregar</button></td>
                 </tr>
             }
         </tbody>
@@ -60,12 +64,12 @@
     <hr />
     <h3>Clientes seleccionados</h3>
     <ul id="listaClientesSeleccionados"></ul>
-    <input type="hidden" name="IdsClientesAsignados" id="IdsClientesAsignados" />
+    <div id="contenedorClientesInputs"></div>
 
     <hr />
-    <button type="submit">Registrar rutina</button>
+    <button type="submit" class="btn-primary">Registrar rutina</button>
 </form>
-
+</div>
 @section Scripts {
-    <script src="~/js/rutinasRegistro.js"></script>
+    <script src="~/js/rutinasRegistro.js?v=2"></script>
 }

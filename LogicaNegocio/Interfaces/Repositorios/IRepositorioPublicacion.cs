@@ -16,5 +16,8 @@ namespace LogicaNegocio.Interfaces.Repositorios
         void ActualizarEstado(int idPublicacion, Enum_EstadoPublicacion nuevoEstado, int adminId, string? motivoRechazo);
         List<Publicacion> ObtenerPendientes();
         List<Publicacion> ObtenerAprobadasPublicas();
+        List<Publicacion> ObtenerCreadasAdmin(int adminId);
+        List<Publicacion> ObtenerAprobadasAdmin(int adminId);
+        void Actualizar(Publicacion publicacion);
     }
 }

@@ -1,0 +1,60 @@
+﻿#contenedor-ejercicios-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 10px;
+    scroll-snap-type: x mandatory;
+    margin-bottom: 20px;
+}
+
+.tarjeta-ejercicio {
+    min-width: 220px;
+    max-width: 220px;
+    flex-shrink: 0;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #1c1c1c;
+    scroll-snap-align: start;
+    text-align: center;
+    color: white;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+    .tarjeta-ejercicio:hover {
+        transform: scale(1.03);
+        border-color: #f54242;
+    }
+
+.img-ejercicio {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    object-fit: cover;
+    background-color: #333;
+}
+
+.card {
+    background-color: #1a1a1a;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 6px;
+}
+
+    .card h5 {
+        color: #f54242;
+    }
+
+.btn-outline-secondary,
+.btn-primary {
+    background-color: #f54242;
+    color: white;
+    border: none;
+}
+
+    .btn-outline-secondary:hover,
+    .btn-primary:hover {
+        background-color: #d12f2f;
+    }

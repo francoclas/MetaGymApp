@@ -21,8 +21,7 @@ namespace LogicaNegocio.Clases
         public Cliente() { }
 
         public List<Cita> Citas { get; set; } = new List<Cita>();
-        public List<Rutina> Rutinas { get; set; } = new List<Rutina>();
-        public List<SesionRutina> SesionesEntrenadas { get; set; } = new List<SesionRutina> { };
+        public List<RutinaAsignada> RutinasAsignadas { get; set; } = new();
         public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
 
         //Constructor registro

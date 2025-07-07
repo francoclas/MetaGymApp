@@ -2,54 +2,81 @@
 @{
     ViewData["Title"] = "Gestión de Ejercicios";
 }
-
 <link rel="stylesheet" href="~/css/ejercicios.css" />
+<script src="~/js/gestionEjerciciosTabs.js"></script>
 
 <div class="container mt-4">
-    <h2 class="text-white mb-3">Gestión de Ejercicios</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-white">Gestión de Ejercicios</h2>
+        <a href="@Url.Action("RegistrarEjercicio", "Profesional")" class="btn btn-danger">+ Crear Ejercicio</a>
+    </div>
 
     <ul class="nav nav-tabs" id="ejerciciosTabs">
         <li class="nav-item">
-            <a class="nav-link active" data-tab="mis-ejercicios">Mis ejercicios</a>
+            <a class="nav-link active" data-tab="mis">Mis ejercicios</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-tab="todos-ejercicios">Todos los ejercicios</a>
+            <a class="nav-link" data-tab="todos">Todos los ejercicios</a>
         </li>
     </ul>
 
-    <div class="busqueda mt-3">
+    <div class="mt-3">
         <input type="text" id="buscadorEjercicios" class="form-control" placeholder="Buscar por nombre, tipo o grupo muscular...">
     </div>
 
-    <div id="mis-ejercicios" class="tab-content mt-4">
-        @foreach (var ej in Model.EjerciciosProfesional)
+    <!-- Mis ejercicios -->
+    <div id="contenedor-mis" class="contenedor-ejercicios mt-4">
+        @if (!Model.EjerciciosProfesional.Any())
         {
-            <div class="card ejercicio-card mb-3" data-nombre="@ej.Nombre" data-tipo="@ej.Tipo" data-grupo="@ej.GrupoMuscular">
-                <div class="card-body">
-                    <h5 class="card-title">@ej.Nombre</h5>
-                    <p class="card-text"><strong>Tipo:</strong> @ej.Tipo</p>
-                    <p class="card-text"><strong>Grupo muscular:</strong> @ej.GrupoMuscular</p>
-                    <a href="@Url.Action("EditarEjercicio", "Profesional", new { id = ej.Id })" class="btn btn-sm btn-warning">Editar</a>
+            <p class="text-light">No tenés ejercicios creados.</p>
+        }
+        else
+        {
+            @foreach (var ej in Model.EjerciciosProfesional)
+            {
+                var img = ej.Media?.Url ?? "/img/default.png";
+                <div class="card ejercicio-card mb-3 d-flex flex-row"
+                     data-nombre="@ej.Nombre"
+                     data-tipo="@ej.Tipo"
+                     data-grupo="@ej.GrupoMuscular">
+                    <img src="@img" class="img-ejercicio-lista" />
+                    <div class="card-body">
+                        <h5 class="card-title">@ej.Nombre</h5>
+                        <p class="card-text"><strong>Tipo:</strong> @ej.Tipo</p>
+                        <p class="card-text"><strong>Grupo muscular:</strong> @ej.GrupoMuscular</p>
+                        <a href="@Url.Action("EditarEjercicio", "Profesional", new { id = ej.Id })" class="btn btn-sm btn-danger">Editar</a>
+                    </div>
                 </div>
-            </div>
+            }
         }
     </div>
 
-    <div id="todos-ejercicios" class="tab-content mt-4 d-none">
-        @foreach (var ej in Model.EjerciciosSistema)
+    <!-- Todos los ejercicios -->
+    <div id="contenedor-todos" class="contenedor-ejercicios mt-4 d-none">
+        @if (!Model.EjerciciosSistema.Any())
         {
-            <div class="card ejercicio-card mb-3" data-nombre="@ej.Nombre" data-tipo="@ej.Tipo" data-grupo="@ej.GrupoMuscular">
-                <div class="card-body">
-                    <h5 class="card-title">@ej.Nombre</h5>
-                    <p class="card-text"><strong>Tipo:</strong> @ej.Tipo</p>
-                    <p class="card-text"><strong>Grupo muscular:</strong> @ej.GrupoMuscular</p>
-                    <a href="@Url.Action("DetalleEjercicio", "Profesional", new { id = ej.Id })" class="btn btn-sm btn-outline-light">Ver detalles</a>
+            <p class="text-light">No hay ejercicios en el sistema.</p>
+        }
+        else
+        {
+            @foreach (var ej in Model.EjerciciosSistema)
+            {
+                var img = ej.Media?.Url ?? "/img/default.png";
+                <div class="card ejercicio-card mb-3 d-flex flex-row"
+                     data-nombre="@ej.Nombre"
+                     data-tipo="@ej.Tipo"
+                     data-grupo="@ej.GrupoMuscular">
+                    <img src="@img" class="img-ejercicio-lista" />
+                    <div class="card-body">
+                        <h5 class="card-title">@ej.Nombre</h5>
+                        <p class="card-text"><strong>Tipo:</strong> @ej.Tipo</p>
+                        <p class="card-text"><strong>Grupo muscular:</strong> @ej.GrupoMuscular</p>
+                        <a href="@Url.Action("DetalleEjercicio", "Profesional", new { id = ej.Id })" class="btn btn-sm btn-outline-light">Ver detalles</a>
+                    </div>
                 </div>
-            </div>
+            }
         }
     </div>
+
+    <p id="mensaje-sin-resultados" class="text-warning mt-3 d-none">No se encontraron ejercicios con ese término.</p>
 </div>
-
-@section Scripts {
-    <script src="~/js/gestionEjerciciosTabs.js"></script>
-}

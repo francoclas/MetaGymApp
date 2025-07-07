@@ -18,5 +18,9 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<PublicacionDTO> ObtenerTodas();
         List<PublicacionDTO> ObtenerPorProfesionalId(int profesionalId);
         void CrearPublicacionImagenes(Publicacion publicacion);
+        List<PublicacionDTO> ObtenerCreadasPorAdmin(int adminId);
+        List<PublicacionDTO> ObtenerAutorizadasPorAdmin(int adminId);
+        void AprobarPublicacion(int publicacionId, int v);
+        void RechazarPublicacion(int publicacionId, string motivoRechazo, int v);
     }
 }

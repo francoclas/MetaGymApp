@@ -11,10 +11,7 @@ namespace LogicaNegocio.Clases
     {
         public SesionRutina() { }
         public int Id { get; set; }
-        
-        //Referencia Rutina original
-        public int RutinaId { get; set; }
-        public Rutina Rutina { get; set; }
+       
 
         public int RutinaAsignadaId { get; set; }
         public RutinaAsignada RutinaAsignada { get; set; }
@@ -23,6 +20,6 @@ namespace LogicaNegocio.Clases
         public int? DuracionMin { get; set; }
 
         //Ejercicios
-        public List<EjercicioRealizado> EjericiosRealizados { get; set; }
+        public List<EjercicioRealizado> EjerciciosRealizados { get; set; }
     }
 }

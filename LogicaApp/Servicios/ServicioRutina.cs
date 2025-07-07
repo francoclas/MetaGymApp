@@ -28,6 +28,45 @@ namespace LogicaApp.Servicios
             throw new NotImplementedException();
         }
 
+        public void AsignarRutinaACliente(int clienteId, int rutinaId)
+        {
+            if (!ClienteTieneRutinaAsignada(clienteId, rutinaId))
+            {
+                var nuevaAsignacion = new RutinaAsignada
+                {
+                    ClienteId = clienteId,
+                    RutinaId = rutinaId,
+                    FechaAsignacion = DateTime.Now
+                };
+                repositorioRutina.AsignarRutinaACliente(nuevaAsignacion);
+            }
+        }
+        public void ReemplazarAsignaciones(int rutinaId, List<int> nuevosClienteIds)
+        {
+            var existentes = repositorioRutina.ObtenerAsignacionesPorRutina(rutinaId);
+
+            // Remover todos los actuales
+            foreach (var a in existentes)
+            {
+                repositorioRutina.RemoverAsignacion(a.Id);
+            }
+
+            // Asignar los nuevos
+            foreach (var id in nuevosClienteIds)
+            {
+                repositorioRutina.AsignarRutinaACliente(new RutinaAsignada
+                {
+                    ClienteId = id,
+                    RutinaId = rutinaId,
+                    FechaAsignacion = DateTime.Now
+                });
+            }
+        }
+        public bool ClienteTieneRutinaAsignada(int clienteId, int rutinaId)
+        {
+            return repositorioRutina.ClienteTieneRutinaAsignada(clienteId, rutinaId);
+        }
+
         public void DesasignarRutina(Rutina rutina, Cliente cliente)
         {
             throw new NotImplementedException();
@@ -52,7 +91,7 @@ namespace LogicaApp.Servicios
 
         public void ModificarRutina(Rutina rutina)
         {
-            throw new NotImplementedException();
+            repositorioRutina.Actualizar(rutina);
         }
 
         public EjercicioDTO ObtenerEjercicioDTOId(int id)
@@ -81,19 +120,48 @@ namespace LogicaApp.Servicios
             return MapeoEjercicioDTO(repositorioEjercicio.ObtenerPorProfesional(Id));
         }
 
+        public List<SesionRutina> ObtenerHistorialCliente(int clienteId)
+        {
+            return repositorioRutina.ObtenerSesionesPorCliente(clienteId);
+        }
+
+        public List<RutinaAsignada> ObtenerRutinasAsignadasCliente(int clienteId)
+        {
+            return repositorioRutina.ObtenerAsignacionesPorCliente(clienteId);
+        }
+
         public List<Rutina> ObtenerRutinasProfesional(int profesionalId)
         {
            return repositorioRutina.ObtenerPorProfesional(profesionalId);
         }
 
+        public SesionRutina? ObtenerSesionPorId(int sesionId)
+        {
+            return repositorioRutina.ObtenerSesionPorId(sesionId);
+        }
+
         public List<Rutina> ObtenerTodasRutinas()
         {
-            throw new NotImplementedException();
+            return repositorioRutina.ObtenerTodos().ToList();
         }
 
         public List<EjercicioDTO> ObtenerTodosEjercicios()
         {
             return MapeoEjercicioDTO(repositorioEjercicio.ObtenerTodos().ToList());
+        }
+
+        public SesionRutina RegistrarSesion(SesionRutina sesion)
+        {
+            repositorioRutina.RegistrarSesion(sesion);
+            return sesion;
+        }
+        public List<SesionRutina> ObtenerSesionesPorAsignacion(int rutinaAsignadaId)
+        {
+            return repositorioRutina.ObtenerSesionesPorAsignacion(rutinaAsignadaId);
+        }
+        public void RemoverAsignacion(int rutinaAsignadaId)
+        {
+            repositorioRutina.RemoverAsignacion(rutinaAsignadaId);
         }
 
         private List<EjercicioDTO> MapeoEjercicioDTO(List<Ejercicio> Lista)
@@ -115,5 +183,50 @@ namespace LogicaApp.Servicios
             }
             return salida;
         }
+
+        public Rutina ObtenerRutinaPorId(int id)
+        {
+            return repositorioRutina.ObtenerPorId(id);
+        }
+
+        public List<RutinaAsignada> ObtenerAsignacionesPorRutina(int rutinaId)
+        {
+            return repositorioRutina.ObtenerAsignacionesPorRutina(rutinaId);
+        }
+        public RutinaAsignadaDTO ObtenerDetalleRutinaAsignadaDTO(int rutinaAsignadaId, int clienteId)
+        {
+            var asignacion = repositorioRutina.ObtenerAsignacionesPorCliente(clienteId)
+                .FirstOrDefault(a => a.Id == rutinaAsignadaId && a.ClienteId == clienteId);
+
+            if (asignacion == null) return null;
+
+            var rutina = repositorioRutina.ObtenerPorId(asignacion.RutinaId);
+            var sesiones = repositorioRutina.ObtenerSesionesPorAsignacion(rutinaAsignadaId);
+
+            var dto = new RutinaAsignadaDTO
+            {
+                RutinaAsignadaId = asignacion.Id,
+                NombreRutina = rutina.NombreRutina,
+                Tipo = rutina.Tipo,
+                FechaAsignacion = asignacion.FechaAsignacion,
+                Sesiones = sesiones,
+                Ejercicios = rutina.Ejercicios
+                    .OrderBy(e => e.Orden)
+                    .Select(e => new EjercicioDTO
+                    {
+                        Id = e.Ejercicio.Id,
+                        Nombre = e.Ejercicio.Nombre,
+                        Tipo = e.Ejercicio.Tipo,
+                        GrupoMuscular = e.Ejercicio.GrupoMuscular,
+                        Instrucciones = e.Ejercicio.Instrucciones,
+                        ProfesionalId = e.Ejercicio.ProfesionalId,
+                        Medias = e.Ejercicio.Medias,
+                        Media = e.Ejercicio.Medias?.FirstOrDefault(m => m.Tipo == Enum_TipoMedia.Imagen)
+                    }).ToList()
+            };
+
+            return dto;
+        }
+
     }
 }

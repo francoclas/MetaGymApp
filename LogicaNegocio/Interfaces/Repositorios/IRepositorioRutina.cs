@@ -12,14 +12,16 @@ namespace LogicaDatos.Interfaces.Repos
         //Gestion
         public List<Rutina> ObtenerPorProfesional(int profesionalId);
         public List<Rutina> BuscarPorNombre(string nombre);
-        //Asignacion
-        public void AsignarRutinaACliente(Cliente cliente, Rutina rutina);
-        public List<Rutina> ObtenerRutinasAsignadasACliente(int clienteId);
-        public bool ClienteTieneRutina(Cliente cliente, Rutina rutina);
-        public void RemoverRutinaDeCliente(Cliente cliente, Rutina rutina);
-        //Sesiones rutina
+        // Gestión de asignación
+        void AsignarRutinaACliente(RutinaAsignada asignacion);
+        List<RutinaAsignada> ObtenerAsignacionesPorCliente(int clienteId);
+        bool ClienteTieneRutinaAsignada(int clienteId, int rutinaId);
+        void RemoverAsignacion(int rutinaAsignadaId);
+        List<RutinaAsignada> ObtenerAsignacionesPorRutina(int rutinaId);
+        // Gestión de sesiones
         void RegistrarSesion(SesionRutina sesion);
         List<SesionRutina> ObtenerSesionesPorCliente(int clienteId);
         SesionRutina? ObtenerSesionPorId(int sesionId);
+        List<SesionRutina> ObtenerSesionesPorAsignacion(int rutinaAsignadaId);
     }
 }
