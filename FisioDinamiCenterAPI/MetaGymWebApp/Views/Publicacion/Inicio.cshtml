@@ -1,0 +1,25 @@
+﻿@model List<PublicacionDTO>
+
+@{
+    ViewData["Title"] = "Inicio";
+}
+<link rel="stylesheet" href="~/css/inicioPublicaciones.css" />
+
+<div class="container mt-4">
+
+    @if (Model == null || !Model.Any())
+    {
+        <p class="text-muted">No hay publicaciones disponibles.</p>
+    }
+    else
+    {
+        foreach (var pub in Model.OrderByDescending(p => p.FechaCreacion))
+        {
+            @Html.Partial("_VistaPublicacion", pub)
+        }
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/interaccionesPublicacion.js"></script>
+}

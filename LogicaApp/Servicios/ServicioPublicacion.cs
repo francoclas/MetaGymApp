@@ -218,6 +218,16 @@ namespace LogicaApp.Servicios
             _repo.Actualizar(publicacion);
         }
 
-       
+        public List<PublicacionDTO> ObtenerPublicacionesInicio()
+        {
+            List<PublicacionDTO> salida = new List<PublicacionDTO>();
+            List<Publicacion> list = _repo.ObtenerAprobadasPublicas().OrderByDescending(p => p.FechaCreacion).ToList();
+
+            foreach (var item in list)
+            {
+                salida.Add(ConvertirAPublicacionDTO(item)); 
+            }
+            return salida;
+        }
     }
 }

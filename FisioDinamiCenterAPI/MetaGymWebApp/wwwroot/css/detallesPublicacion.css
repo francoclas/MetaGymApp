@@ -1,0 +1,20 @@
+﻿.media-slider {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.video-preview, .img-preview {
+    width: 240px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 8px;
+    background-color: #222;
+    flex-shrink: 0;
+}
+
+.list-group-item {
+    border: 1px solid #333;
+    border-radius: 5px;
+}

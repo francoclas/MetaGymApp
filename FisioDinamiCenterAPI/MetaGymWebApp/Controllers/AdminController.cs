@@ -475,8 +475,9 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult DetallesPublicacion(int id)
         {
-                
-            return View();
+            PublicacionDTO publicacion = _publicacionServicio.ObtenerPorId(id);
+            if (publicacion == null) return NotFound();
+            return View(publicacion);
         }
         //Revision de publicacion
         [HttpGet]
@@ -492,7 +493,7 @@ namespace MetaGymWebApp.Controllers
 
             return View("RevisionPublicacion", publicacion);
         }
-
+      
         [HttpPost]
         public IActionResult ConfirmarRevision(int PublicacionId, string Accion, string? MotivoRechazo)
         {

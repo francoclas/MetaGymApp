@@ -1,0 +1,91 @@
+﻿@using LogicaNegocio.Extra
+@model PublicacionDTO
+
+<div class="publicacion-card mb-4" data-id="@Model.Id">
+    <!-- Encabezado -->
+    <div class="publicacion-header d-flex align-items-center">
+        <img src="@Model.Medias.FirstOrDefault()?.Url ?? " /img/default.png"" class="img-autor" alt="Autor" />
+        <div class="ms-2">
+            <strong>@Model.NombreAutor</strong><br />
+            <small class="text-muted">@Model.FechaCreacion.ToShortDateString()</small>
+        </div>
+    </div>
+
+    <!-- Título -->
+    <h5 class="titulo-publicacion mt-2">@Model.Titulo</h5>
+
+    <!-- Slideshow de media -->
+    @if (Model.Medias.Any(m => m.Tipo == Enum_TipoMedia.Imagen || m.Tipo == Enum_TipoMedia.Video))
+    {
+        <div class="slideshow-container mt-2" data-pub-id="@Model.Id">
+            @{
+                var index = 0;
+                foreach (var media in Model.Medias)
+                {
+                    <div class="slide-item @(index == 0 ? "active" : "")" data-index="@index">
+                        @if (media.Tipo == Enum_TipoMedia.Imagen)
+                        {
+                            <img src="@media.Url" class="media-slide" />
+                        }
+                        else if (media.Tipo == Enum_TipoMedia.Video)
+                        {
+                            <video src="@media.Url" class="media-slide" controls></video>
+                        }
+                    </div>
+                    index++;
+                }
+            }
+            @if (Model.Medias.Count > 1)
+            {
+                <button class="slide-btn prev" onclick="cambiarSlide(@Model.Id, -1)">‹</button>
+                <button class="slide-btn next" onclick="cambiarSlide(@Model.Id, 1)">›</button>
+
+                <div class="slide-indicators">
+                    @for (int i = 0; i < Model.Medias.Count; i++)
+                    {
+                        <span class="dot @(i == 0 ? "active" : "")" onclick="irASlide(@Model.Id, @i)"></span>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Descripción -->
+    <div class="descripcion-publicacion mt-2">
+        <p class="descripcion-text" id="desc-@Model.Id" data-completa="@Model.Descripcion"></p>
+        <button class="btn btn-sm btn-outline-light btn-expandir" onclick="expandirDescripcion(@Model.Id)">Ver más</button>
+    </div>
+
+    <!-- Sección de interacción -->
+    <div class="acciones-publicacion mt-3">
+        <button class="btn btn-outline-danger me-2" onclick="darLike(this)">
+            ❤️ Me gusta (<span class="likes-count">@(Model.CantLikes)</span>)
+        </button>
+        <button class="btn btn-outline-secondary" onclick="mostrarComentarios(@Model.Id)">
+            💬 Comentarios (@(Model.Comentarios?.Count ?? 0))
+        </button>
+    </div>
+
+    <!-- Comentarios -->
+    <div id="comentarios-@Model.Id" class="comentarios-publicacion mt-3 d-none">
+        @if (Model.Comentarios != null && Model.Comentarios.Any())
+        {
+            foreach (var com in Model.Comentarios)
+            {
+                <div class="comentario d-flex mb-2">
+                    <img src="@com.ImagenAutor?.Url ?? " /img/default-user.png"" class="img-comentario" />
+                    <div class="comentario-contenido">
+                        <strong>@com.AutorNombre</strong> <small class="text-muted">@com.FechaCreacion.ToShortDateString()</small>
+                        <p>@com.Contenido</p>
+                        <button class="btn btn-sm btn-link text-danger p-0">❤️</button>
+                        <button class="btn btn-sm btn-link p-0">Responder</button>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted">No hay comentarios aún.</p>
+        }
+    </div>
+</div>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LogicaNegocio.Clases;
 
 namespace LogicaNegocio.Interfaces.DTOS
 {
@@ -16,7 +17,7 @@ namespace LogicaNegocio.Interfaces.DTOS
         public int AutorId { get; set; }
         public string AutorNombre { get; set; }
         public string RolAutor { get; set; }
-
+        public Media ImagenAutor { get; set; }
         public int CantLikes { get; set; }
 
         public int? ComentarioPadreId { get; set; }

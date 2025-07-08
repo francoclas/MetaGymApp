@@ -64,7 +64,13 @@ namespace LogicaDatos.Repositorio
         }
         public List<Publicacion> ObtenerAprobadasPublicas()
         { 
-            return _context.Publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Aprobada && !p.EsPrivada)
+            return _context.Publicaciones
+                 .Include(p => p.ListaMedia)
+                 .Include(p => p.Profesional)
+                 .Include(p => p.AdminCreador)
+                 .Include(p => p.AdminAprobador)
+                 .Include(p => p.Comentarios)
+                .Where(p => p.Estado == Enum_EstadoPublicacion.Aprobada && !p.EsPrivada)
                                      .OrderByDescending(p => p.FechaCreacion)
                                      .ToList();
         }
