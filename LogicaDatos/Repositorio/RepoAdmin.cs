@@ -38,6 +38,11 @@ namespace LogicaDatos.Repositorio
             return _context.Administradores.Any(a => a.NombreUsuario.ToLower() == usuario.ToLower());
         }
 
+        public void GuardarCambios()
+        {
+           _context.SaveChanges();
+        }
+
         public Admin ObtenerPorId(int id)
         {
             return _context.Administradores.FirstOrDefault(A => A.Id == id);

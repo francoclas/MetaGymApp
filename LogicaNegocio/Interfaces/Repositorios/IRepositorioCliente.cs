@@ -16,6 +16,6 @@ namespace LogicaDatos.Interfaces.Repos
         List<Cliente> BuscarClienteNombre(string Nombre);
         List<Cliente> BuscarClienteCI(string CI);
         Cliente ObtenerPorUsuario(string usuario);
-
+        void GuardarCambios();
     }
 }

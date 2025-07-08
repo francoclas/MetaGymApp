@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LogicaDatos.Repositorio;
+﻿using LogicaDatos.Repositorio;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.Repositorios;
 using LogicaNegocio.Interfaces.Servicios;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LogicaApp.Servicios
 {
@@ -150,6 +151,17 @@ namespace LogicaApp.Servicios
                 if (File.Exists(rutaFisica)) File.Delete(rutaFisica);
                 _repositorio.Eliminar(media);
             }
+        }
+
+        public Media? ObtenerFotoFavorita(Enum_TipoEntidad tipo, int idEntidad)
+        {
+            return _repositorio.ObtenerFavorita(tipo, idEntidad);
+            
+        }
+
+        public void AsignarFotoFavorita(int mediaId, Enum_TipoEntidad tipo, int entidadId)
+        {
+            _repositorio.AsignarFotoFavorita(mediaId, tipo, entidadId);
         }
     }
 }

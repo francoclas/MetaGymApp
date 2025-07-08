@@ -15,5 +15,7 @@ namespace LogicaNegocio.Interfaces.Repositorios
         Media ObtenerPorEntidad(Enum_TipoEntidad tipoEntidad, int idEntidad);
         Media ObtenerPorId(int mediaId);
         void Guardar();
+        Media? ObtenerFavorita(Enum_TipoEntidad tipo, int idEntidad);
+        void AsignarFotoFavorita(int mediaId, Enum_TipoEntidad tipo, int entidadId);
     }
 }

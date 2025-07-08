@@ -1,0 +1,68 @@
+﻿@model UsuarioGenericoDTO
+
+<h2>Editar Perfil</h2>
+
+<form asp-action="GuardarCambiosPerfil" method="post">
+    <input type="hidden" name="Id" value="@Model.Id" />
+    <input type="hidden" name="Rol" value="@Model.Rol" />
+
+    <div>
+        <label>Nombre</label>
+        <input name="Nombre" value="@Model.Nombre" class="form-control" />
+    </div>
+    <div>
+        <label>Correo</label>
+        <input name="Correo" value="@Model.Correo" class="form-control" />
+    </div>
+    <div>
+        <label>Teléfono</label>
+        <input name="Telefono" value="@Model.Telefono" class="form-control" />
+    </div>
+    <button class="btn btn-primary mt-2">Guardar Cambios</button>
+</form>
+
+<hr />
+
+<h4>Foto de Perfil Actual</h4>
+@if (Model.Perfil != null)
+{
+    <img src="@Model.Perfil.Url" style="width:150px;height:150px;" class="rounded-circle" />
+}
+else
+{
+    <p>No hay foto de perfil seleccionada.</p>
+}
+
+<form asp-action="ActualizarFotoPerfil" enctype="multipart/form-data" method="post" class="mt-3">
+    <label>Cargar nueva foto</label>
+    <input type="file" name="archivo" accept="image/*" />
+    <button class="btn btn-success mt-1">Subir</button>
+</form>
+
+<hr />
+<h4>Tus Fotos</h4>
+<div class="d-flex gap-3 overflow-auto">
+    @foreach (var media in Model.Medias)
+    {
+        <div class="text-center">
+            <img src="@media.Url" style="width:100px;height:100px;" class="rounded" />
+            <div class="mt-1">
+                @if (!media.EsFavorito)
+                {
+                    <form asp-action="AsignarComoFavorita" method="post">
+                        <input type="hidden" name="mediaId" value="@media.Id" />
+                        <button class="btn btn-outline-primary btn-sm">Marcar como perfil</button>
+                    </form>
+                }
+                else
+                {
+                    <span class="badge bg-primary">Foto actual</span>
+                }
+            </div>
+            <form asp-action="EliminarMediaPerfil" method="post" onsubmit="return confirm('¿Seguro que querés eliminar esta foto?');">
+                <input type="hidden" name="mediaId" value="@media.Id" />
+                <button class="btn btn-danger btn-sm mt-1">Eliminar</button>
+            </form>
+        </div>
+    }
+</div>

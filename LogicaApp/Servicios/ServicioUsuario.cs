@@ -16,12 +16,14 @@ namespace LogicaNegocio.Servicios
         private readonly IRepositorioProfesional repoProfesional;
 
         private readonly IRepositorioAdmin repoAdmin;
+        private readonly IMediaServicio mediaServicio;
 
-        public ServicioUsuario(IRepositorioCliente rCli, IRepositorioAdmin rAdm,IRepositorioProfesional rPro)
+        public ServicioUsuario(IRepositorioCliente rCli, IRepositorioAdmin rAdm,IRepositorioProfesional rPro, IMediaServicio mediaServicio)
         {
             repoCliente = rCli;
             repoAdmin = rAdm;
             repoProfesional = rPro;
+            this.mediaServicio = mediaServicio;
         }
         public void AgregarTelefono(string Usuario, string NumeroNuevo)
         {
@@ -153,6 +155,28 @@ namespace LogicaNegocio.Servicios
             //Devuelvo user
             return UsuarioCliente;
         }
+
+        public UsuarioGenericoDTO ObtenerUsuarioGenericoDTO(int usuarioId, string rol)
+        {
+            UsuarioGenericoDTO salida;
+            switch (rol)
+            {
+                case "Admin":
+                    return MapeoAdminUsuarioDTO(repoAdmin.ObtenerPorId(usuarioId));
+                    break;
+                case "Cliente":
+                    return MapeoClienteUsuarioDTO(repoCliente.ObtenerPorId(usuarioId));
+                    break;
+
+                case "Profesional":
+                    return MapeoProfesionalUsuarioDTO(repoProfesional.ObtenerPorId(usuarioId));
+                    break;
+                default:
+                    return null;
+                    break;
+            }
+        }
+
         public void RegistrarCliente(ClienteDTO cliente)
         {
             //Verifico que no exista uno con ese nombre de usuario
@@ -172,6 +196,83 @@ namespace LogicaNegocio.Servicios
             //Agrego desde repositorio
             repoCliente.Agregar(Nuevo);
         }
+        private UsuarioGenericoDTO MapeoClienteUsuarioDTO(Cliente cliente)
+        {
+            return new UsuarioGenericoDTO
+            {
+                Rol = "Cliente",
+                Id = cliente.Id,
+                Nombre = cliente.NombreCompleto,
+                Correo = cliente.Correo,
+                Medias = cliente.FotosPerfil,
+                Telefono = cliente.Telefono,
+                Perfil = cliente.FotosPerfil.FirstOrDefault(f => f.EsFavorito)
+            };
 
+        }
+        private UsuarioGenericoDTO MapeoAdminUsuarioDTO(Admin admin)
+        {
+            return new UsuarioGenericoDTO
+            {
+                Rol = "Admin",
+                Id = admin.Id,
+                Nombre = admin.NombreCompleto,
+                Correo = admin.Correo,
+                Medias = admin.FotosPerfil,
+                Telefono = admin.Telefono,
+                Perfil = admin.FotosPerfil.FirstOrDefault(f => f.EsFavorito)
+            };
+        }
+        private UsuarioGenericoDTO MapeoProfesionalUsuarioDTO(Profesional profesional)
+        {
+            return new UsuarioGenericoDTO
+            {
+                Rol = "Profesional",
+                Id = profesional.Id,
+                Nombre = profesional.NombreCompleto,
+                Correo = profesional.Correo,
+                Medias = profesional.FotosPerfil,
+                Telefono = profesional.Telefono,
+                Perfil = profesional.FotosPerfil.FirstOrDefault(f => f.EsFavorito)
+            };
+        }
+
+        public void AsignarFotoFavorita(int mediaId, Enum_TipoEntidad tipo, int entidadId)
+        {
+            mediaServicio.AsignarFotoFavorita(mediaId, tipo, entidadId);
+        }
+
+        public void GuardarCambiosGenerales(UsuarioGenericoDTO dto)
+        {
+            switch (dto.Rol)
+            {
+                case "Cliente":
+                    var cliente = repoCliente.ObtenerPorId(dto.Id);
+                    cliente.NombreCompleto = dto.Nombre;
+                    cliente.Correo = dto.Correo;
+                    cliente.Telefono = dto.Telefono;
+                    repoCliente.GuardarCambios();
+                    break;
+
+                case "Profesional":
+                    var profesional = repoProfesional.ObtenerPorId(dto.Id);
+                    profesional.NombreCompleto = dto.Nombre;
+                    profesional.Correo = dto.Correo;
+                    profesional.Telefono = dto.Telefono;
+                    repoProfesional.GuardarCambios();
+                    break;
+
+                case "Admin":
+                    var admin = repoAdmin.ObtenerPorId(dto.Id);
+                    admin.NombreCompleto = dto.Nombre;
+                    admin.Correo = dto.Correo;
+                    admin.Telefono = dto.Telefono;
+                    repoAdmin.GuardarCambios();
+                    break;
+
+                default:
+                    throw new Exception("Rol desconocido.");
+            }
+        }
     }
 }

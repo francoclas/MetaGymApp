@@ -15,5 +15,6 @@ namespace LogicaDatos.Interfaces.Repos
         List<Profesional> BuscarPorCi(string ci);
         List<Profesional> BuscarPorNombre(string Nombre);
         Profesional ObtenerPorUsuario(string usuario);
+        void GuardarCambios();
     }
 }

@@ -9,6 +9,7 @@ namespace LogicaNegocio.Extra
     public enum Enum_TipoMedia
     {
         Imagen,
-        Video
+        Video,
+        Archivo
     }
 }

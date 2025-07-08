@@ -21,9 +21,9 @@ namespace LogicaNegocio.Clases
         public Cliente() { }
 
         public List<Cita> Citas { get; set; } = new List<Cita>();
-        public List<RutinaAsignada> RutinasAsignadas { get; set; } = new();
+        public List<RutinaAsignada> RutinasAsignadas { get; set; } = new List<RutinaAsignada>() ;
         public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
-
+        public List<Media> FotosPerfil { get; set; } = new List<Media>();
         //Constructor registro
         public Cliente(string ci, string nombreusuario, string nombreCompleto, string pass, string correo, string telefono)
         {

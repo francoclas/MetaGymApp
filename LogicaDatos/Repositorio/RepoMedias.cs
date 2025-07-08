@@ -55,5 +55,40 @@ namespace LogicaDatos.Repositorio
         {
             _context.SaveChanges(); 
         }
+
+        public Media? ObtenerFavorita(Enum_TipoEntidad tipo, int idEntidad)
+        {
+            return tipo switch
+            {
+                Enum_TipoEntidad.Cliente => _context.Medias.FirstOrDefault(m => m.EsFavorito && m.ClienteId == idEntidad),
+                Enum_TipoEntidad.Profesional => _context.Medias.FirstOrDefault(m => m.EsFavorito && m.ProfesionalId == idEntidad),
+                Enum_TipoEntidad.Admin => _context.Medias.FirstOrDefault(m => m.EsFavorito && m.AdminId == idEntidad),
+
+            };
+
+        }
+
+        public void AsignarFotoFavorita(int mediaId, Enum_TipoEntidad tipo, int entidadId)
+        {
+            var medias = _context.Medias
+                   .Where(m =>
+                       (tipo == Enum_TipoEntidad.Cliente && m.ClienteId == entidadId) ||
+                       (tipo == Enum_TipoEntidad.Profesional && m.ProfesionalId == entidadId) ||
+                       (tipo == Enum_TipoEntidad.Admin && m.AdminId == entidadId)
+                   ).ToList();
+
+            if (!medias.Any())
+                throw new Exception("No se encontraron archivos multimedia para esta entidad.");
+
+            var seleccionada = medias.FirstOrDefault(m => m.Id == mediaId);
+
+            if (seleccionada == null)
+                throw new Exception("La media especificada no pertenece a la entidad indicada.");
+
+            foreach (var media in medias)
+                media.EsFavorito = (media.Id == mediaId);
+
+            _context.SaveChanges();
+        }
     }
 }

@@ -23,7 +23,10 @@ namespace LogicaDatos.Repositorio
             _context.Update(entidad);
             _context.SaveChanges();
         }
-
+        public void GuardarCambios()
+        {
+            _context.SaveChanges();
+        }
         public void Agregar(Profesional entidad)
             {
             _context.Add(entidad);

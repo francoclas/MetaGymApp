@@ -12,10 +12,12 @@ namespace MetaGymWebApp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IUsuarioServicio _usuarioServicio;
-        public HomeController(ILogger<HomeController> logger,IUsuarioServicio usuario)
+        private readonly IMediaServicio _mediaServicio;
+        public HomeController(ILogger<HomeController> logger,IUsuarioServicio usuario, IMediaServicio mediaServicio)
         {
             _logger = logger;
-            _usuarioServicio = usuario; 
+            _usuarioServicio = usuario;
+            _mediaServicio = mediaServicio;
         }
 
         public IActionResult Index()
@@ -100,6 +102,63 @@ namespace MetaGymWebApp.Controllers
             }
             //Valido datos ingresados
 
+        }
+        //Funciones Usuario
+        [HttpGet]
+        public IActionResult EditarPerfil()
+        {
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
+
+            var dto = _usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId, rol);
+
+            return View(dto);
+        }
+        [HttpPost]
+        public IActionResult GuardarCambiosPerfil(UsuarioGenericoDTO dto)
+        {
+            _usuarioServicio.GuardarCambiosGenerales(dto);
+            return RedirectToAction("EditarPerfil");
+        }
+        [HttpPost]
+        public IActionResult EliminarMediaPerfil(int mediaId)
+        {
+            _mediaServicio.EliminarMedia(mediaId);
+            return RedirectToAction("EditarPerfil");
+        }
+        [HttpPost]
+        public IActionResult ActualizarFotoPerfil(IFormFile archivo)
+        {
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            var rol = GestionSesion.ObtenerRol(HttpContext);
+
+            var tipo = rol switch
+            {
+                "Cliente" => Enum_TipoEntidad.Cliente,
+                "Profesional" => Enum_TipoEntidad.Profesional,
+                "Admin" => Enum_TipoEntidad.Admin,
+                _ => throw new Exception("Rol desconocido.")
+            };
+
+            _mediaServicio.GuardarArchivo(archivo, tipo, usuarioId);
+            return RedirectToAction("EditarPerfil");
+        }
+        [HttpPost]
+        public IActionResult AsignarComoFavorita(int mediaId)
+        {
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            var rol = GestionSesion.ObtenerRol(HttpContext);
+
+            var tipo = rol switch
+            {
+                "Cliente" => Enum_TipoEntidad.Cliente,
+                "Profesional" => Enum_TipoEntidad.Profesional,
+                "Admin" => Enum_TipoEntidad.Admin,
+                _ => throw new Exception("Rol desconocido.")
+            };
+
+            _usuarioServicio.AsignarFotoFavorita(mediaId, tipo, usuarioId);
+            return RedirectToAction("EditarPerfil");
         }
         [HttpGet]
         public IActionResult Logout()
