@@ -7,6 +7,7 @@ using LogicaDatos.Excepciones;
 using LogicaDatos.Interfaces.Repos;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
+using Microsoft.EntityFrameworkCore;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LogicaDatos.Repositorio
@@ -78,7 +79,9 @@ namespace LogicaDatos.Repositorio
         }
         public Cliente ObtenerPorId(int id)
         {
-            return _context.Clientes.FirstOrDefault(C => C.Id == id);
+            return _context.Clientes
+                                .Include(p => p.FotosPerfil)
+                .FirstOrDefault(C => C.Id == id);
         }
 
         public Cliente ObtenerPorUsuario(string usuario)

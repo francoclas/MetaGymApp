@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LogicaDatos.Interfaces.Repos;
 using LogicaNegocio.Clases;
+using Microsoft.EntityFrameworkCore;
 
 namespace LogicaDatos.Repositorio
 {
@@ -45,7 +46,9 @@ namespace LogicaDatos.Repositorio
 
         public Admin ObtenerPorId(int id)
         {
-            return _context.Administradores.FirstOrDefault(A => A.Id == id);
+            return _context.Administradores
+                .Include(p => p.FotosPerfil)
+                .FirstOrDefault(A => A.Id == id);
         }
 
         public Admin ObtenerPorUsuario(string usuario)

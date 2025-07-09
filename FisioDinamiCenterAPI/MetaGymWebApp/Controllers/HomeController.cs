@@ -3,7 +3,9 @@ using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
+using MetaGymWebApp.Filtros;
 using MetaGymWebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetaGymWebApp.Controllers
@@ -159,6 +161,16 @@ namespace MetaGymWebApp.Controllers
 
             _usuarioServicio.AsignarFotoFavorita(mediaId, tipo, usuarioId);
             return RedirectToAction("EditarPerfil");
+        }
+        [AutorizacionRol("Cliente","Profesional","Admin")]
+        [HttpGet]
+        public IActionResult MiPerfil()
+        {
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
+
+            UsuarioGenericoDTO dto = _usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId, rol);
+            return View(dto);
         }
         [HttpGet]
         public IActionResult Logout()

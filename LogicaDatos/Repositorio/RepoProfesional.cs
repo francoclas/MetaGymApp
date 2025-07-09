@@ -71,7 +71,11 @@ namespace LogicaDatos.Repositorio
                 .Include(p => p.Especialidades)
                 .Include(p => p.Citas)
                 .Include(p => p.Rutinas)
-                .Include(p => p.Publicaciones).FirstOrDefault(C => C.Id == id);
+                .Include(p => p.FotosPerfil)
+                .Include(p => p.Publicaciones)
+                .FirstOrDefault(C => C.Id == id)
+
+                ;
         }
 
         public Profesional ObtenerPorUsuario(string usuario)
