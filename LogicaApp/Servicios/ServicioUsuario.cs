@@ -204,9 +204,9 @@ namespace LogicaNegocio.Servicios
                 Id = cliente.Id,
                 Nombre = cliente.NombreCompleto,
                 Correo = cliente.Correo,
-                Medias = cliente.FotosPerfil,
+                Medias = mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Cliente, cliente.Id),
                 Telefono = cliente.Telefono,
-                Perfil = cliente.FotosPerfil.FirstOrDefault(f => f.EsFavorito)
+                Perfil = mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Cliente, cliente.Id)
             };
 
         }
@@ -218,9 +218,9 @@ namespace LogicaNegocio.Servicios
                 Id = admin.Id,
                 Nombre = admin.NombreCompleto,
                 Correo = admin.Correo,
-                Medias = admin.FotosPerfil,
+                Medias = mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Admin, admin.Id),
                 Telefono = admin.Telefono,
-                Perfil = admin.FotosPerfil.FirstOrDefault(f => f.EsFavorito)
+                Perfil = mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Admin, admin.Id)
             };
         }
         private UsuarioGenericoDTO MapeoProfesionalUsuarioDTO(Profesional profesional)
@@ -231,9 +231,9 @@ namespace LogicaNegocio.Servicios
                 Id = profesional.Id,
                 Nombre = profesional.NombreCompleto,
                 Correo = profesional.Correo,
-                Medias = profesional.FotosPerfil,
+                Medias = mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Profesional, profesional.Id),
                 Telefono = profesional.Telefono,
-                Perfil = profesional.FotosPerfil.FirstOrDefault(f => f.EsFavorito)
+                Perfil = mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Profesional, profesional.Id)
             };
         }
 

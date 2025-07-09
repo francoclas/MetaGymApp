@@ -45,9 +45,12 @@ namespace LogicaDatos
             modelBuilder.Entity<Cita>()
            .Property(c => c.Estado)
            .HasConversion<string>();
-            //Enum de tipo multimedia
+            //Enum de tipo multimedia y tipo entidad en multimedia
                 modelBuilder.Entity<Media>()
                 .Property(m => m.Tipo)
+                .HasConversion<string>();
+                modelBuilder.Entity<Media>()
+                .Property(m => m.TipoEntidad)
                 .HasConversion<string>();
 
             //Relacion profesionhales tienen sus ejercicios

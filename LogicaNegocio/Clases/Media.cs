@@ -13,6 +13,7 @@ namespace LogicaNegocio.Clases
         public string Url { get; set; }
         public string? Descripcion { get; set; }
         public Enum_TipoMedia Tipo { get; set; }
+        public Enum_TipoEntidad TipoEntidad { get; set; }
         public bool EsFavorito { get; set; } = false;
         //Conexion Publicacion
         public int? PublicacionId { get; set; }

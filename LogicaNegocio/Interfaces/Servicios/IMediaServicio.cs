@@ -16,9 +16,11 @@ namespace LogicaNegocio.Interfaces.Servicios
         void ReemplazarArchivo(IFormFile archivoNuevo, Enum_TipoEntidad tipoEntidad, int idEntidad);
         Media ObtenerMediaPorEntidad(Enum_TipoEntidad tipoEntidad, int idEntidad);
         void EliminarMedia(int mediaId);
-
+        List<Media> ObtenerMediasPorEntidadGeneral(Enum_TipoEntidad tipo, int idEntidad);
         //Usuarios
         void AsignarFotoFavorita(int mediaId, Enum_TipoEntidad tipo, int entidadId);
         public Media? ObtenerFotoFavorita(Enum_TipoEntidad tipo, int idEntidad);
+        List<Media> ObtenerImagenesUsuario(Enum_TipoEntidad tipo, int idEntidad);
+        Media? ObtenerImagenPerfil(Enum_TipoEntidad tipo, int idEntidad);
     }
 }

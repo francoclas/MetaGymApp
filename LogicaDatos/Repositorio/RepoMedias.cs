@@ -90,5 +90,52 @@ namespace LogicaDatos.Repositorio
 
             _context.SaveChanges();
         }
+        public List<Media> ObtenerImagenesUsuario(Enum_TipoEntidad tipo, int idEntidad)
+        {
+            return _context.Medias
+                .Where(m =>
+                    m.Tipo == Enum_TipoMedia.Imagen &&
+                    m.TipoEntidad == tipo &&
+                    (
+                        (tipo == Enum_TipoEntidad.Cliente && m.ClienteId == idEntidad) ||
+                        (tipo == Enum_TipoEntidad.Profesional && m.ProfesionalId == idEntidad) ||
+                        (tipo == Enum_TipoEntidad.Admin && m.AdminId == idEntidad)
+                    )
+                )
+                .ToList();
+        }
+        public Media? ObtenerImagenPerfil(Enum_TipoEntidad tipo, int idEntidad)
+        {
+            return _context.Medias
+                .FirstOrDefault(m =>
+                    m.Tipo == Enum_TipoMedia.Imagen &&
+                    m.TipoEntidad == tipo &&
+                    m.EsFavorito &&
+                    (
+                        (tipo == Enum_TipoEntidad.Cliente && m.ClienteId == idEntidad) ||
+                        (tipo == Enum_TipoEntidad.Profesional && m.ProfesionalId == idEntidad) ||
+                        (tipo == Enum_TipoEntidad.Admin && m.AdminId == idEntidad)
+                    )
+                );
+        }
+        public List<Media> ObtenerPorEntidadGeneral(Enum_TipoEntidad tipo, int idEntidad)
+        {
+            return _context.Medias
+                .Where(m =>
+                    m.TipoEntidad == tipo &&
+                    (
+                        (tipo == Enum_TipoEntidad.Cliente && m.ClienteId == idEntidad) ||
+                        (tipo == Enum_TipoEntidad.Profesional && m.ProfesionalId == idEntidad) ||
+                        (tipo == Enum_TipoEntidad.Admin && m.AdminId == idEntidad) ||
+                        (tipo == Enum_TipoEntidad.Ejercicio && m.EjercicioId == idEntidad) ||
+                        (tipo == Enum_TipoEntidad.Publicacion && m.PublicacionId == idEntidad) ||
+                        (tipo == Enum_TipoEntidad.Establecimiento && m.EstablecimientoId == idEntidad)
+                    )
+                )
+                .ToList();
+        }
+
+
+
     }
 }

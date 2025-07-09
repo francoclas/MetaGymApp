@@ -23,47 +23,53 @@ namespace LogicaApp.Servicios
         }
         public Media GuardarArchivo(IFormFile archivo, Enum_TipoEntidad tipoEntidad, int idEntidad)
         {
-            //Valido la informacion recibida
             if (archivo == null || archivo.Length == 0)
                 throw new Exception("No se proporcionó un archivo válido.");
 
-            //genero nombre de archivo
-            var extension = Path.GetExtension(archivo.FileName);
+            // Determinar tipo de archivo
+            var extension = Path.GetExtension(archivo.FileName).ToLower();
+            Enum_TipoMedia tipoMedia;
+
+            if (extension is ".jpg" or ".jpeg" or ".png" or ".gif" or ".webp")
+                tipoMedia = Enum_TipoMedia.Imagen;
+            else if (extension is ".mp4" or ".avi" or ".mov" or ".webm")
+                tipoMedia = Enum_TipoMedia.Video;
+            else
+                tipoMedia = Enum_TipoMedia.Archivo;
+
+            // Nombre único para el archivo
             var timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
             var nombreArchivo = $"{tipoEntidad}_{idEntidad}_{timestamp}{extension}";
 
-            // Genero ruta de carpeta segun entidad Subcarpeta según tipo y ID
-            string subcarpeta = tipoEntidad switch
+            // Subcarpeta según tipo de archivo y entidad
+            string tipoCarpeta = tipoMedia switch
             {
-                //todos dentro de Multimedia
-                Enum_TipoEntidad.Cliente => Path.Combine("Usuarios", "cliente", idEntidad.ToString()), //Manda a /Usuarios/cliente/Idcliente
-                Enum_TipoEntidad.Profesional => Path.Combine("Usuarios", "profesional", idEntidad.ToString()), //Manda a /Usuarios/profesional/Idprofesional
-                Enum_TipoEntidad.Admin => Path.Combine("Usuarios", "admin", idEntidad.ToString()), //Manda a /Usuarios/admin/Idadmin
-                Enum_TipoEntidad.Ejercicio => Path.Combine("Ejercicios", idEntidad.ToString()), //Manda a /Ejercicios/IdEJercicio
-                Enum_TipoEntidad.Publicacion => Path.Combine("Publicaciones", idEntidad.ToString()), //Manda a /Publicaciones/IdPublicacion
-                Enum_TipoEntidad.Establecimiento => Path.Combine("Establecimientos", idEntidad.ToString()), //Manda a /Establecimientos/IdEstablecimiento
-                _ => "Otros"//Por posibles implementaciones futuras
+                Enum_TipoMedia.Imagen => "Imagenes",
+                Enum_TipoMedia.Video => "Videos",
+                Enum_TipoMedia.Archivo => "Documentos",
+                _ => "Otros"
             };
 
-            //Finalizo ruta
-            var rutaFisicaCarpeta = Path.Combine("wwwroot", "MediaWeb", "Imagenes", subcarpeta);
+            string subcarpeta = Path.Combine(tipoCarpeta, tipoEntidad.ToString(), idEntidad.ToString());
+            var rutaFisicaCarpeta = Path.Combine("wwwroot", "MediaWeb", subcarpeta);
             Directory.CreateDirectory(rutaFisicaCarpeta);
 
-            //Termino de cargar archivo a su carpeta
+            // Guardar archivo físico
             var rutaCompleta = Path.Combine(rutaFisicaCarpeta, nombreArchivo);
             using (var stream = new FileStream(rutaCompleta, FileMode.Create))
             {
                 archivo.CopyTo(stream);
             }
 
-            //Instancio media a cargar
+            // Crear objeto Media
             var media = new Media
             {
-                Url = $"/MediaWeb/Imagenes/{subcarpeta.Replace("\\", "/")}/{nombreArchivo}",
-                Tipo = Enum_TipoMedia.Imagen
+                Url = $"/MediaWeb/{subcarpeta.Replace("\\", "/")}/{nombreArchivo}",
+                Tipo = tipoMedia,
+                TipoEntidad = tipoEntidad
             };
 
-            //Genera la relacion segun el tipo a cargar
+            // Relación con entidad
             switch (tipoEntidad)
             {
                 case Enum_TipoEntidad.Cliente:
@@ -86,10 +92,10 @@ namespace LogicaApp.Servicios
                     break;
             }
 
-            //Mando a la bd
             _repositorio.Agregar(media);
             return media;
         }
+
         public void AsignarMediaPorDefecto(Enum_TipoEntidad tipo, int idEntidad)
         {
             string rutaDefecto = tipo switch
@@ -162,6 +168,21 @@ namespace LogicaApp.Servicios
         public void AsignarFotoFavorita(int mediaId, Enum_TipoEntidad tipo, int entidadId)
         {
             _repositorio.AsignarFotoFavorita(mediaId, tipo, entidadId);
+        }
+        //Usuarios
+        public List<Media> ObtenerImagenesUsuario(Enum_TipoEntidad tipo, int idEntidad)
+        {
+            return _repositorio.ObtenerImagenesUsuario(tipo, idEntidad);
+        }
+
+        public Media? ObtenerImagenPerfil(Enum_TipoEntidad tipo, int idEntidad)
+        {
+            return _repositorio.ObtenerImagenPerfil(tipo, idEntidad);
+        }
+
+        public List<Media> ObtenerMediasPorEntidadGeneral(Enum_TipoEntidad tipo, int idEntidad)
+        {
+            return _repositorio.ObtenerPorEntidadGeneral(tipo, idEntidad);
         }
     }
 }
