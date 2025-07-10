@@ -72,7 +72,7 @@ namespace MetaGymWebApp.Controllers
                 TempData["TipoMensaje"] = "danger";
                 return View();
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Inicio", "Publicacion");
         }
         [HttpGet]
         public IActionResult RegistrarUsuario()

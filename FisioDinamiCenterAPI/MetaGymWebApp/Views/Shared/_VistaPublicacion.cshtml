@@ -4,7 +4,7 @@
 <div class="publicacion-card mb-4" data-id="@Model.Id">
     <!-- Encabezado -->
     <div class="publicacion-header d-flex align-items-center">
-        <img src="@Model.Medias.FirstOrDefault()?.Url ?? " /img/default.png"" class="img-autor" alt="Autor" />
+        <img src="@Model.Medias.FirstOrDefault()?.Url" class="img-autor" alt="Autor" />
         <div class="ms-2">
             <strong>@Model.NombreAutor</strong><br />
             <small class="text-muted">@Model.FechaCreacion.ToShortDateString()</small>
