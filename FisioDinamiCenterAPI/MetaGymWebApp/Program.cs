@@ -48,6 +48,12 @@ builder.Services.AddScoped<IPublicacionServicio,ServicioPublicacion>();
 builder.Services.AddSession();
 var app = builder.Build();
 //Precarga
+//Migracion
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<DbContextApp>();
+    context.Database.Migrate();
+}
 CargaAdmin.CargarAdminBase(app.Services);
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
