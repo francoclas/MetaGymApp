@@ -1,48 +1,46 @@
-﻿
-document.addEventListener("DOMContentLoaded", function () {
-    // Expansión de descripciones largas
-    document.querySelectorAll(".btn-expandir").forEach(btn => {
-        btn.addEventListener("click", function () {
-            const desc = this.previousElementSibling;
-            desc.classList.remove("descripcion-recortada");
-            this.remove(); // Eliminar botón
-        });
-    });
+﻿document.addEventListener("DOMContentLoaded", function () {
+    // Ver más
+    document.querySelectorAll(".pub-descripcion").forEach(desc => {
+        const span = desc.querySelector(".pub-texto-resumen");
+        const btn = desc.querySelector(".pub-btn-vermas");
+        const originalText = span.innerText;
 
-    // Likes (simulado localmente)
-    document.querySelectorAll(".btn-like").forEach(btn => {
-        btn.addEventListener("click", function () {
-            const countSpan = this.querySelector(".like-count");
-            let count = parseInt(countSpan.innerText);
-            countSpan.innerText = count + 1;
-        });
-    });
+        if (originalText.length <= 130) {
+            btn.style.display = "none";
+            return;
+        }
 
-    // Expandir/comprimir sección de comentarios
-    document.querySelectorAll(".btn-toggle-comentarios").forEach(btn => {
-        btn.addEventListener("click", function () {
-            const contenedor = this.closest(".publicacion").querySelector(".comentarios-contenedor");
-            contenedor.classList.toggle("d-none");
-        });
-    });
-    document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".descripcion-text").forEach(p => {
-            const textoCompleto = p.dataset.completa || "";
-            if (textoCompleto.length > 130) {
-                p.innerHTML = textoCompleto.substring(0, 130) + "...";
+        span.innerText = originalText.slice(0, 130) + "...";
+
+        btn.addEventListener("click", () => {
+            if (btn.innerText === "Ver más") {
+                span.innerText = originalText;
+                btn.innerText = "Ver menos";
             } else {
-                p.innerHTML = textoCompleto;
-                const boton = p.parentElement.querySelector(".btn-expandir");
-                if (boton) boton.classList.add("d-none");
+                span.innerText = originalText.slice(0, 130) + "...";
+                btn.innerText = "Ver más";
             }
         });
     });
 
-    function expandirDescripcion(id) {
-        const p = document.getElementById("desc-" + id);
-        p.innerHTML = p.dataset.completa;
-        const btn = p.parentElement.querySelector(".btn-expandir");
-        if (btn) btn.remove();
-    }
+    // Comentarios toggle
+    document.querySelectorAll(".pub-btn-comentarios").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const id = btn.dataset.id;
+            const comentarios = document.getElementById("comentarios-" + id);
+            if (comentarios.classList.contains("d-none")) {
+                comentarios.classList.remove("d-none");
+            } else {
+                comentarios.classList.add("d-none");
+            }
+        });
+    });
 
+    // Like (simulado)
+    document.querySelectorAll(".pub-btn-like").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const span = btn.querySelector("span");
+            span.innerText = parseInt(span.innerText) + 1;
+        });
+    });
 });

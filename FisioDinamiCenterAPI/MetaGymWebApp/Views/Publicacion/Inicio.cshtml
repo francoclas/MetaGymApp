@@ -3,20 +3,22 @@
 @{
     ViewData["Title"] = "Inicio";
 }
+
 <link rel="stylesheet" href="~/css/inicioPublicaciones.css" />
 
 <div class="container mt-4">
+    <h2 class="text-white">Inicio - Publicaciones</h2>
 
-    @if (Model == null || !Model.Any())
+    @if (Model != null && Model.Any())
     {
-        <p class="text-muted">No hay publicaciones disponibles.</p>
-    }
-    else
-    {
-        foreach (var pub in Model.OrderByDescending(p => p.FechaCreacion))
+        @foreach (var pub in Model.OrderByDescending(p => p.FechaCreacion))
         {
             @Html.Partial("_VistaPublicacion", pub)
         }
+    }
+    else
+    {
+        <p class="text-muted">No hay publicaciones para mostrar.</p>
     }
 </div>
 
