@@ -7,8 +7,8 @@
     var promedioDuracion = sesiones.Where(s => s.DuracionMin.HasValue).Select(s => s.DuracionMin.Value).DefaultIfEmpty(0).Average();
 }
 
-<link rel="stylesheet" href="~/css/sesionesEntrenamientoHistorial.css" />
-<script src="~/js/busquedaHistorialSesiones.js"></script>
+<link rel="stylesheet" href="~/css/cliente/sesionesEntrenamientoHistorial.css" />
+<script src="~/js/cliente/busquedaHistorialSesiones.js"></script>
 
 <div class="container mt-4">
     <h2 class="text-white">Historial de entrenamientos</h2>

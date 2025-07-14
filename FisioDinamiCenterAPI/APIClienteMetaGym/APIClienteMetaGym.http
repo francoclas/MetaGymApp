@@ -1,0 +1,10 @@
+@APIClienteMetaGym_HostAddress = http://localhost:5101
+
+POST {{APIClienteMetaGym_HostAddress}}/api/usuario/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "nombreUsuario": "usuario@email.com",
+  "password": "123456"
+}

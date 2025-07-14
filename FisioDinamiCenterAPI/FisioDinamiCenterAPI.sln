@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogicaApp", "..\LogicaApp\L
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaGymWebApp", "MetaGymWebApp\MetaGymWebApp.csproj", "{5838869D-D897-4CFB-B4A4-C35E5C489B10}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIClienteMetaGym", "APIClienteMetaGym\APIClienteMetaGym.csproj", "{0408F0D7-D145-4926-B2D3-36CA4610C79F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{5838869D-D897-4CFB-B4A4-C35E5C489B10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5838869D-D897-4CFB-B4A4-C35E5C489B10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5838869D-D897-4CFB-B4A4-C35E5C489B10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0408F0D7-D145-4926-B2D3-36CA4610C79F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0408F0D7-D145-4926-B2D3-36CA4610C79F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0408F0D7-D145-4926-B2D3-36CA4610C79F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0408F0D7-D145-4926-B2D3-36CA4610C79F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

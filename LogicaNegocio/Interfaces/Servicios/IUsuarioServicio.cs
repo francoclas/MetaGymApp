@@ -13,7 +13,7 @@ namespace LogicaNegocio.Interfaces.Servicios
         //Inicio de sesion
 
         SesionDTO IniciarSesion(LoginDTO login);
-        Cliente IniciarSesionCliente(LoginDTO login);
+        SesionDTO IniciarSesionCliente(LoginDTO login);
 
         //Registro usuario
         void RegistrarCliente(ClienteDTO cliente);

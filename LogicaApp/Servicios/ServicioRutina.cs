@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LogicaApp.Excepciones;
 using LogicaDatos.Interfaces.Repos;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
@@ -97,6 +98,7 @@ namespace LogicaApp.Servicios
         public EjercicioDTO ObtenerEjercicioDTOId(int id)
         {
             Ejercicio ejercicio = repositorioEjercicio.ObtenerPorId(id);
+            if (ejercicio == null) return null;
             EjercicioDTO e = new EjercicioDTO
             {
                 Id = ejercicio.Id,

@@ -1,35 +1,44 @@
 ﻿@model UsuarioGenericoDTO
 
-<div class="container">
-    <h2>Editar Profesional</h2>
+@{
+    ViewData["Title"] = "Editar profesional - " + Model.Usuario;
+}
+<div class="container card py-2">
+    <h2 class="mb-4 text-white">Editar Cliente</h2>
 
     <form asp-action="GuardarEdicionCliente" asp-controller="Admin" method="post">
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="Rol" />
 
-        <div class="form-group">
-            <label asp-for="Nombre"></label>
-            <input asp-for="Nombre" class="form-control" />
+        <div class="form-group mb-3">
+            <label asp-for="Nombre" class="form-label text-white">Nombre completo</label>
+            <input asp-for="Nombre" class="form-control" placeholder="Ej: Juan Pérez" />
+            <span asp-validation-for="Nombre" class="text-danger small"></span>
         </div>
 
-        <div class="form-group">
-            <label asp-for="Usuario" readonly="readonly">Usuario</label>
-            <input asp-for="Usuario" class="form-control" />
+        <div class="form-group mb-3">
+            <label asp-for="Usuario" class="form-label text-white">Usuario</label>
+            <input asp-for="Usuario" class="form-control" readonly />
         </div>
 
-        <div class="form-group">
-            <label asp-for="Correo"></label>
-            <input asp-for="Correo" class="form-control" />
+        <div class="form-group mb-3">
+            <label asp-for="Correo" class="form-label text-white">Correo electrónico</label>
+            <input asp-for="Correo" class="form-control" placeholder="nombre@ejemplo.com" />
+            <span asp-validation-for="Correo" class="text-danger small"></span>
         </div>
 
-        <div class="form-group">
-            <label asp-for="Pass">Contraseña</label>
-            <input asp-for="Pass" type="password" class="form-control" />
+        <div class="form-group mb-3">
+            <label asp-for="Pass" class="form-label text-white">Nueva contraseña <span class="text-muted small">(dejar en blanco si no desea cambiarla)</span></label>
+            <input asp-for="Pass" type="password" class="form-control" placeholder="••••••••" />
+            <span asp-validation-for="Pass" class="text-danger small"></span>
         </div>
 
-        <div class="form-group">
-            <label asp-for="Telefono"></label>
-            <input asp-for="Telefono" class="form-control" />
+        <div class="form-group mb-4">
+            <label asp-for="Telefono" class="form-label text-white">Teléfono</label>
+            <input asp-for="Telefono" class="form-control" placeholder="Ej: 099123456" />
+            <span asp-validation-for="Telefono" class="text-danger small"></span>
         </div>
-        <button type="submit" class="btn btn-success mt-3">Guardar cambios</button>
+
+        <button type="submit" class="btn btn-success w-100">Guardar cambios</button>
     </form>
+</div>
