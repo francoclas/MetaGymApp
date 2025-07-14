@@ -41,35 +41,7 @@ namespace MetaGymWebApp.Controllers
         {
             return View();
         }
-        [HttpPost]
-        public IActionResult LoginCliente(LoginDTO login)
-        {
-            //Valido Credenciales
-            try
-            {
-                if (string.IsNullOrEmpty(login.Password))
-                {
-                    throw new Exception("Verifique ingresar la contraseña.");
-                }
-                if (string.IsNullOrEmpty(login.NombreUsuario))
-                {
-                    throw new Exception("Verifique ingresar el usuario.");
-                }
-                //Consulto 
-                Cliente UsuarioLogueado = usuarioServicio.IniciarSesionCliente(login);
-                HttpContext.Session.SetInt32("ClienteId", UsuarioLogueado.Id);
-                //Redirecciono
-                return RedirectToAction("PanelControlCliente", "Cliente");
-            }
-            catch (Exception e)
-            {
-                TempData["Mensaje"] = e.Message;
-                TempData["TipoMensaje"] = "danger";
-                return View("LoginCliente", login);
-            }
-
-        }
-
+        
         //Panel de control cliente
         [HttpGet]
         public IActionResult PanelControlCliente()

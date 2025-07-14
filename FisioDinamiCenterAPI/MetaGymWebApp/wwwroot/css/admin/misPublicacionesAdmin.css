@@ -1,0 +1,25 @@
+﻿.card-publicacion {
+    background-color: #1e1e1e;
+    border: 1px solid #444;
+    color: white;
+    width: 300px;
+    min-height: 200px;
+    border-radius: 8px;
+}
+
+    .card-publicacion .card-body {
+        padding: 15px;
+    }
+
+    .card-publicacion .btn {
+        margin-top: 10px;
+    }
+
+.nav-tabs .nav-link {
+    color: #e50914;
+}
+
+    .nav-tabs .nav-link.active {
+        background-color: #e50914;
+        color: white;
+    }

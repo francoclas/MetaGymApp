@@ -1,0 +1,30 @@
+﻿.lista-sesiones {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.card-sesion {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 16px;
+    color: white;
+    transition: transform 0.2s ease;
+}
+
+    .card-sesion:hover {
+        transform: scale(1.01);
+        border-color: #f54242;
+    }
+
+    .card-sesion h4 {
+        margin-bottom: 6px;
+        color: #f54242;
+    }
+
+    .card-sesion p {
+        margin: 0 0 10px 0;
+        font-size: 0.9rem;
+        color: #ccc;
+    }

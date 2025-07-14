@@ -1,6 +1,8 @@
 ﻿@model UsuarioGenericoDTO
-
-<div class="container">
+@{
+    ViewData["Title"] = "Editar administrador - " + Model.Usuario;
+}
+<div class="container card py-4">
     <h2>Editar Profesional</h2>
 
     <form asp-action="GuardarEdicionAdmin" asp-controller="Admin" method="post">

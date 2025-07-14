@@ -1,4 +1,5 @@
-﻿using Humanizer;
+﻿using System.Runtime.Intrinsics.X86;
+using Humanizer;
 using LogicaApp.Servicios;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
@@ -154,17 +155,28 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult EditarCliente(int id)
         {
-            Cliente cliente = _clienteServicio.ObtenerPorId(id);
-            UsuarioGenericoDTO dto = new UsuarioGenericoDTO
+            try
             {
-                Id = id,
-                Nombre = cliente.NombreCompleto,
-                Usuario = cliente.NombreUsuario,
-                Correo = cliente.Correo,
-                Telefono = cliente.Telefono,
-                Rol = "Cliente"
-            };
-            return View(dto);
+                Cliente cliente = _clienteServicio.ObtenerPorId(id);
+                if (cliente == null) throw new Exception("No se logro obtener el usuario");
+                UsuarioGenericoDTO dto = new UsuarioGenericoDTO
+                {
+                    Id = id,
+                    Nombre = cliente.NombreCompleto,
+                    Usuario = cliente.NombreUsuario,
+                    Correo = cliente.Correo,
+                    Telefono = cliente.Telefono,
+                    Rol = "Cliente"
+                };
+                return View(dto);
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionUsuarios");
+            }
+            
         }
         [HttpPost]
         public IActionResult GuardarEdicionCliente(UsuarioGenericoDTO dto)
@@ -175,45 +187,76 @@ namespace MetaGymWebApp.Controllers
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("GestionUsuarios");
             }
-
-            //Obtengo cliente
-            Cliente cliente = _clienteServicio.ObtenerPorId(dto.Id);
-            //valido la info
-            if(!string.Equals(cliente.NombreCompleto,dto.Nombre))
-                cliente.NombreCompleto = dto.Nombre;
-            if(!string.Equals(cliente.Correo,dto.Correo))
-                cliente.Correo = dto.Correo;
-            if (!string.Equals(cliente.Telefono, dto.Telefono))
-                cliente.Telefono = dto.Telefono;
-                if (!string.IsNullOrEmpty(dto.Pass))
+            try
             {
-                cliente.Pass = HashContrasena.Hashear(dto.Pass);
+                //Obtengo cliente
+                Cliente cliente = _clienteServicio.ObtenerPorId(dto.Id);
+                if (cliente == null) throw new Exception("No se logro obtener el usuario");
+                //valido la info
+                if (!string.Equals(cliente.NombreCompleto, dto.Nombre))
+                    cliente.NombreCompleto = dto.Nombre;
+                if (!string.Equals(cliente.Correo, dto.Correo))
+                    cliente.Correo = dto.Correo;
+                if (!string.Equals(cliente.Telefono, dto.Telefono))
+                    cliente.Telefono = dto.Telefono;
+                if (!string.IsNullOrEmpty(dto.Pass))
+                {
+                    cliente.Pass = HashContrasena.Hashear(dto.Pass);
+                }
+                //Actualizo
+                _clienteServicio.ActualizarCliente(cliente);
+                TempData["Mensaje"] = "Se actualizo usuario: " + cliente.Correo;
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("GestionUsuarios");
             }
-            //Actualizo
-            TempData["Mensaje"] = "Se actualizo usuario: " + cliente.Correo;
-            TempData["TipoMensaje"] = "success";
-            _clienteServicio.ActualizarCliente(cliente);
-            return RedirectToAction("GestionUsuarios");
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionUsuarios");
+            }
+            
         }
         //Editar profesional
         [HttpGet]
         public IActionResult EditarProfesional(int id)
                 {
-                    //Obtengo especialidades        
-                    ViewBag.EspecialidadesDisponibles = _extraServicio.ObtenerEspecialidades();
-                    //Obtengo profesional
-                    Profesional aux = _profesionalServicio.ObtenerProfesional(id);
-                    UsuarioGenericoDTO profesional = new UsuarioGenericoDTO { Id = aux.Id ,
-                        Usuario = aux.NombreUsuario,
-                        Nombre = aux.NombreCompleto,
-                        Correo = aux.Correo,
-                        Pass = aux.Pass,
-                        Telefono = aux.Telefono,
-                        Especialidades = aux.Especialidades,
-                        Rol = "Profesional"
-                    };
-                        
-                    return View(profesional);
+            try
+            {
+                //Obtengo especialidades        
+                ViewBag.EspecialidadesDisponibles = _extraServicio.ObtenerEspecialidades();
+                if (ViewBag.EspecialidadesDisponibles == null)
+                {
+                    throw new Exception("No se lograron cargar las especialidades, intente volviendo a iniciar sesion.");
+                }
+
+                //Obtengo profesional
+                Profesional aux = _profesionalServicio.ObtenerProfesional(id);
+                if (aux == null)
+                {
+                    throw new Exception("No se encontro usuario.");
+                }
+                UsuarioGenericoDTO profesional = new UsuarioGenericoDTO
+                {
+                    Id = aux.Id,
+                    Usuario = aux.NombreUsuario,
+                    Nombre = aux.NombreCompleto,
+                    Correo = aux.Correo,
+                    Pass = aux.Pass,
+                    Telefono = aux.Telefono,
+                    Especialidades = aux.Especialidades,
+                    Rol = "Profesional"
+                };
+
+                return View(profesional);
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionUsuarios");
+            }
+                   
                 }
         [HttpPost]
         public IActionResult GuardarEdicionProfesional(UsuarioGenericoDTO dto, int especialidadId)
@@ -255,17 +298,28 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult EditarAdmin(int id)
         {
-            Admin admin = _adminServicio.ObtenerPorId(id);
-            UsuarioGenericoDTO dto = new UsuarioGenericoDTO
+            try
             {
-                Id = id,
-                Nombre = admin.NombreCompleto,
-                Usuario = admin.NombreUsuario,
-                Correo = admin.Correo,
-                Telefono = admin.Telefono,
-                Rol = "Admin"
-            };
-            return View(dto);
+                Admin admin = _adminServicio.ObtenerPorId(id);
+                if (admin == null) throw new Exception("No se obtuvo el usuario");
+                UsuarioGenericoDTO dto = new UsuarioGenericoDTO
+                {
+                    Id = id,
+                    Nombre = admin.NombreCompleto,
+                    Usuario = admin.NombreUsuario,
+                    Correo = admin.Correo,
+                    Telefono = admin.Telefono,
+                    Rol = "Admin"
+                };
+                return View(dto);
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionUsuarios");
+            }
+            
         }
         [HttpPost]
         public IActionResult GuardarEdicionAdmin(UsuarioGenericoDTO dto)
@@ -360,7 +414,12 @@ namespace MetaGymWebApp.Controllers
         public IActionResult EditarEstablecimiento(int id)
         {
             var entidad = _extraServicio.ObtenerEstablecimiento(id);
-            if (entidad == null) return NotFound();
+            if (entidad == null)
+            {
+                TempData["Mensaje"] = "No se encontro establecimiento o no existe.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("PanelControl");
+            }
 
             var mediaUrl = entidad.Media?.FirstOrDefault()?.Url ?? "/mediaweb/default/gym_default.jpg";
 
@@ -398,8 +457,12 @@ namespace MetaGymWebApp.Controllers
         public IActionResult EditarEspecialidad(int id)
         {
             var entidad = _extraServicio.ObtenerEspecialidad(id);
-            if (entidad == null) return NotFound();
-
+            if (entidad == null)
+            {
+                TempData["Mensaje"] = "No se encontro especialidad o no existe.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("PanelControl");
+            }
             var dto = new EspecialidadDTO
             {
                 Id = entidad.Id,
@@ -481,7 +544,13 @@ namespace MetaGymWebApp.Controllers
         public IActionResult DetallesPublicacion(int id)
         {
             PublicacionDTO publicacion = _publicacionServicio.ObtenerPorId(id);
-            if (publicacion == null) return NotFound();
+            if (publicacion == null)
+            {
+                TempData["Mensaje"] = "No se encontro la publicacion o no existe.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("ControlPublicaciones");
+            }
+            ;
             return View(publicacion);
         }
         //Revision de publicacion

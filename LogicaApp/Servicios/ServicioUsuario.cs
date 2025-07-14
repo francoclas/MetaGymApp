@@ -144,16 +144,32 @@ namespace LogicaNegocio.Servicios
             throw new UsuarioException("Revisar credenciales ingresadas");
         }
 
-        public Cliente IniciarSesionCliente(LoginDTO login)
+        public SesionDTO IniciarSesionCliente(LoginDTO login)
         {
-            Cliente UsuarioCliente = repoCliente.VerificarCredenciales(login.NombreUsuario, login.Password);
-            //Valido
-            if (UsuarioCliente == null)
+            Cliente UsuarioCliente = null;
+            //Verifico si es correo o no
+            if (EsCorreo(login.NombreUsuario))
             {
-                throw new UsuarioException("Verificar credenciales ingresadas.");
+                //Implementar inicio correo UsuarioCliente 
+                return null;
             }
-            //Devuelvo user
-            return UsuarioCliente;
+            else //Inicio con usuario
+            {
+                var cliente = repoCliente.ObtenerPorUsuario(login.NombreUsuario);
+                //Valido
+                if (cliente != null && HashContrasena.Verificar(cliente.Pass,login.Password))
+                {
+                    //Mapeo y devuelvo
+                    return new SesionDTO
+                    {
+                        Nombre = cliente.NombreUsuario,
+                        NombreCompleto = cliente.NombreCompleto,
+                        UsuarioId = cliente.Id,
+                        Rol = "Cliente"
+                    };
+                }
+                return null;
+            }
         }
 
         public UsuarioGenericoDTO ObtenerUsuarioGenericoDTO(int usuarioId, string rol)
@@ -273,6 +289,10 @@ namespace LogicaNegocio.Servicios
                 default:
                     throw new Exception("Rol desconocido.");
             }
+        }
+        private bool EsCorreo(string input)
+        {
+            return input.Contains("@") && input.Contains(".");
         }
     }
 }

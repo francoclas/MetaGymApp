@@ -1,0 +1,29 @@
+﻿.media-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.media-video, .media-img {
+    width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    background-color: #000;
+}
+
+.media-img {
+    border: 2px solid #e50914;
+}
+
+video::-webkit-media-controls {
+    filter: invert(100%);
+}
+
+@media (max-width: 768px) {
+    .media-video, .media-img {
+        width: 100%;
+        height: auto;
+    }
+}

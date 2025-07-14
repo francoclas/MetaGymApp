@@ -1,0 +1,61 @@
+﻿
+
+h2 {
+    color: #f54242;
+}
+
+.info-sesion {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    color: #ccc;
+}
+
+.contenedor-ejercicios {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.tarjeta-ejercicio {
+    background-color: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
+}
+
+    .tarjeta-ejercicio h4 {
+        color: #f54242;
+    }
+
+.img-ejercicio {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background-color: #222;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table, th, td {
+    border: 1px solid #555;
+}
+
+th, td {
+    padding: 8px;
+    text-align: center;
+}
+
+.no-realizado {
+    color: #bbb;
+    font-style: italic;
+    margin-top: 10px;
+}
