@@ -1,5 +1,10 @@
 ﻿@model ClienteDTO
 
+@{
+    ViewData["Title"] = "Registrarme :)";
+}
+<!-- Mensaje temporal -->
+@Html.Partial("_MensajeTemporal")
 <div class="login-wrapper d-flex flex-column align-items-center justify-content-center">
     <img src="@Url.Content("~/MediaWeb/Imagenes/metagymLogo.png")" alt="MetaGym Logo" class="login-logo mb-3" />
     <h2 class="text-center mb-4">Registro de usuario</h2>

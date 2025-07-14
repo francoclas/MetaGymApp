@@ -34,7 +34,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasIndex("ProfesionalesId");
 
-                    b.ToTable("EspecialidadProfesional");
+                    b.ToTable("EspecialidadProfesional", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Admin", b =>
@@ -71,7 +71,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Administradores");
+                    b.ToTable("Administradores", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Cita", b =>
@@ -124,7 +124,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasIndex("ProfesionalId");
 
-                    b.ToTable("Citas");
+                    b.ToTable("Citas", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Cliente", b =>
@@ -161,7 +161,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Clientes");
+                    b.ToTable("Clientes", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Comentario", b =>
@@ -215,7 +215,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasIndex("PublicacionId");
 
-                    b.ToTable("Comentarios");
+                    b.ToTable("Comentarios", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Ejercicio", b =>
@@ -246,7 +246,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasIndex("ProfesionalId");
 
-                    b.ToTable("Ejercicios");
+                    b.ToTable("Ejercicios", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.EjercicioRealizado", b =>
@@ -278,7 +278,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasIndex("SesionRutinaId");
 
-                    b.ToTable("EjercicioRealizadosPorClientes");
+                    b.ToTable("EjercicioRealizadosPorClientes", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Especialidad", b =>
@@ -299,7 +299,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Especialidades");
+                    b.ToTable("Especialidades", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Establecimiento", b =>
@@ -320,7 +320,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Establecimientos");
+                    b.ToTable("Establecimientos", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Media", b =>
@@ -381,7 +381,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasIndex("PublicacionId");
 
-                    b.ToTable("Medias");
+                    b.ToTable("Medias", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Profesional", b =>
@@ -418,7 +418,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Profesionales");
+                    b.ToTable("Profesionales", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Publicacion", b =>
@@ -483,7 +483,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasIndex("ProfesionalId");
 
-                    b.ToTable("Publicaciones");
+                    b.ToTable("Publicaciones", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Rutina", b =>
@@ -515,7 +515,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasIndex("ProfesionalId");
 
-                    b.ToTable("Rutinas");
+                    b.ToTable("Rutinas", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.RutinaAsignada", b =>
@@ -541,7 +541,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasIndex("RutinaId");
 
-                    b.ToTable("RutinasAsignadas");
+                    b.ToTable("RutinasAsignadas", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.RutinaEjercicio", b =>
@@ -567,7 +567,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasIndex("RutinaId");
 
-                    b.ToTable("RutinaEjercicios");
+                    b.ToTable("RutinaEjercicios", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.SesionRutina", b =>
@@ -596,7 +596,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasIndex("RutinaAsignadaId");
 
-                    b.ToTable("SesionesRutina");
+                    b.ToTable("SesionesRutina", (string)null);
                 });
 
             modelBuilder.Entity("LogicaNegocio.Extra.SerieRealizada", b =>
@@ -620,7 +620,7 @@ namespace LogicaDatos.Migrations
 
                     b.HasIndex("EjercicioRealizadoId");
 
-                    b.ToTable("SeriesParaEjerciciosDeCliente");
+                    b.ToTable("SeriesParaEjerciciosDeCliente", (string)null);
                 });
 
             modelBuilder.Entity("EspecialidadProfesional", b =>

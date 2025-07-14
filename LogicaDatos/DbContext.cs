@@ -38,9 +38,10 @@ namespace LogicaDatos
         public DbSet<Establecimiento> Establecimientos { get; set; }
         //Imagenes y video
         public DbSet<Media> Medias { get; set; }
+        //Notificaciones 
+        public DbSet<Notificacion> Notificaciones { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             //Enum de estadocitas
             modelBuilder.Entity<Cita>()
            .Property(c => c.Estado)
@@ -65,13 +66,11 @@ namespace LogicaDatos
                 .WithMany()
                 .HasForeignKey(p => p.AdminCreadorId)
                 .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<Publicacion>()
                 .HasOne(p => p.AdminAprobador)
                 .WithMany()
                 .HasForeignKey(p => p.AdminAprobadorId)
                 .OnDelete(DeleteBehavior.Restrict);
-
         }
 
     }

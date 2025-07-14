@@ -46,11 +46,8 @@
         </div>
     </header>
 
-    <!-- Mensaje temporal -->
-    @Html.Partial("_MensajeTemporal")
+    
 
-    <!-- Hero opcional -->
-    @RenderSection("Hero", required: false)
 
     <!-- Cuerpo principal -->
     <main>
@@ -62,11 +59,14 @@
                         @Html.Partial("_MenuLateral", sesion)
                     </div>
                     <div class="col-md-9">
+                        <!-- Mensaje temporal -->
+                        @Html.Partial("_MensajeTemporal")
                         @RenderBody()
                     </div>
                 }
                 else
                 {
+
                     <div class="col-12">
                         @RenderBody()
                     </div>

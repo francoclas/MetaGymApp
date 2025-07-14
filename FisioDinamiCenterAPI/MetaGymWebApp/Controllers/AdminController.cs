@@ -46,7 +46,12 @@ namespace MetaGymWebApp.Controllers
         [HttpPost]
         public IActionResult CrearUsuario(CrearUsuarioDTO dto)
         {
-            if (!ModelState.IsValid) return View(dto);
+            if (!ModelState.IsValid) {
+                
+                TempData["Mensaje"] = "Ingrese los correspondientes";
+                TempData["TipoMensaje"] = "danger";
+                return View(dto);
+            }
 
             try
             {
