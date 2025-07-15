@@ -104,7 +104,51 @@ namespace LogicaDatos.Repositorio
             _context.Publicaciones.Update(entidad);
             _context.SaveChanges();
         }
+        public bool UsuarioYaDioLike(int publicacionId, int usuarioId, string rol)
+        {
+            return _context.LikePublicaciones.Any(l =>
+                l.PublicacionId == publicacionId &&
+                l.UsuarioId == usuarioId &&
+                l.TipoUsuario == rol);
+        }
 
-        
+        public void DarLike(int publicacionId, int usuarioId, string rol)
+        {
+            if (!UsuarioYaDioLike(publicacionId, usuarioId, rol))
+            {
+                _context.LikePublicaciones.Add(new LikePublicacion
+                {
+                    PublicacionId = publicacionId,
+                    UsuarioId = usuarioId,
+                    TipoUsuario = rol,
+                    Fecha = DateTime.Now
+                });
+
+                var pub = _context.Publicaciones.Find(publicacionId);
+                if (pub != null) pub.CantLikes++;
+
+                _context.SaveChanges();
+            }
+        }
+
+        public void QuitarLike(int publicacionId, int usuarioId, string rol)
+        {
+            var like = _context.LikePublicaciones.FirstOrDefault(l =>
+                l.PublicacionId == publicacionId &&
+                l.UsuarioId == usuarioId &&
+                l.TipoUsuario == rol);
+
+            if (like != null)
+            {
+                _context.LikePublicaciones.Remove(like);
+
+                var pub = _context.Publicaciones.Find(publicacionId);
+                if (pub != null && pub.CantLikes > 0) pub.CantLikes--;
+
+                _context.SaveChanges();
+            }
+        }
+
+
     }
 }

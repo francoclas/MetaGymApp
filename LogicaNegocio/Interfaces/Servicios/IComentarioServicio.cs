@@ -13,7 +13,9 @@ namespace LogicaNegocio.Interfaces.Servicios
             void AgregarComentario(ComentarioDTO dto);
             void EditarComentario(int comentarioId, string nuevoContenido);
             void EliminarComentario(int comentarioId);
-            void DarLike(int comentarioId);
-            void QuitarLike(int comentarioId);
+            void DarLikeComentario(int comentarioId, int usuarioId, string rol);
+            void QuitarLikeComentario(int comentarioId, int usuarioId, string rol);
+            bool UsuarioYaDioLikeComentario(int comentarioId, int usuarioId, string rol);
+
     }
 }

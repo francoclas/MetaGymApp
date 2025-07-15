@@ -16,10 +16,11 @@ namespace LogicaApp.Servicios
     public class ServicioPublicacion : IPublicacionServicio
     {
         private readonly IRepositorioPublicacion _repo;
-
-        public ServicioPublicacion(IRepositorioPublicacion repo)
+        private readonly IMediaServicio mediaServicio;
+        public ServicioPublicacion(IRepositorioPublicacion repo, IMediaServicio mediaServicio)
         {
             _repo = repo;
+            this.mediaServicio = mediaServicio;
         }
 
         public List<PublicacionDTO> ObtenerPublicaciones()
@@ -99,7 +100,7 @@ namespace LogicaApp.Servicios
                     AutorId = c.ProfesionalId ?? c.ClienteId ?? c.AdminId ?? 0,
                     AutorNombre = c.Profesional?.NombreCompleto ?? c.Cliente?.NombreCompleto ?? c.Admin?.NombreCompleto ?? "Desconocido",
                     RolAutor = c.Profesional != null ? "Profesional" : c.Cliente != null ? "Cliente" : "Admin",
-                    CantLikes = c.CantLikes,
+                    //CantLikes = c.CantLikes,
                     ComentarioPadreId = c.ComentarioPadreId,
                     Respuestas = c.Respuestas?
                         .Where(r => r.EstaActivo)
@@ -112,7 +113,7 @@ namespace LogicaApp.Servicios
                             AutorId = r.ProfesionalId ?? r.ClienteId ?? r.AdminId ?? 0,
                             AutorNombre = r.Profesional?.NombreCompleto ?? r.Cliente?.NombreCompleto ?? r.Admin?.NombreCompleto ?? "Desconocido",
                             RolAutor = r.Profesional != null ? "Profesional" : r.Cliente != null ? "Cliente" : "Admin",
-                            CantLikes = r.CantLikes,
+                            //CantLikes = r.CantLikes,
                             ComentarioPadreId = r.ComentarioPadreId
                         }).ToList() ?? new()
                 }).ToList() ?? new(),
@@ -120,6 +121,9 @@ namespace LogicaApp.Servicios
                 UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new(),
                 Medias = pub.ListaMedia,
                 NombreAutor = pub.Profesional?.NombreCompleto ?? pub.AdminCreador?.NombreCompleto ?? "Desconocido",
+                ImagenAutorURL = pub.Profesional != null
+                        ? mediaServicio.ObtenerFotoFavorita(Enum_TipoEntidad.Profesional, pub.Profesional.Id)?.Url
+                        : mediaServicio.ObtenerFotoFavorita(Enum_TipoEntidad.Admin, (int)pub.AdminCreadorId)?.Url,
                 RolAutor = pub.Profesional != null ? "Profesional" : "Admin",
                 MotivoRechazo = pub.MotivoRechazo,
                 NombreAprobador = pub.AdminAprobador?.NombreCompleto,
@@ -229,5 +233,20 @@ namespace LogicaApp.Servicios
             }
             return salida;
         }
+        public void DarLikePublicacion(int publicacionId, int usuarioId, string rol)
+        {
+            _repo.DarLike(publicacionId, usuarioId, rol);
+        }
+
+        public void QuitarLikePublicacion(int publicacionId, int usuarioId, string rol)
+        {
+            _repo.QuitarLike(publicacionId, usuarioId, rol);
+        }
+
+        public bool UsuarioYaDioLikePublicacion(int publicacionId, int usuarioId, string rol)
+        {
+            return _repo.UsuarioYaDioLike(publicacionId, usuarioId, rol);
+        }
+
     }
 }

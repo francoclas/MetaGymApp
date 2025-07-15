@@ -23,7 +23,9 @@ namespace LogicaNegocio.Clases
         public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
         public List<Media> FotosPerfil { get; set; } = new List<Media>();
         public List<Notificacion> Notificaciones { get; set; } = new List<Notificacion>();
-
+        //Interacciones
+        public List<LikePublicacion> LikesPublicaciones { get; set; } = new();
+        public List<LikeComentario> LikesComentarios { get; set; } = new();
         public Admin(string ci, string nombreusuario, string nombreCompleto,string pass, string correo, string telefono)
         {
             this.NombreUsuario = nombreusuario;

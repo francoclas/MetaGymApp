@@ -56,16 +56,21 @@ namespace LogicaApp.Servicios
         {
             _repo.Desactivar(comentarioId);
         }
-
-        public void DarLike(int comentarioId)
+        public void DarLikeComentario(int comentarioId, int usuarioId, string rol)
         {
-            _repo.IncrementarLikes(comentarioId);
+            _repo.DarLike(comentarioId, usuarioId, rol);
         }
 
-        public void QuitarLike(int comentarioId)
+        public void QuitarLikeComentario(int comentarioId, int usuarioId, string rol)
         {
-            _repo.DecrementarLikes(comentarioId);
+            _repo.QuitarLike(comentarioId, usuarioId, rol);
         }
+
+        public bool UsuarioYaDioLikeComentario(int comentarioId, int usuarioId, string rol)
+        {
+            return _repo.UsuarioYaDioLike(comentarioId, usuarioId, rol);
+        }
+
 
         private ComentarioDTO ConstruirDTO(Comentario c)
         {
@@ -78,7 +83,7 @@ namespace LogicaApp.Servicios
                 AutorId = c.ProfesionalId ?? c.ClienteId ?? c.AdminId ?? 0,
                 AutorNombre = c.Profesional?.NombreCompleto ?? c.Cliente?.NombreCompleto ?? c.Admin?.NombreCompleto ?? "Desconocido",
                 RolAutor = c.Profesional != null ? "Profesional" : c.Cliente != null ? "Cliente" : "Admin",
-                CantLikes = c.CantLikes,
+                //CantLikes = c.CantLikes,
                 ComentarioPadreId = c.ComentarioPadreId,
                 Respuestas = c.Respuestas?
                     .Where(r => r.EstaActivo)

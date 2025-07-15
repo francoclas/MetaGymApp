@@ -20,5 +20,8 @@ namespace LogicaNegocio.Interfaces.Repositorios
         List<Publicacion> ObtenerAprobadasAdmin(int adminId);
         void Actualizar(Publicacion publicacion);
         List<Publicacion> ObtenerRechazadasAdmin(int adminId);
+        bool UsuarioYaDioLike(int publicacionId, int usuarioId, string rol);
+        void DarLike(int publicacionId, int usuarioId, string rol);
+        void QuitarLike(int publicacionId, int usuarioId, string rol);
     }
 }

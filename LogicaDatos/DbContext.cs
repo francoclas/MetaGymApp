@@ -33,6 +33,9 @@ namespace LogicaDatos
         //Publicaciones
         public DbSet<Publicacion> Publicaciones { get; set; }
         public DbSet<Comentario> Comentarios { get; set; }
+        public DbSet<LikePublicacion> LikePublicaciones { get; set; }
+        public DbSet<LikeComentario> LikeComentarios { get; set; }
+
         //Extras
         public DbSet<Especialidad> Especialidades { get; set; }
         public DbSet<Establecimiento> Establecimientos { get; set; }
@@ -71,6 +74,16 @@ namespace LogicaDatos
                 .WithMany()
                 .HasForeignKey(p => p.AdminAprobadorId)
                 .OnDelete(DeleteBehavior.Restrict);
+            //Interacciones
+            modelBuilder.Entity<LikePublicacion>()
+                .HasOne(lp => lp.Publicacion)
+                .WithMany(p => p.Likes)
+                .HasForeignKey(lp => lp.PublicacionId);
+
+            modelBuilder.Entity<LikeComentario>()
+                .HasOne(lc => lc.Comentario)
+                .WithMany(c => c.Likes)
+                .HasForeignKey(lc => lc.ComentarioId);
         }
 
     }

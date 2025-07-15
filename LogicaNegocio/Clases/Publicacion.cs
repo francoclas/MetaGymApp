@@ -30,7 +30,8 @@ namespace LogicaNegocio.Clases
         public int CantLikes { get; set; }
         public List<Media> ListaMedia { get; set; } = new List<Media>();
         public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
-
+        //Interacciones
+        public List<LikePublicacion> Likes { get; set; }
         // Quien la crea (opcional: Profesional o Admin)
         public int? ProfesionalId { get; set; }
         public Profesional? Profesional { get; set; }

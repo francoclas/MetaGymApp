@@ -1,4 +1,5 @@
-﻿using LogicaNegocio.Interfaces.DTOS;
+﻿using LogicaApp.Servicios;
+using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +9,12 @@ namespace MetaGymWebApp.Controllers
     {   
         private readonly IPublicacionServicio publicacionServicio;
         private readonly IUsuarioServicio usuarioServicio;
-
-        public PublicacionController(IPublicacionServicio publicacionServicio, IUsuarioServicio usuarioServicio)
+        private readonly IComentarioServicio comentarioServicio;
+        public PublicacionController(IPublicacionServicio publicacionServicio, IUsuarioServicio usuarioServicio, IComentarioServicio comentarioServicio)
         {
             this.publicacionServicio = publicacionServicio;
             this.usuarioServicio = usuarioServicio;
+            this.comentarioServicio = comentarioServicio;
         }
 
         public IActionResult Index()
@@ -33,5 +35,45 @@ namespace MetaGymWebApp.Controllers
             var dto = usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId, rol);
             return View(dto);
         }
+        [HttpPost]
+        public IActionResult DarLike(int id)
+        {
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
+
+            publicacionServicio.DarLikePublicacion(id, usuarioId, rol);
+            return RedirectToAction("DetallePublicacion", new { id });
+        }
+
+        [HttpPost]
+        public IActionResult QuitarLike(int id)
+        {
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
+
+            publicacionServicio.QuitarLikePublicacion(id, usuarioId, rol);
+            return RedirectToAction("DetallePublicacion", new { id });
+        }
+        [HttpPost]
+        public IActionResult DarLikeComentario(int id)
+        {
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
+
+            comentarioServicio.DarLikeComentario(id, usuarioId, rol);
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
+        [HttpPost]
+        public IActionResult QuitarLikeComentario(int id)
+        {
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
+
+            comentarioServicio.QuitarLikeComentario(id, usuarioId, rol);
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
+
     }
 }

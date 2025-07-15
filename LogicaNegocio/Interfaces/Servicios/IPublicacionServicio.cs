@@ -24,5 +24,9 @@ namespace LogicaNegocio.Interfaces.Servicios
         void RechazarPublicacion(int publicacionId, string motivoRechazo, int v);
         List<PublicacionDTO> ObtenerRechazadasPorAdmin(int adminId);
         List<PublicacionDTO> ObtenerPublicacionesInicio();
+        void DarLikePublicacion(int publicacionId, int usuarioId, string rol);
+        void QuitarLikePublicacion(int publicacionId, int usuarioId, string rol);
+        bool UsuarioYaDioLikePublicacion(int publicacionId, int usuarioId, string rol);
+
     }
 }

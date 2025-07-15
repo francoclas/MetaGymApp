@@ -4,6 +4,7 @@ using LogicaDatos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LogicaDatos.Migrations
 {
     [DbContext(typeof(DbContextApp))]
-    partial class DbContextAppModelSnapshot : ModelSnapshot
+    [Migration("20250714234855_notificacionesInicial")]
+    partial class notificacionesInicial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,6 +178,9 @@ namespace LogicaDatos.Migrations
                     b.Property<int?>("AdminId")
                         .HasColumnType("int");
 
+                    b.Property<int>("CantLikes")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ClienteId")
                         .HasColumnType("int");
 
@@ -318,92 +324,6 @@ namespace LogicaDatos.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Establecimientos");
-                });
-
-            modelBuilder.Entity("LogicaNegocio.Clases.LikeComentario", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AdminId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ClienteId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ComentarioId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ProfesionalId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TipoUsuario")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AdminId");
-
-                    b.HasIndex("ClienteId");
-
-                    b.HasIndex("ComentarioId");
-
-                    b.HasIndex("ProfesionalId");
-
-                    b.ToTable("LikeComentarios");
-                });
-
-            modelBuilder.Entity("LogicaNegocio.Clases.LikePublicacion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AdminId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ClienteId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ProfesionalId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PublicacionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TipoUsuario")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AdminId");
-
-                    b.HasIndex("ClienteId");
-
-                    b.HasIndex("ProfesionalId");
-
-                    b.HasIndex("PublicacionId");
-
-                    b.ToTable("LikePublicaciones");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Media", b =>
@@ -876,52 +796,6 @@ namespace LogicaDatos.Migrations
                     b.Navigation("SesionRutina");
                 });
 
-            modelBuilder.Entity("LogicaNegocio.Clases.LikeComentario", b =>
-                {
-                    b.HasOne("LogicaNegocio.Clases.Admin", null)
-                        .WithMany("LikesComentarios")
-                        .HasForeignKey("AdminId");
-
-                    b.HasOne("LogicaNegocio.Clases.Cliente", null)
-                        .WithMany("LikesComentarios")
-                        .HasForeignKey("ClienteId");
-
-                    b.HasOne("LogicaNegocio.Clases.Comentario", "Comentario")
-                        .WithMany("Likes")
-                        .HasForeignKey("ComentarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LogicaNegocio.Clases.Profesional", null)
-                        .WithMany("LikesComentarios")
-                        .HasForeignKey("ProfesionalId");
-
-                    b.Navigation("Comentario");
-                });
-
-            modelBuilder.Entity("LogicaNegocio.Clases.LikePublicacion", b =>
-                {
-                    b.HasOne("LogicaNegocio.Clases.Admin", null)
-                        .WithMany("LikesPublicaciones")
-                        .HasForeignKey("AdminId");
-
-                    b.HasOne("LogicaNegocio.Clases.Cliente", null)
-                        .WithMany("LikesPublicaciones")
-                        .HasForeignKey("ClienteId");
-
-                    b.HasOne("LogicaNegocio.Clases.Profesional", null)
-                        .WithMany("LikesPublicaciones")
-                        .HasForeignKey("ProfesionalId");
-
-                    b.HasOne("LogicaNegocio.Clases.Publicacion", "Publicacion")
-                        .WithMany("Likes")
-                        .HasForeignKey("PublicacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Publicacion");
-                });
-
             modelBuilder.Entity("LogicaNegocio.Clases.Media", b =>
                 {
                     b.HasOne("LogicaNegocio.Clases.Admin", "Admin")
@@ -1090,10 +964,6 @@ namespace LogicaDatos.Migrations
 
                     b.Navigation("FotosPerfil");
 
-                    b.Navigation("LikesComentarios");
-
-                    b.Navigation("LikesPublicaciones");
-
                     b.Navigation("Notificaciones");
 
                     b.Navigation("Publicaciones");
@@ -1107,10 +977,6 @@ namespace LogicaDatos.Migrations
 
                     b.Navigation("FotosPerfil");
 
-                    b.Navigation("LikesComentarios");
-
-                    b.Navigation("LikesPublicaciones");
-
                     b.Navigation("Notificaciones");
 
                     b.Navigation("RutinasAsignadas");
@@ -1118,8 +984,6 @@ namespace LogicaDatos.Migrations
 
             modelBuilder.Entity("LogicaNegocio.Clases.Comentario", b =>
                 {
-                    b.Navigation("Likes");
-
                     b.Navigation("Respuestas");
                 });
 
@@ -1157,10 +1021,6 @@ namespace LogicaDatos.Migrations
 
                     b.Navigation("FotosPerfil");
 
-                    b.Navigation("LikesComentarios");
-
-                    b.Navigation("LikesPublicaciones");
-
                     b.Navigation("Notificaciones");
 
                     b.Navigation("Publicaciones");
@@ -1171,8 +1031,6 @@ namespace LogicaDatos.Migrations
             modelBuilder.Entity("LogicaNegocio.Clases.Publicacion", b =>
                 {
                     b.Navigation("Comentarios");
-
-                    b.Navigation("Likes");
 
                     b.Navigation("ListaMedia");
                 });

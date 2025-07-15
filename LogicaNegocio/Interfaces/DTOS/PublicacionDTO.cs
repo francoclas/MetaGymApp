@@ -19,9 +19,9 @@ namespace LogicaNegocio.Interfaces.DTOS
         public bool EsPrivada { get; set; }
         public int Vistas { get; set; }
         public int CantLikes { get; set; }
-        
         public int AutorId { get; set; }
         public string? NombreAutor { get; set; }
+        public string? ImagenAutorURL { get; set; }
         public string RolAutor { get; set; }
         public string MotivoRechazo { get; set; }
         public string? NombreAprobador { get; set; }

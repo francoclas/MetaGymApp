@@ -158,7 +158,6 @@ namespace LogicaApp.Servicios
                 _repositorio.Eliminar(media);
             }
         }
-
         public Media? ObtenerFotoFavorita(Enum_TipoEntidad tipo, int idEntidad)
         {
             return _repositorio.ObtenerFavorita(tipo, idEntidad);

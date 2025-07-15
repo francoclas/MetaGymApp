@@ -27,8 +27,10 @@ namespace LogicaNegocio.Clases
         public List<Ejercicio> Ejercicios { get; set; } = new List<Ejercicio>();
         public List<Media> FotosPerfil { get; set; } = new List<Media>();
         public List<Notificacion> Notificaciones { get; set; } = new List<Notificacion>();
-
         public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
+        //Interacciones
+        public List<LikePublicacion> LikesPublicaciones { get; set; } = new();
+        public List<LikeComentario> LikesComentarios { get; set; } = new();
         public Profesional(string ci, string nombreusuario, string nombreCompleto, string pass, string correo, string telefono)
         {
             this.NombreUsuario = nombreusuario;

@@ -28,7 +28,6 @@ public static class GestionJWT
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-
         return tokenHandler.WriteToken(token);
     }
 }

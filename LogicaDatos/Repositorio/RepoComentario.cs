@@ -69,24 +69,50 @@ namespace LogicaDatos.Repositorio
             }
         }
 
-        public void IncrementarLikes(int comentarioId)
+        public bool UsuarioYaDioLike(int comentarioId, int usuarioId, string rol)
         {
-            var comentario = _context.Comentarios.Find(comentarioId);
-            if (comentario != null)
+            return _context.LikesComentarios.Any(l =>
+                l.ComentarioId == comentarioId &&
+                l.UsuarioId == usuarioId &&
+                l.UsuarioRol == rol);
+        }
+
+        public void DarLike(int comentarioId, int usuarioId, string rol)
+        {
+            if (!UsuarioYaDioLike(comentarioId, usuarioId, rol))
             {
-                comentario.CantLikes++;
+                _context.LikeComentarios.Add(new LikeComentario
+                {
+                    ComentarioId = comentarioId,
+                    UsuarioId = usuarioId,
+                    TipoUsuario = rol,
+                    Fecha = DateTime.Now
+                });
+
+                var comentario = _context.Comentarios.Find(comentarioId);
+                if (comentario != null) comentario.CantLikes++;
+
                 _context.SaveChanges();
             }
         }
 
-        public void DecrementarLikes(int comentarioId)
+        public void QuitarLike(int comentarioId, int usuarioId, string rol)
         {
-            var comentario = _context.Comentarios.Find(comentarioId);
-            if (comentario != null && comentario.CantLikes > 0)
+            var like = _context.LikeComentarios.FirstOrDefault(l =>
+                l.ComentarioId == comentarioId &&
+                l.UsuarioId == usuarioId &&
+                l.TipoUsuario == rol);
+
+            if (like != null)
             {
-                comentario.CantLikes--;
+                _context.LikeComentarios.Remove(like);
+
+                var comentario = _context.Comentarios.Find(comentarioId);
+                if (comentario != null && comentario.CantLikes > 0) comentario.CantLikes--;
+
                 _context.SaveChanges();
             }
         }
+
     }
 }
