@@ -24,7 +24,7 @@ namespace LogicaNegocio.Clases
 
         public Enum_EstadoPublicacion Estado { get; set; }
         public string? MotivoRechazo { get; set; }
-
+        public bool MostrarEnNoticiasPublicas {  get; set; } = false;
         public bool EsPrivada { get; set; }
         public int Vistas { get; set; }
         public int CantLikes { get; set; }

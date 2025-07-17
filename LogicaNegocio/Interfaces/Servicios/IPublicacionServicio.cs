@@ -13,6 +13,7 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<PublicacionDTO> ObtenerPublicaciones();
         PublicacionDTO ObtenerPorId(int id);
         void CrearPublicacion(CrearPublicacionDTO dto);
+        void CrearPublicacionAdmin(Publicacion publicacion);
         void ModerarPublicacion(ModerarPublicacionDTO dto);
         List<PublicacionDTO> ObtenerPendientes();
         List<PublicacionDTO> ObtenerTodas();
@@ -27,6 +28,7 @@ namespace LogicaNegocio.Interfaces.Servicios
         void DarLikePublicacion(int publicacionId, int usuarioId, string rol);
         void QuitarLikePublicacion(int publicacionId, int usuarioId, string rol);
         bool UsuarioYaDioLikePublicacion(int publicacionId, int usuarioId, string rol);
+        int ContarLikesPublicacion(int publicacionId);
 
     }
 }

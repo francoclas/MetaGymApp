@@ -540,6 +540,69 @@ namespace MetaGymWebApp.Controllers
 
             return View(modelo);
         }
+
+        [HttpGet]
+        public IActionResult CrearPublicacion()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CrearPublicacion(CrearPublicacionDTO dto)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(dto.Titulo))
+                    throw new Exception("El título es obligatorio.");
+
+                if (string.IsNullOrWhiteSpace(dto.Descripcion))
+                    throw new Exception("La descripción es obligatoria.");
+
+                if (dto.Titulo.Length > 100)
+                    throw new Exception("El título no puede superar los 100 caracteres.");
+
+                if (dto.Descripcion.Length > 1000)
+                    throw new Exception("La descripción no puede superar los 1000 caracteres.");
+                var archivos = dto.ArchivosMedia;
+                int adminId = GestionSesion.ObtenerUsuarioId(HttpContext);
+                Publicacion publicacion = new Publicacion
+                {
+                    Titulo = dto.Titulo,
+                    Descripcion = dto.Descripcion,
+                    FechaCreacion = DateTime.Now,
+                    FechaProgramada = dto.FechaProgramada,
+                    EsPrivada = dto.EsPrivada,
+                    MostrarEnNoticiasPublicas = dto.MostrarEnNoticiasPublicas,
+                    AdminCreadorId = adminId,
+                    Estado = Enum_EstadoPublicacion.Aprobada,
+                    ListaMedia = new List<Media>(),
+                    
+                };
+                _publicacionServicio.CrearPublicacionAdmin(publicacion);
+                if (archivos != null && archivos.Any())
+                {
+                    foreach (var archivo in archivos)
+                    {
+                        if (archivo.Length > 0)
+                        {
+                            _mediaServicio.GuardarArchivo(archivo, Enum_TipoEntidad.Publicacion, publicacion.Id);
+                        }
+                    }
+                }
+                TempData["Mensaje"] = "Se registro la nueva publicacion correctamente.";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("MisPublicaciones");
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("MisPublicaciones");
+
+            }
+
+        }
+
         [HttpGet]
         public IActionResult DetallesPublicacion(int id)
         {

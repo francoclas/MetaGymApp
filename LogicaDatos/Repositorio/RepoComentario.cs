@@ -71,10 +71,10 @@ namespace LogicaDatos.Repositorio
 
         public bool UsuarioYaDioLike(int comentarioId, int usuarioId, string rol)
         {
-            return _context.LikesComentarios.Any(l =>
+            return _context.LikeComentarios.Any(l =>
                 l.ComentarioId == comentarioId &&
                 l.UsuarioId == usuarioId &&
-                l.UsuarioRol == rol);
+                l.TipoUsuario == rol);
         }
 
         public void DarLike(int comentarioId, int usuarioId, string rol)
@@ -90,7 +90,6 @@ namespace LogicaDatos.Repositorio
                 });
 
                 var comentario = _context.Comentarios.Find(comentarioId);
-                if (comentario != null) comentario.CantLikes++;
 
                 _context.SaveChanges();
             }
@@ -106,13 +105,12 @@ namespace LogicaDatos.Repositorio
             if (like != null)
             {
                 _context.LikeComentarios.Remove(like);
-
-                var comentario = _context.Comentarios.Find(comentarioId);
-                if (comentario != null && comentario.CantLikes > 0) comentario.CantLikes--;
-
                 _context.SaveChanges();
             }
         }
-
+        public int ContarLikes(int comentarioId)
+        {
+            return _context.LikeComentarios.Count(l => l.ComentarioId == comentarioId);
+        }
     }
 }

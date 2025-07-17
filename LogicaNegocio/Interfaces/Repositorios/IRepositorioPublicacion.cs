@@ -23,5 +23,6 @@ namespace LogicaNegocio.Interfaces.Repositorios
         bool UsuarioYaDioLike(int publicacionId, int usuarioId, string rol);
         void DarLike(int publicacionId, int usuarioId, string rol);
         void QuitarLike(int publicacionId, int usuarioId, string rol);
+        int ContarLikes(int publicacionId);
     }
 }

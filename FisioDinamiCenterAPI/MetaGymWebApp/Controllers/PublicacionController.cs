@@ -73,7 +73,25 @@ namespace MetaGymWebApp.Controllers
             comentarioServicio.QuitarLikeComentario(id, usuarioId, rol);
             return Redirect(Request.Headers["Referer"].ToString());
         }
+        [HttpPost]
+        public IActionResult AgregarComentario(int publicacionId, string contenido, int? comentarioPadreId)
+        {
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
 
+            ComentarioDTO comentario = new ComentarioDTO
+            {
+                PublicacionId = publicacionId,
+                Contenido = contenido,
+                AutorId = usuarioId,
+                RolAutor = rol,
+                ComentarioPadreId = comentarioPadreId
+            };
+
+            comentarioServicio.AgregarComentario(comentario);
+
+            return RedirectToAction("DetallePublicacion", new { id = publicacionId });
+        }
 
     }
 }

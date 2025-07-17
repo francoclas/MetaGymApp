@@ -37,7 +37,7 @@ namespace LogicaApp.Servicios
             var nuevo = new Comentario
             {
                 Contenido = dto.Contenido,
-                PublicacionId = dto.ComentarioPadreId == null ? dto.ComentarioId : 0, // asegura validación externa
+                PublicacionId = dto.PublicacionId, // SIEMPRE se necesita
                 ComentarioPadreId = dto.ComentarioPadreId,
                 ProfesionalId = dto.RolAutor == "Profesional" ? dto.AutorId : null,
                 ClienteId = dto.RolAutor == "Cliente" ? dto.AutorId : null,
@@ -46,6 +46,7 @@ namespace LogicaApp.Servicios
 
             _repo.Agregar(nuevo);
         }
+
 
         public void EditarComentario(int comentarioId, string nuevoContenido)
         {
@@ -90,6 +91,10 @@ namespace LogicaApp.Servicios
                     .Select(r => ConstruirDTO(r))
                     .ToList() ?? new List<ComentarioDTO>()
             };
+        }
+        public int ContarLikesComentario(int id)
+        {
+           return _repo.ContarLikes(id);    
         }
     }
 }

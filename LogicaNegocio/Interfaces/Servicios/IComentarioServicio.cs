@@ -16,6 +16,6 @@ namespace LogicaNegocio.Interfaces.Servicios
             void DarLikeComentario(int comentarioId, int usuarioId, string rol);
             void QuitarLikeComentario(int comentarioId, int usuarioId, string rol);
             bool UsuarioYaDioLikeComentario(int comentarioId, int usuarioId, string rol);
-
+            public int ContarLikesComentario(int id);
     }
 }

@@ -17,10 +17,12 @@ namespace LogicaApp.Servicios
     {
         private readonly IRepositorioPublicacion _repo;
         private readonly IMediaServicio mediaServicio;
-        public ServicioPublicacion(IRepositorioPublicacion repo, IMediaServicio mediaServicio)
+        private readonly IComentarioServicio comentarioServicio;
+        public ServicioPublicacion(IRepositorioPublicacion repo, IMediaServicio mediaServicio, IComentarioServicio comentarioServicio)
         {
             _repo = repo;
             this.mediaServicio = mediaServicio;
+            this.comentarioServicio = comentarioServicio;
         }
 
         public List<PublicacionDTO> ObtenerPublicaciones()
@@ -45,7 +47,7 @@ namespace LogicaApp.Servicios
 
         public void CrearPublicacion(CrearPublicacionDTO dto)
         {
-            var nueva = new Publicacion
+            Publicacion nueva = new Publicacion
             {
                 Titulo = dto.Titulo,
                 Descripcion = dto.Descripcion,
@@ -57,7 +59,10 @@ namespace LogicaApp.Servicios
 
             _repo.Crear(nueva);
         }
-
+        public void CrearPublicacionAdmin(Publicacion publicacion)
+        {
+            _repo.Crear(publicacion);
+        }
         public void ModerarPublicacion(ModerarPublicacionDTO dto)
         {
             var nuevoEstado = dto.Aprobar ? Enum_EstadoPublicacion.Aprobada : Enum_EstadoPublicacion.Rechazada;
@@ -79,6 +84,9 @@ namespace LogicaApp.Servicios
         // Método privado para convertir
         private PublicacionDTO ConvertirAPublicacionDTO(Publicacion pub)
         {
+            var autorId = pub.ProfesionalId ?? pub.AdminCreadorId ?? 0;
+            var rolAutor = pub.Profesional != null ? Enum_TipoEntidad.Profesional : Enum_TipoEntidad.Admin;
+
             return new PublicacionDTO
             {
                 Id = pub.Id,
@@ -89,45 +97,46 @@ namespace LogicaApp.Servicios
                 Estado = pub.Estado,
                 EsPrivada = pub.EsPrivada,
                 Vistas = pub.Vistas,
-                CantLikes = pub.CantLikes,
-                AutorId = pub.ProfesionalId ?? pub.AdminCreadorId ?? 0,
-                Comentarios = pub.Comentarios?.Select(c => new ComentarioDTO
-                {
-                    ComentarioId = c.ComentarioId,
-                    Contenido = c.Contenido,
-                    FechaCreacion = c.FechaCreacion,
-                    FechaEdicion = c.FechaEdicion,
-                    AutorId = c.ProfesionalId ?? c.ClienteId ?? c.AdminId ?? 0,
-                    AutorNombre = c.Profesional?.NombreCompleto ?? c.Cliente?.NombreCompleto ?? c.Admin?.NombreCompleto ?? "Desconocido",
-                    RolAutor = c.Profesional != null ? "Profesional" : c.Cliente != null ? "Cliente" : "Admin",
-                    //CantLikes = c.CantLikes,
-                    ComentarioPadreId = c.ComentarioPadreId,
-                    Respuestas = c.Respuestas?
-                        .Where(r => r.EstaActivo)
-                        .Select(r => new ComentarioDTO
-                        {
-                            ComentarioId = r.ComentarioId,
-                            Contenido = r.Contenido,
-                            FechaCreacion = r.FechaCreacion,
-                            FechaEdicion = r.FechaEdicion,
-                            AutorId = r.ProfesionalId ?? r.ClienteId ?? r.AdminId ?? 0,
-                            AutorNombre = r.Profesional?.NombreCompleto ?? r.Cliente?.NombreCompleto ?? r.Admin?.NombreCompleto ?? "Desconocido",
-                            RolAutor = r.Profesional != null ? "Profesional" : r.Cliente != null ? "Cliente" : "Admin",
-                            //CantLikes = r.CantLikes,
-                            ComentarioPadreId = r.ComentarioPadreId
-                        }).ToList() ?? new()
-                }).ToList() ?? new(),
-                
+                AutorId = autorId,
+                RolAutor = rolAutor.ToString(),
+                NombreAutor = pub.Profesional?.NombreCompleto ?? pub.AdminCreador?.NombreCompleto ?? "Desconocido",
+                ImagenAutorURL = mediaServicio.ObtenerFotoFavorita(rolAutor, autorId)?.Url,
                 UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new(),
                 Medias = pub.ListaMedia,
-                NombreAutor = pub.Profesional?.NombreCompleto ?? pub.AdminCreador?.NombreCompleto ?? "Desconocido",
-                ImagenAutorURL = pub.Profesional != null
-                        ? mediaServicio.ObtenerFotoFavorita(Enum_TipoEntidad.Profesional, pub.Profesional.Id)?.Url
-                        : mediaServicio.ObtenerFotoFavorita(Enum_TipoEntidad.Admin, (int)pub.AdminCreadorId)?.Url,
-                RolAutor = pub.Profesional != null ? "Profesional" : "Admin",
+                Comentarios = pub.Comentarios?
+                    .Where(c => c.ComentarioPadreId == null && c.EstaActivo)
+                    .Select(c => MapearComentario(c))
+                    .ToList() ?? new(),
                 MotivoRechazo = pub.MotivoRechazo,
                 NombreAprobador = pub.AdminAprobador?.NombreCompleto,
                 NombreCreadorAdmin = pub.AdminCreador?.NombreCompleto
+            };
+        }
+
+        private ComentarioDTO MapearComentario(Comentario c)
+        {
+            var tipo = c.Profesional != null ? Enum_TipoEntidad.Profesional :
+                       c.Cliente != null ? Enum_TipoEntidad.Cliente :
+                       Enum_TipoEntidad.Admin;
+
+            var autorId = c.ProfesionalId ?? c.ClienteId ?? c.AdminId ?? 0;
+
+            return new ComentarioDTO
+            {
+                ComentarioId = c.ComentarioId,
+                Contenido = c.Contenido,
+                FechaCreacion = c.FechaCreacion,
+                FechaEdicion = c.FechaEdicion,
+                AutorId = autorId,
+                AutorNombre = c.Profesional?.NombreCompleto ?? c.Cliente?.NombreCompleto ?? c.Admin?.NombreCompleto ?? "Desconocido",
+                RolAutor = tipo.ToString(),
+                ImagenAutor = mediaServicio.ObtenerFotoFavorita(tipo, autorId),
+                ComentarioPadreId = c.ComentarioPadreId,
+                CantLikes = comentarioServicio.ContarLikesComentario(c.ComentarioId),
+                Respuestas = c.Respuestas?
+                    .Where(r => r.EstaActivo)
+                    .Select(r => MapearComentario(r))
+                    .ToList() ?? new()
             };
         }
 
@@ -247,6 +256,11 @@ namespace LogicaApp.Servicios
         {
             return _repo.UsuarioYaDioLike(publicacionId, usuarioId, rol);
         }
+        public int ContarLikesPublicacion(int id)
+        {
+            return _repo.ContarLikes(id);
+        }
 
+       
     }
 }

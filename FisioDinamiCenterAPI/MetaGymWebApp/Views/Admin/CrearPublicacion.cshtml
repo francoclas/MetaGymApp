@@ -1,0 +1,42 @@
+﻿@model CrearPublicacionDTO
+
+@{
+    ViewData["Title"] = "Crear Publicación";
+}
+<div class="container">
+    <h2>Crear nueva publicación</h2>
+
+    <form asp-action="CrearPublicacion" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label>Título</label>
+            <input asp-for="Titulo" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label>Descripción</label>
+            <textarea asp-for="Descripcion" class="form-control"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label>Fecha programada (opcional)</label>
+            <input asp-for="FechaProgramada" type="datetime-local" class="form-control" />
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="EsPrivada" class="form-check-input" />
+            <label class="form-check-label">Marcar como privada</label>
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="MostrarEnNoticiasPublicas" class="form-check-input" />
+            <label class="form-check-label">Mostrar en noticias públicas</label>
+        </div>
+
+        <div class="mb-3">
+            <label>Archivos multimedia</label>
+            <input asp-for="ArchivosMedia" type="file" multiple class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Crear publicación</button>
+    </form>
+</div>

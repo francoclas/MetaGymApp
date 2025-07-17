@@ -35,11 +35,17 @@ namespace LogicaDatos.Repositorio
         public void Crear(Publicacion publicacion)
         {
             publicacion.FechaCreacion = DateTime.Now;
-            publicacion.Estado = publicacion.FechaProgramada.HasValue
-                ? Enum_EstadoPublicacion.Programada
-                : Enum_EstadoPublicacion.Pendiente;
-
-            _context.Publicaciones.Add(publicacion);
+            //Esto verifica si la creo un profesional y la deja en espera de ser aprobada
+            if (publicacion.ProfesionalId != null){
+                publicacion.Estado = publicacion.FechaProgramada.HasValue
+                    ? Enum_EstadoPublicacion.Programada
+                    : Enum_EstadoPublicacion.Pendiente;
+            }
+            else
+            {
+                publicacion.Estado = Enum_EstadoPublicacion.Aprobada;
+            }
+                _context.Publicaciones.Add(publicacion);
             _context.SaveChanges();
         }
 
@@ -63,16 +69,30 @@ namespace LogicaDatos.Repositorio
                 .Where(p => p.Estado == Enum_EstadoPublicacion.Pendiente).ToList();
         }
         public List<Publicacion> ObtenerAprobadasPublicas()
-        { 
+        {
             return _context.Publicaciones
-                 .Include(p => p.ListaMedia)
-                 .Include(p => p.Profesional)
-                 .Include(p => p.AdminCreador)
-                 .Include(p => p.AdminAprobador)
-                 .Include(p => p.Comentarios)
-                .Where(p => p.Estado == Enum_EstadoPublicacion.Aprobada && !p.EsPrivada)
-                                     .OrderByDescending(p => p.FechaCreacion)
-                                     .ToList();
+                    .Include(p => p.ListaMedia)
+                    .Include(p => p.Profesional)
+                    .Include(p => p.AdminCreador)
+                    .Include(p => p.AdminAprobador)
+                    .Include(p => p.Comentarios)
+                        .ThenInclude(c => c.Profesional)
+                    .Include(p => p.Comentarios)
+                        .ThenInclude(c => c.Cliente)
+                    .Include(p => p.Comentarios)
+                        .ThenInclude(c => c.Admin)
+                    .Include(p => p.Comentarios)
+                        .ThenInclude(c => c.Respuestas)
+                    .ThenInclude(r => r.Profesional)
+                    .Include(p => p.Comentarios)
+                        .ThenInclude(c => c.Respuestas)
+                    .ThenInclude(r => r.Cliente)
+                    .Include(p => p.Comentarios)
+                        .ThenInclude(c => c.Respuestas)
+                    .ThenInclude(r => r.Admin)
+                    .Where(p => p.Estado == Enum_EstadoPublicacion.Aprobada && !p.EsPrivada)
+                    .OrderByDescending(p => p.FechaCreacion)
+                    .ToList();
         }
 
         public List<Publicacion> ObtenerCreadasAdmin(int adminId)
@@ -148,7 +168,10 @@ namespace LogicaDatos.Repositorio
                 _context.SaveChanges();
             }
         }
-
+        public int ContarLikes(int publicacionId)
+        {
+            return _context.LikePublicaciones.Count(l => l.PublicacionId == publicacionId);
+        }
 
     }
 }

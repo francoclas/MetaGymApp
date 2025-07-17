@@ -403,30 +403,42 @@ namespace MetaGymWebApp.Controllers
         public IActionResult SolicitarPublicacion(CrearPublicacionDTO dto, List<IFormFile> ArchivosMedia)
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
-
-            var publicacion = new Publicacion
+            try
             {
-                Titulo = dto.Titulo,
-                Descripcion = dto.Descripcion,
-                FechaCreacion = DateTime.Now,
-                FechaProgramada = dto.FechaProgramada,
-                EsPrivada = dto.EsPrivada,
-                Estado = dto.FechaProgramada.HasValue ? Enum_EstadoPublicacion.Programada : Enum_EstadoPublicacion.Pendiente,
-                ProfesionalId = profesionalId,
-                ListaMedia = new List<Media>()
-            };
-            //Lo creo
-            publicacionServicio.CrearPublicacionImagenes(publicacion);
-
-            //Si hay imagenes las registro
-            if (ArchivosMedia != null && ArchivosMedia.Count > 0)
-            {
-                foreach (var archivo in ArchivosMedia)
+                //valido datos
+                Publicacion publicacion = new Publicacion
                 {
-                    mediaServicio.GuardarArchivo(archivo,Enum_TipoEntidad.Publicacion,publicacion.Id);
+                    Titulo = dto.Titulo,
+                    Descripcion = dto.Descripcion,
+                    FechaCreacion = DateTime.Now,
+                    FechaProgramada = dto.FechaProgramada,
+                    EsPrivada = dto.EsPrivada,
+                    Estado = dto.FechaProgramada.HasValue ? Enum_EstadoPublicacion.Programada : Enum_EstadoPublicacion.Pendiente,
+                    ProfesionalId = profesionalId,
+                    ListaMedia = new List<Media>()
+                };
+           
+                //Lo creo
+                publicacionServicio.CrearPublicacionImagenes(publicacion);
+                //Si hay imagenes las registro
+                if (ArchivosMedia != null && ArchivosMedia.Count > 0)
+                {
+                    foreach (var archivo in ArchivosMedia)
+                    {
+                        mediaServicio.GuardarArchivo(archivo, Enum_TipoEntidad.Publicacion, publicacion.Id);
+                    }
                 }
+                TempData["Mensaje"] = "Se envio la solicitud para su revision";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("MisPublicaciones");
             }
-            return RedirectToAction("MisPublicaciones");
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("MisPublicaciones");
+            }
+            
         }
         //Mis publicaciones
         [HttpGet]

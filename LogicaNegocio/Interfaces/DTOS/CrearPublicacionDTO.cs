@@ -12,8 +12,12 @@ namespace LogicaNegocio.Interfaces.DTOS
         public string Titulo { get; set; }
         public string Descripcion { get; set; }
         public DateTime? FechaProgramada { get; set; }
+        public bool MostrarEnNoticiasPublicas { get; set; }
+
         public bool EsPrivada { get; set; }
         public List<IFormFile> ArchivosMedia { get; set; } = new();
         public int? ProfesionalId { get; set; }
+        public int? AdminId { get; set; }
+
     }
 }

@@ -16,6 +16,7 @@ namespace LogicaNegocio.Interfaces.DTOS
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaProgramada { get; set; }
         public Enum_EstadoPublicacion Estado { get; set; }
+        public bool MostrarEnNoticiasPublicas { get; set; } 
         public bool EsPrivada { get; set; }
         public int Vistas { get; set; }
         public int CantLikes { get; set; }
