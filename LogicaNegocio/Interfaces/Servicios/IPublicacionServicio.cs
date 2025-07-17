@@ -29,6 +29,6 @@ namespace LogicaNegocio.Interfaces.Servicios
         void QuitarLikePublicacion(int publicacionId, int usuarioId, string rol);
         bool UsuarioYaDioLikePublicacion(int publicacionId, int usuarioId, string rol);
         int ContarLikesPublicacion(int publicacionId);
-
+        List<PublicacionDTO> ObtenerNovedades();
     }
 }

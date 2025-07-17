@@ -13,36 +13,55 @@
 
     <!-- Título -->
     <h5 class="pub-titulo">@Model.Titulo</h5>
-
-    <!-- Slideshow -->
-    @if (Model.Medias != null && Model.Medias.Any())
-    {
-        <div class="pub-slideshow" id="slideshow-@Model.Id">
-            @foreach (var media in Model.Medias)
-            {
-                if (media.Tipo == Enum_TipoMedia.Imagen)
-                {
-                    <img src="@media.Url" class="pub-slide pub-slide-img" />
-                }
-                else if (media.Tipo == Enum_TipoMedia.Video)
-                {
-                    <video src="@media.Url" class="pub-slide pub-slide-video" controls></video>
-                }
-            }
-            <div class="pub-slide-dots"></div>
-        </div>
-    }
-
     <!-- Descripción -->
     <div class="pub-descripcion" data-publicacion-id="@Model.Id">
         <span class="pub-texto-resumen">@Model.Descripcion</span>
         <button class="pub-btn-vermas" data-id="@Model.Id">Ver más</button>
     </div>
 
+    <!-- Slideshow -->
+   @if (Model.Medias != null && Model.Medias.Count > 0)
+{
+    <div class="pub-slideshow" id="slideshow-@Model.Id">
+        <div class="pub-slide-container">
+            @foreach (var media in Model.Medias)
+            {
+                <div class="pub-slide">
+                    @if (media.Tipo == Enum_TipoMedia.Imagen)
+                    {
+                        <img src="@media.Url" class="pub-slide-img" />
+                    }
+                    else
+                    {
+                        <video src="@media.Url" class="pub-slide-video" controls></video>
+                    }
+                </div>
+            }
+        </div>
+
+        @if (Model.Medias.Count > 1)
+        {
+            <button class="pub-slide-btn left" onclick="cambiarSlide(@Model.Id, -1)">❮</button>
+            <button class="pub-slide-btn right" onclick="cambiarSlide(@Model.Id, 1)">❯</button>
+
+            <div class="pub-slide-dots">
+                @for (int i = 0; i < Model.Medias.Count; i++)
+                {
+                    <span class="pub-slide-dot @(i == 0 ? "active" : "")"
+                          onclick="cambiarSlide(@Model.Id, @i - slideIndices[@Model.Id] || 0)">
+                    </span>
+                }
+            </div>
+        }
+    </div>
+}
+
+
+    
     <!-- Interacciones -->
     <div class="pub-interacciones mt-2">
         <button class="pub-btn-like">❤️ <span>@Model.CantLikes</span></button>
-        <button class="pub-btn-comentarios" data-id="@Model.Id">💬 Comentarios</button>
+        <button class="pub-btn-comentarios" data-id="@Model.Id">💬 Ver comentarios</button>
     </div>
 
     <!-- Comentarios -->
@@ -70,21 +89,19 @@
                             </div>
                         </form>
 
-                        <!-- Respuestas  -->
+                        <!-- Respuestas -->
                         @if (com.Respuestas != null && com.Respuestas.Any())
                         {
-                            <div class="ms-4 mt-2">
-                                @foreach (var resp in com.Respuestas)
-                                {
-                                    <div class="pub-comentario">
-                                        <img src="@resp.ImagenAutor.Url" class="pub-com-img" />
-                                        <div>
-                                            <p class="pub-com-autor">@resp.AutorNombre</p>
-                                            <p class="pub-com-texto">@resp.Contenido</p>
-                                        </div>
+                            @foreach (var resp in com.Respuestas)
+                            {
+                                <div class="pub-comentario">
+                                    <img src="@resp.ImagenAutor.Url" class="pub-com-img" />
+                                    <div>
+                                        <p class="pub-com-autor">@resp.AutorNombre</p>
+                                        <p class="pub-com-texto">@resp.Contenido</p>
                                     </div>
-                                }
-                            </div>
+                                </div>
+                            }
                         }
                     </div>
                 </div>
@@ -96,12 +113,10 @@
         }
     </div>
     <div>
-        <form asp-action="AgregarComentario" method="post" class="mt-3">
+        <form asp-action="AgregarComentario" method="post" class="pub-comentar-form">
             <input type="hidden" name="publicacionId" value="@Model.Id" />
-            <div class="input-group">
-                <input name="contenido" class="form-control" placeholder="Escribí un comentario..." />
-                <button type="submit" class="btn btn-success">Comentar</button>
-            </div>
+            <textarea name="contenido" placeholder="Escribí un comentario..."></textarea>
+            <button type="submit" class="pub-btn-comentar">Comentar</button>
         </form>
     </div>
 

@@ -1,4 +1,5 @@
 ﻿using LogicaNegocio.Interfaces.DTOS;
+using LogicaNegocio.Interfaces.DTOS.API;
 using LogicaNegocio.Interfaces.Servicios;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,6 +35,37 @@ namespace APIClienteMetaGym.Controllers
 
             return Ok(new { success = true, data = usuario });
         }
+        [HttpPost("registro")]
+        public IActionResult registro(RegistroUsuarioDTO registro)
+        {
+            // Validaciones básicas
+            if (string.IsNullOrWhiteSpace(registro.Correo) ||
+                string.IsNullOrWhiteSpace(registro.Usuario) ||
+                string.IsNullOrWhiteSpace(registro.Pass) ||
+                string.IsNullOrWhiteSpace(registro.Confirmacion))
+            {
+                return BadRequest(new { success = false, error = "Faltan campos obligatorios." });
+            }
 
+            if (registro.Pass != registro.Confirmacion)
+            {
+                return BadRequest(new { success = false, error = "Las contraseñas no coinciden." });
+            }
+
+            // Llamar al servicio
+            //falta implementar
+            SesionDTO sesion = null;//_usuarioServicio.RegistrarCliente(registro);
+
+            if (sesion == null)
+            {
+                return Conflict(new { success = false, error = "El correo o nombre de usuario ya está en uso." });
+            }
+
+            // Generar token
+            var token = GestionJWT.GenerarToken(sesion, _configuration["Jwt:Key"]);
+            sesion.Token = token;
+
+            return Ok(new { success = true, data = sesion });
+        }
     }
 }

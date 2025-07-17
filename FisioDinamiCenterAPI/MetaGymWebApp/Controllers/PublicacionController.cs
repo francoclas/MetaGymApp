@@ -93,5 +93,11 @@ namespace MetaGymWebApp.Controllers
             return RedirectToAction("DetallePublicacion", new { id = publicacionId });
         }
 
+        [HttpGet]
+        public IActionResult Novedades()
+        {
+            List<PublicacionDTO> Publicaciones = publicacionServicio.ObtenerNovedades();
+            return View(Publicaciones);
+        }
     }
 }

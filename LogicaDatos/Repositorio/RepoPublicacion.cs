@@ -173,5 +173,12 @@ namespace LogicaDatos.Repositorio
             return _context.LikePublicaciones.Count(l => l.PublicacionId == publicacionId);
         }
 
+        public List<Publicacion> ObtenerNovedades()
+        {
+            return _context.Publicaciones
+                .Include(p => p.ListaMedia)
+                .Include(p => p.Profesional)
+                .Where(p => p.MostrarEnNoticiasPublicas == true).ToList();
+        }
     }
 }

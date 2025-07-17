@@ -24,5 +24,6 @@ namespace LogicaNegocio.Interfaces.Repositorios
         void DarLike(int publicacionId, int usuarioId, string rol);
         void QuitarLike(int publicacionId, int usuarioId, string rol);
         int ContarLikes(int publicacionId);
+        List<Publicacion> ObtenerNovedades();
     }
 }

@@ -81,64 +81,7 @@ namespace LogicaApp.Servicios
             return result;
         }
 
-        // Método privado para convertir
-        private PublicacionDTO ConvertirAPublicacionDTO(Publicacion pub)
-        {
-            var autorId = pub.ProfesionalId ?? pub.AdminCreadorId ?? 0;
-            var rolAutor = pub.Profesional != null ? Enum_TipoEntidad.Profesional : Enum_TipoEntidad.Admin;
-
-            return new PublicacionDTO
-            {
-                Id = pub.Id,
-                Titulo = pub.Titulo,
-                Descripcion = pub.Descripcion,
-                FechaCreacion = pub.FechaCreacion,
-                FechaProgramada = pub.FechaProgramada,
-                Estado = pub.Estado,
-                EsPrivada = pub.EsPrivada,
-                Vistas = pub.Vistas,
-                AutorId = autorId,
-                RolAutor = rolAutor.ToString(),
-                NombreAutor = pub.Profesional?.NombreCompleto ?? pub.AdminCreador?.NombreCompleto ?? "Desconocido",
-                ImagenAutorURL = mediaServicio.ObtenerFotoFavorita(rolAutor, autorId)?.Url,
-                UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new(),
-                Medias = pub.ListaMedia,
-                Comentarios = pub.Comentarios?
-                    .Where(c => c.ComentarioPadreId == null && c.EstaActivo)
-                    .Select(c => MapearComentario(c))
-                    .ToList() ?? new(),
-                MotivoRechazo = pub.MotivoRechazo,
-                NombreAprobador = pub.AdminAprobador?.NombreCompleto,
-                NombreCreadorAdmin = pub.AdminCreador?.NombreCompleto
-            };
-        }
-
-        private ComentarioDTO MapearComentario(Comentario c)
-        {
-            var tipo = c.Profesional != null ? Enum_TipoEntidad.Profesional :
-                       c.Cliente != null ? Enum_TipoEntidad.Cliente :
-                       Enum_TipoEntidad.Admin;
-
-            var autorId = c.ProfesionalId ?? c.ClienteId ?? c.AdminId ?? 0;
-
-            return new ComentarioDTO
-            {
-                ComentarioId = c.ComentarioId,
-                Contenido = c.Contenido,
-                FechaCreacion = c.FechaCreacion,
-                FechaEdicion = c.FechaEdicion,
-                AutorId = autorId,
-                AutorNombre = c.Profesional?.NombreCompleto ?? c.Cliente?.NombreCompleto ?? c.Admin?.NombreCompleto ?? "Desconocido",
-                RolAutor = tipo.ToString(),
-                ImagenAutor = mediaServicio.ObtenerFotoFavorita(tipo, autorId),
-                ComentarioPadreId = c.ComentarioPadreId,
-                CantLikes = comentarioServicio.ContarLikesComentario(c.ComentarioId),
-                Respuestas = c.Respuestas?
-                    .Where(r => r.EstaActivo)
-                    .Select(r => MapearComentario(r))
-                    .ToList() ?? new()
-            };
-        }
+        
 
         public List<PublicacionDTO> ObtenerTodas()
         {
@@ -181,7 +124,17 @@ namespace LogicaApp.Servicios
             }
             return salida;
         }
+        public List<PublicacionDTO> ObtenerNovedades()
+        {
+            List<PublicacionDTO> salida = new List<PublicacionDTO>();
+            List<Publicacion> lista = _repo.ObtenerNovedades();
+            foreach (Publicacion item in lista)
+            {
+                salida.Add(ConvertirNoticia(item));
+            }
+            return salida;
 
+        }
         public List<PublicacionDTO> ObtenerAutorizadasPorAdmin(int adminId)
         {
             List<PublicacionDTO> salida = new List<PublicacionDTO>();
@@ -261,6 +214,87 @@ namespace LogicaApp.Servicios
             return _repo.ContarLikes(id);
         }
 
-       
+        // Método privado para convertir
+        private PublicacionDTO ConvertirAPublicacionDTO(Publicacion pub)
+        {
+            var autorId = pub.ProfesionalId ?? pub.AdminCreadorId ?? 0;
+            var rolAutor = pub.Profesional != null ? Enum_TipoEntidad.Profesional : Enum_TipoEntidad.Admin;
+
+            return new PublicacionDTO
+            {
+                Id = pub.Id,
+                Titulo = pub.Titulo,
+                Descripcion = pub.Descripcion,
+                FechaCreacion = pub.FechaCreacion,
+                FechaProgramada = pub.FechaProgramada,
+                Estado = pub.Estado,
+                EsPrivada = pub.EsPrivada,
+                Vistas = pub.Vistas,
+                AutorId = autorId,
+                RolAutor = rolAutor.ToString(),
+                NombreAutor = pub.Profesional?.NombreCompleto ?? pub.AdminCreador?.NombreCompleto ?? "Desconocido",
+                ImagenAutorURL = mediaServicio.ObtenerFotoFavorita(rolAutor, autorId)?.Url,
+                UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new(),
+                Medias = pub.ListaMedia,
+                Comentarios = pub.Comentarios?
+                    .Where(c => c.ComentarioPadreId == null && c.EstaActivo)
+                    .Select(c => MapearComentario(c))
+                    .ToList() ?? new(),
+                MotivoRechazo = pub.MotivoRechazo,
+                NombreAprobador = pub.AdminAprobador?.NombreCompleto,
+                NombreCreadorAdmin = pub.AdminCreador?.NombreCompleto
+            };
+        }
+        private PublicacionDTO ConvertirNoticia(Publicacion pub)
+        {
+            var autorId = pub.ProfesionalId ?? pub.AdminCreadorId ?? 0;
+            var rolAutor = pub.Profesional != null ? Enum_TipoEntidad.Profesional : Enum_TipoEntidad.Admin;
+
+            return new PublicacionDTO
+            {
+                Titulo = pub.Titulo,
+                Descripcion = pub.Descripcion,
+                FechaCreacion = pub.FechaCreacion,
+                FechaProgramada = pub.FechaProgramada,
+                Estado = pub.Estado,
+                EsPrivada = pub.EsPrivada,
+                Vistas = pub.Vistas,
+                NombreAutor = pub.Profesional?.NombreCompleto ?? pub.AdminCreador?.NombreCompleto ?? "Desconocido",
+                ImagenAutorURL = mediaServicio.ObtenerFotoFavorita(rolAutor, autorId)?.Url,
+                UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new(),
+                Medias = pub.ListaMedia
+            };
+            }
+        private ComentarioDTO MapearComentario(Comentario c)
+        {
+            var tipo = c.Profesional != null ? Enum_TipoEntidad.Profesional :
+                       c.Cliente != null ? Enum_TipoEntidad.Cliente :
+                       Enum_TipoEntidad.Admin;
+
+            var autorId = c.ProfesionalId ?? c.ClienteId ?? c.AdminId ?? 0;
+
+            ComentarioDTO salida = new ComentarioDTO
+            {
+                ComentarioId = c.ComentarioId,
+                Contenido = c.Contenido,
+                FechaCreacion = c.FechaCreacion,
+                FechaEdicion = c.FechaEdicion,
+                AutorId = autorId,
+                AutorNombre = c.Profesional?.NombreCompleto ?? c.Cliente?.NombreCompleto ?? c.Admin?.NombreCompleto ?? "Desconocido",
+                RolAutor = tipo.ToString(),
+                ImagenAutor = mediaServicio.ObtenerFotoFavorita(tipo, autorId),
+                ComentarioPadreId = c.ComentarioPadreId,
+                CantLikes = comentarioServicio.ContarLikesComentario(c.ComentarioId),
+                Respuestas = c.Respuestas?
+                    .Where(r => r.EstaActivo)
+                    .Select(r => MapearComentario(r))
+                    .ToList() ?? new()
+            };
+            if (salida.ImagenAutor == null)
+            {
+                salida.ImagenAutor = new Media { Url = "/MediaWeb/Default/perfil_default.jpg" };
+            }
+            return salida;
+        }
     }
 }
