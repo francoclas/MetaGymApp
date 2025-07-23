@@ -15,7 +15,8 @@ namespace LogicaNegocio.Interfaces.DTOS
         public List<int> IdsClientesAsignados { get; set; } = new();
         
         // Para la vista (no se postean)
-        public List<EjercicioDTO> EjerciciosDisponibles { get; set; } = new();
+        public List<EjercicioDTO> MisEjerciciosDisponibles { get; set; } = new();
+        public List<EjercicioDTO> EjerciciosDisponiblesSistema { get; set; } = new();
         public List<ClienteDTO> ClientesDisponibles { get; set; } = new();
     }
 }

@@ -283,12 +283,15 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult RegistrarRutina()
         {
-            //ViewBag.Ejercicios = rutinaServicio.ObtenerTodosEjercicios(); // EjercicioDTO
+            int profesionalId = GestionSesion.ObtenerUsuarioId(this.HttpContext);
+            List<EjercicioDTO> todos = rutinaServicio.ObtenerTodosEjercicios();
             var modelo = new RutinaRegistroDTO
             {
-                EjerciciosDisponibles = rutinaServicio.ObtenerTodosEjercicios(),
+                MisEjerciciosDisponibles = todos.Where(e => e.ProfesionalId == profesionalId).ToList(),
+                EjerciciosDisponiblesSistema = todos.Where(e => e.ProfesionalId != profesionalId).ToList(),
                 ClientesDisponibles = clienteServicio.ObtenerTodosDTO()
             };
+            
 
             return View(modelo);
         }
@@ -344,7 +347,7 @@ namespace MetaGymWebApp.Controllers
                     Tipo = rutina.Tipo,
                     IdsEjerciciosSeleccionados = rutina.Ejercicios.Select(e => e.EjercicioId).ToList(),
                     IdsClientesAsignados = rutinaServicio.ObtenerAsignacionesPorRutina(id).Select(a => a.ClienteId).ToList(),
-                    EjerciciosDisponibles = rutinaServicio.ObtenerTodosEjercicios(),
+                    MisEjerciciosDisponibles = rutinaServicio.ObtenerTodosEjercicios(),
                     ClientesDisponibles = clienteServicio.ObtenerTodosDTO()
                 };
                 return View(dto);

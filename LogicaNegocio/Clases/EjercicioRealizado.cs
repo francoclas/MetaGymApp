@@ -18,10 +18,13 @@ namespace LogicaNegocio.Clases
         public int EjercicioId { get; set; }
         public Ejercicio Ejercicio { get; set; }
 
-        public int? Orden { get; set; } // opcional si querés preservar el orden
+        public int? Orden { get; set; } 
         public bool SeRealizo { get; set; }
         public string? Observaciones { get; set; }
 
         public List<SerieRealizada> Series { get; set; } = new();
+        
+        //Solicitados por profesional
+        public List<ValorMedicion> ValoresMediciones { get; set; } = new();
     }
 }

@@ -84,8 +84,19 @@ namespace LogicaDatos
                 .HasOne(lc => lc.Comentario)
                 .WithMany(c => c.Likes)
                 .HasForeignKey(lc => lc.ComentarioId);
+            modelBuilder.Entity<ValorMedicion>()
+                .HasOne(vm => vm.Medicion)
+                .WithMany()
+                .HasForeignKey(vm => vm.MedicionId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<ValorMedicion>()
+                .HasOne(vm => vm.EjercicioRealizado)
+                .WithMany(er => er.ValoresMediciones)
+                .HasForeignKey(vm => vm.EjercicioRealizadoId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
+    }
 
     }
 
-}

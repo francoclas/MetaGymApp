@@ -24,7 +24,7 @@
     <input type="text" id="buscadorEjercicios" placeholder="Buscar por nombre o tipo..." />
 
     <div style="display: flex; gap: 20px; padding-top:5px; flex-wrap: wrap;" id="ejerciciosDisponibles">
-        @foreach (var ejercicio in Model.EjerciciosDisponibles)
+        @foreach (var ejercicio in Model.MisEjerciciosDisponibles)
         {
                 var img = ejercicio.Media?.Url;
                 <div class="card-ejercicio" data-nombre="@ejercicio.Nombre" data-tipo="@ejercicio.Tipo" data-id="@ejercicio.Id">
@@ -40,7 +40,7 @@
     <ul id="listaEjerciciosSeleccionados">
         @foreach (var id in Model.IdsEjerciciosSeleccionados)
         {
-            var ej = Model.EjerciciosDisponibles.FirstOrDefault(e => e.Id == id);
+            var ej = Model.MisEjerciciosDisponibles.FirstOrDefault(e => e.Id == id);
             if (ej != null)
             {
                 <li data-id="@id">@ej.Nombre <button type="button" onclick="quitarEjercicio(@id)">X</button></li>

@@ -1,8 +1,10 @@
 ﻿@using LogicaNegocio.Extra
 @model PublicacionDTO
+
 @{
     ViewData["Title"] = "Detalles de la Publicación";
 }
+
 <link rel="stylesheet" href="~/css/admin/detallesPublicacion.css" />
 
 <div class="container mt-4 ">
@@ -10,6 +12,8 @@
 
     <div class="bg-dark p-4 rounded mt-3">
         <h3 class="text-danger">@Model.Titulo</h3>
+        <h4 class="text-danger">Descripcion:</h4>
+
         <p>@Model.Descripcion</p>
         <p class="text-muted">Creada por <strong>@Model.NombreAutor</strong> el @Model.FechaCreacion.ToShortDateString()</p>
 

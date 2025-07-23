@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LogicaApp.Excepciones;
 using LogicaDatos.Interfaces.Repos;
+using LogicaDatos.Repositorio;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
@@ -110,7 +111,7 @@ namespace LogicaApp.Servicios
                 Nombre = ejercicio.Nombre,
                 Tipo = ejercicio.Tipo,
                 GrupoMuscular = ejercicio.GrupoMuscular,
-                Medias = ejercicio.Medias
+                Medias = ejercicio.Medias,
             };
             return e;
 
