@@ -12,12 +12,12 @@ namespace LogicaNegocio.Clases
     public class Cliente : IValidable
     {
         public int Id { get; set; }
-        public string CI { get; set; }
+        public string? CI { get; set; }
         public string NombreUsuario { get; set; }
         public string NombreCompleto { get; set; }
         public string Pass { get; set; }
         public string Correo { get; set; }
-        public string Telefono { get; set; }
+        public string? Telefono { get; set; }
         public Cliente() { }
 
         public List<Cita> Citas { get; set; } = new List<Cita>();

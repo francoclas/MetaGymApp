@@ -1,6 +1,7 @@
 ﻿using LogicaApp.Servicios;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
+using MetaGymWebApp.Filtros;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetaGymWebApp.Controllers
@@ -21,11 +22,15 @@ namespace MetaGymWebApp.Controllers
         {
             return View();
         }
+        [AutorizacionRol("Admin", "Profesional", "Cliente")]
+
         public IActionResult Inicio()
         {
             List<PublicacionDTO> publicaciones = publicacionServicio.ObtenerPublicacionesInicio();
             return View("Inicio", publicaciones);
         }
+        [AutorizacionRol("Admin", "Profesional", "Cliente")]
+
         [HttpGet]
         public IActionResult MiPerfil()
         {
@@ -35,25 +40,39 @@ namespace MetaGymWebApp.Controllers
             var dto = usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId, rol);
             return View(dto);
         }
+
+        [AutorizacionRol("Admin", "Profesional", "Cliente")]
+
         [HttpPost]
-        public IActionResult DarLike(int id)
+        public IActionResult GestionLike(int id)
         {
             int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
             string rol = GestionSesion.ObtenerRol(HttpContext);
-
-            publicacionServicio.DarLikePublicacion(id, usuarioId, rol);
-            return RedirectToAction("DetallePublicacion", new { id });
+            if (publicacionServicio.UsuarioYaDioLikePublicacion(id,usuarioId,rol))
+            {
+                QuitarLike(id);
+            }
+            else
+            {
+                 DarLike(id);
+            }
+            return RedirectToAction("Inicio");
         }
+        public void DarLike(int id)
+               {
+                    int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+                    string rol = GestionSesion.ObtenerRol(HttpContext);
 
-        [HttpPost]
-        public IActionResult QuitarLike(int id)
+                    publicacionServicio.DarLikePublicacion(id, usuarioId, rol);
+                }
+        public void QuitarLike(int id)
         {
             int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
             string rol = GestionSesion.ObtenerRol(HttpContext);
 
             publicacionServicio.QuitarLikePublicacion(id, usuarioId, rol);
-            return RedirectToAction("DetallePublicacion", new { id });
         }
+        [AutorizacionRol("Admin","Profesional","Cliente")]
         [HttpPost]
         public IActionResult DarLikeComentario(int id)
         {
@@ -63,6 +82,7 @@ namespace MetaGymWebApp.Controllers
             comentarioServicio.DarLikeComentario(id, usuarioId, rol);
             return Redirect(Request.Headers["Referer"].ToString());
         }
+        [AutorizacionRol("Admin", "Profesional", "Cliente")]
 
         [HttpPost]
         public IActionResult QuitarLikeComentario(int id)
@@ -73,6 +93,8 @@ namespace MetaGymWebApp.Controllers
             comentarioServicio.QuitarLikeComentario(id, usuarioId, rol);
             return Redirect(Request.Headers["Referer"].ToString());
         }
+        [AutorizacionRol("Admin", "Profesional", "Cliente")]
+
         [HttpPost]
         public IActionResult AgregarComentario(int publicacionId, string contenido, int? comentarioPadreId)
         {
@@ -90,7 +112,7 @@ namespace MetaGymWebApp.Controllers
 
             comentarioServicio.AgregarComentario(comentario);
 
-            return RedirectToAction("DetallePublicacion", new { id = publicacionId });
+            return RedirectToAction("Inicio");
         }
 
         [HttpGet]

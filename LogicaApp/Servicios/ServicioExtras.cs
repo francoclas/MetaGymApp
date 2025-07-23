@@ -121,13 +121,16 @@ namespace LogicaApp.Servicios
 
         public void RegistrarEstablecimiento(EstablecimientoDTO dto)
         {
+
             var nuevo = new Establecimiento
             {
                 Nombre = dto.Nombre,
-                Direccion = dto.Direccion
+                Direccion = dto.Direccion,
+                Latitud = dto.Latitud,
+                Longitud = dto.Longitud,
             };
-            repoExtras.AltaEstablecimiento(nuevo);
-                    }
+                repoExtras.AltaEstablecimiento(nuevo);
+            }
 
         public void GuardarCambios()
         {

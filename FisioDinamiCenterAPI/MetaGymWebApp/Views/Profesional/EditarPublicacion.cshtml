@@ -1,0 +1,75 @@
+﻿@using LogicaNegocio.Extra
+@model PublicacionDTO
+@{
+    ViewData["Title"] = "Editar mi publicación";
+}
+
+<h2 class="text-white">Editar publicación</h2>
+
+<form asp-action="EditarPublicacionProfesional" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div class="mb-3">
+        <label class="form-label text-white">Título</label>
+        <input name="Titulo" class="form-control" value="@Model.Titulo" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label text-white">Descripción</label>
+        <textarea name="Descripcion" class="form-control" rows="4" required>@Model.Descripcion</textarea>
+    </div>
+
+    <h5 class="text-white mt-4">Archivos actuales</h5>
+    @if (Model.Medias != null && Model.Medias.Any())
+    {
+        <div class="row">
+            @foreach (var media in Model.Medias)
+            {
+                <div class="col-md-4 mb-3">
+                    @if (media.Tipo == Enum_TipoMedia.Imagen)
+                    {
+                        <img src="@media.Url" class="img-fluid rounded" />
+                    }
+                    else
+                    {
+                        <video src="@media.Url" class="img-fluid rounded" controls></video>
+                    }
+
+                    <button type="button" class="btn btn-sm btn-danger mt-2"
+                            onclick="eliminarMedia(@media.Id, @Model.Id)">
+                        Eliminar
+                    </button>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">No hay archivos asociados.</p>
+    }
+
+    <div class="mb-3 mt-4">
+        <label class="form-label text-white">Agregar nuevos archivos</label>
+        <input type="file" name="archivos" multiple class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Guardar cambios</button>
+</form>
+
+<script>
+    function eliminarMedia(mediaId, publicacionId) {
+        if (!confirm("¿Eliminar este archivo?")) return;
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/Profesional/EliminarMedia';
+
+        form.innerHTML = `
+            <input type="hidden" name="mediaId" value="${mediaId}" />
+            <input type="hidden" name="publicacionId" value="${publicacionId}" />
+        `;
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>

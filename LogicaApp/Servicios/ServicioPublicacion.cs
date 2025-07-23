@@ -18,11 +18,13 @@ namespace LogicaApp.Servicios
         private readonly IRepositorioPublicacion _repo;
         private readonly IMediaServicio mediaServicio;
         private readonly IComentarioServicio comentarioServicio;
-        public ServicioPublicacion(IRepositorioPublicacion repo, IMediaServicio mediaServicio, IComentarioServicio comentarioServicio)
+        private readonly INotificacionServicio notificacionServicio;
+        public ServicioPublicacion(IRepositorioPublicacion repo, IMediaServicio mediaServicio, IComentarioServicio comentarioServicio,INotificacionServicio notificacion)
         {
             _repo = repo;
             this.mediaServicio = mediaServicio;
             this.comentarioServicio = comentarioServicio;
+            notificacionServicio = notificacion;    
         }
 
         public List<PublicacionDTO> ObtenerPublicaciones()
@@ -80,9 +82,6 @@ namespace LogicaApp.Servicios
             }
             return result;
         }
-
-        
-
         public List<PublicacionDTO> ObtenerTodas()
         {
             List<PublicacionDTO> salida = new List<PublicacionDTO>();
@@ -155,6 +154,20 @@ namespace LogicaApp.Servicios
             }
             return salida;
         }
+        public void ActualizarPublicacion(PublicacionDTO pubActualizada)
+        {
+            Publicacion original = _repo.ObtenerPorId(pubActualizada.Id);
+            if (original == null) throw new Exception("La publicación no existe.");
+
+            original.Titulo = pubActualizada.Titulo;
+            original.Descripcion = pubActualizada.Descripcion;
+            original.EsPrivada = pubActualizada.EsPrivada;
+            original.MostrarEnNoticiasPublicas = pubActualizada.MostrarEnNoticiasPublicas;
+            original.FechaModificacion = DateTime.Now;
+
+            _repo.Actualizar(original);
+        }
+
         public void AprobarPublicacion(int publicacionId, int adminId)
         {
             Publicacion publicacion = _repo.ObtenerPorId(publicacionId);
@@ -165,8 +178,17 @@ namespace LogicaApp.Servicios
             publicacion.Estado = Enum_EstadoPublicacion.Aprobada;
             publicacion.FechaModificacion = DateTime.Now;
             publicacion.AdminAprobadorId = adminId;
-
             _repo.Actualizar(publicacion);
+            notificacionServicio.NotificacionPersonalizada((int)publicacion.ProfesionalId, "Profesional", 
+                new Notificacion {
+                    ProfesionalId = (int)publicacion.ProfesionalId,
+                    Titulo = "Se aprobo tu publicacion!",
+                    Mensaje = "Felicidades, se acepto tu publicacion para el portal.",
+                    PublicacionId = publicacion.Id,
+                    Tipo = Enum_TipoNotificacion.Publicacion,
+                    Fecha = DateTime.Now,
+                    Leido = false
+                });
         }
 
         public void RechazarPublicacion(int publicacionId, string motivoRechazo, int adminId)
@@ -182,6 +204,17 @@ namespace LogicaApp.Servicios
             publicacion.AdminAprobadorId = adminId;
 
             _repo.Actualizar(publicacion);
+            notificacionServicio.NotificacionPersonalizada((int)publicacion.ProfesionalId, "Profesional",
+                new Notificacion
+                {
+                    ProfesionalId = (int)publicacion.ProfesionalId,
+                    Titulo = "Se rechazo tu publicacion!",
+                    Mensaje = "Desgraciadamente no se acepto tu solicitud de publicacion. Accede para ver mas detalles.",
+                    PublicacionId = publicacion.Id,
+                    Tipo = Enum_TipoNotificacion.Publicacion,
+                    Fecha = DateTime.Now,
+                    Leido = false
+                });
         }
 
         public List<PublicacionDTO> ObtenerPublicacionesInicio()
@@ -236,6 +269,7 @@ namespace LogicaApp.Servicios
                 ImagenAutorURL = mediaServicio.ObtenerFotoFavorita(rolAutor, autorId)?.Url,
                 UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new(),
                 Medias = pub.ListaMedia,
+                CantLikes = _repo.ContarLikes(pub.Id),
                 Comentarios = pub.Comentarios?
                     .Where(c => c.ComentarioPadreId == null && c.EstaActivo)
                     .Select(c => MapearComentario(c))

@@ -25,7 +25,8 @@ namespace MetaGymWebApp.Controllers
         private readonly IMediaServicio mediaServicio;
         private readonly IClienteServicio clienteServicio;
         private readonly IPublicacionServicio publicacionServicio;
-        public ProfesionalController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio, IProfesionalServicio proservicio, IRutinaServicio rutina, IMediaServicio mediaServicio, IClienteServicio clienteServicio, IPublicacionServicio publicacionServicio)
+        private readonly INotificacionServicio notificacionServicio;
+        public ProfesionalController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio, IProfesionalServicio proservicio, IRutinaServicio rutina, IMediaServicio mediaServicio, IClienteServicio clienteServicio, IPublicacionServicio publicacionServicio,INotificacionServicio notificacion)
         {
             this.usuarioServicio = usuarioServicio;
             this.citaServicio = citaServicio;
@@ -35,6 +36,7 @@ namespace MetaGymWebApp.Controllers
             this.mediaServicio = mediaServicio;
             this.clienteServicio = clienteServicio;
             this.publicacionServicio = publicacionServicio;
+            this.notificacionServicio = notificacion;
         }
         [HttpGet]
         public IActionResult VerSolicitudCitas()
@@ -45,7 +47,7 @@ namespace MetaGymWebApp.Controllers
             return View(salida);
 
         }
-
+        
         //Gestionar cita
         [HttpGet]
         public IActionResult RevisarCita(int id)
@@ -464,7 +466,63 @@ namespace MetaGymWebApp.Controllers
 
             return View(publicacion);
         }
+        [HttpGet]
+        public IActionResult EditarPublicacion(int id)
+        {
+            var publicacion = publicacionServicio.ObtenerPorId(id);
+
+            int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            if (publicacion == null || publicacion.AutorId != profesionalId || publicacion.RolAutor != "Profesional")
+            {
+                TempData["Mensaje"] = "No tenés permiso para editar esta publicación.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("MisPublicaciones");
+            }
+
+            return View(publicacion);
+        }
+        [HttpPost]
+        public IActionResult EditarPublicacion(int Id, string Titulo, string Descripcion, List<IFormFile> archivos)
+        {
+            try
+            {
+                var pub = publicacionServicio.ObtenerPorId(Id);
+                int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+
+                if (pub == null || pub.AutorId != profesionalId && pub.RolAutor != "Profesional")
+                    throw new Exception("No podés editar esta publicación.");
+
+                pub.Titulo = Titulo;
+                pub.Descripcion = Descripcion;
+                pub.FechaProgramada = DateTime.Now;
+
+                // Opcional: volver a estado Pendiente tras edición
+                pub.Estado = Enum_EstadoPublicacion.Pendiente;
+                pub.MotivoRechazo = null;
+
+                publicacionServicio.ActualizarPublicacion(pub);
+
+                if (archivos != null && archivos.Any())
+                {
+                    foreach (var archivo in archivos)
+                    {
+                        mediaServicio.GuardarArchivo(archivo, Enum_TipoEntidad.Publicacion, pub.Id);
+                    }
+                }
+
+                TempData["Mensaje"] = "Publicación editada correctamente. Queda pendiente de revisión.";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("MisPublicaciones");
+            }
+            catch (Exception ex)
+            {
+                TempData["Mensaje"] = ex.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("MisPublicaciones");
+            }
+        }
+
     }
-    }
+}
 
 

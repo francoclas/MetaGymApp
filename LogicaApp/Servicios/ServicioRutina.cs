@@ -17,11 +17,13 @@ namespace LogicaApp.Servicios
     {
         private readonly IRepositorioRutina repositorioRutina;
         private readonly IRepositorioEjercicio repositorioEjercicio;
+        private readonly INotificacionServicio notificacionServicio;
 
-        public ServicioRutina(IRepositorioRutina repositorioRutina,IRepositorioEjercicio repositorio)
+        public ServicioRutina(IRepositorioRutina repositorioRutina,IRepositorioEjercicio repositorio, INotificacionServicio inotificacionServicio)
         {
             this.repositorioRutina = repositorioRutina;
             this.repositorioEjercicio = repositorio;
+            this.notificacionServicio = inotificacionServicio;
         }
 
         public void AsignarRutina(Rutina rutina, Cliente cliente)
@@ -40,6 +42,7 @@ namespace LogicaApp.Servicios
                     FechaAsignacion = DateTime.Now
                 };
                 repositorioRutina.AsignarRutinaACliente(nuevaAsignacion);
+                notificacionServicio.NotificarRutinaAsignada(clienteId, rutinaId);
             }
         }
         public void ReemplazarAsignaciones(int rutinaId, List<int> nuevosClienteIds)
@@ -61,6 +64,7 @@ namespace LogicaApp.Servicios
                     RutinaId = rutinaId,
                     FechaAsignacion = DateTime.Now
                 });
+                notificacionServicio.NotificarRutinaAsignada(id, rutinaId);
             }
         }
         public bool ClienteTieneRutinaAsignada(int clienteId, int rutinaId)

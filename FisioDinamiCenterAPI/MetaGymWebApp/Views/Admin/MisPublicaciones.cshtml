@@ -30,8 +30,11 @@
                     <div class="card card-publicacion">
                         <div class="card-body">
                             <h5 class="card-title">@pub.Titulo</h5>
+                            <span>Fecha publicacion: @pub.FechaCreacion</span>
                             <p class="card-text">@pub.Descripcion</p>
+                            <hr />
                             <a href="@Url.Action("DetallesPublicacion", "Admin", new { id = pub.Id })" class="btn btn-outline-light btn-sm">Ver detalles</a>
+                            <a href="@Url.Action("EditarPublicacion", "Admin", new { id = pub.Id })" class="btn-outline-warning btn-sm">Editar publicacion</a>
                         </div>
                     </div>
                 }
@@ -54,6 +57,7 @@
                             <h5 class="card-title">@pub.Titulo</h5>
                             <p class="card-text">@pub.Descripcion</p>
                             <a href="@Url.Action("DetallesPublicacion", "Admin", new { id = pub.Id })" class="btn btn-outline-light btn-sm">Ver detalles</a>
+                            <a href="@Url.Action("EditarPublicacion", "Admin", new { id = pub.Id })" class="btn-outline-warning btn-sm">Editar publicacion</a>
                         </div>
                     </div>
                 }

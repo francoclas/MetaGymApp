@@ -3,23 +3,34 @@
     ViewData["Title"] = "Registrar Establecimiento";
 }
 
-<h2>Registrar nuevo establecimiento</h2>
+<h2 class="text-light mb-4">Registrar nuevo establecimiento</h2>
 
-<form asp-action="RegistrarEstablecimiento" method="post" enctype="multipart/form-data">
-    <div class="form-group">
+<form asp-action="RegistrarEstablecimiento" method="post" enctype="multipart/form-data" class="bg-dark text-light p-4 rounded shadow-sm">
+    <div class="mb-3">
         <label>Nombre del establecimiento</label>
-        <input asp-for="Nombre" class="form-control" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
+        <input asp-for="Nombre" class="form-control" placeholder="Ej: MetaGym Centro" />
+        <span asp-validation-for="Nombre" class="text-danger small"></span>
     </div>
-    <div class="form-group">
-        <label>Dirección</label>
-        <input asp-for="Direccion" class="form-control" />
-        <span asp-validation-for="Direccion" class="text-danger"></span>
+
+    <div class="mb-3">
+        <label>Ubicación</label>
+        <input asp-for="Direccion" class="form-control mb-2" id="inputDireccion" placeholder="Se completa desde el mapa" readonly />
+        <span asp-validation-for="Direccion" class="text-danger small"></span>
+        <div id="map" class="rounded shadow-sm" style="height: 600px;"></div>
     </div>
-    <div class="form-group">
+
+    <input type="hidden" asp-for="Latitud" id="latitud" />
+    <input type="hidden" asp-for="Longitud" id="longitud" />
+
+    <div class="mb-3">
         <label>Imagen del establecimiento</label>
         <input type="file" name="archivo" class="form-control" />
     </div>
 
-    <button type="submit" class="btn btn-primary mt-3">Registrar</button>
+    <button type="submit" class="btn btn-success">Registrar</button>
 </form>
+
+@section Scripts {
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCujqNEiedXkyO3mMkfXzz6vPvPW7C20Gg&callback=initMap&libraries=places" async defer></script>
+    <script src="~/js/admin/mapaEstablecimiento.js"></script>
+}

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LogicaDatos.Repositorio;
 using LogicaNegocio.Clases;
+using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Repositorios;
 using LogicaNegocio.Interfaces.Servicios;
@@ -13,10 +15,13 @@ namespace LogicaApp.Servicios
     public class ServicioComentario: IComentarioServicio
     {
         private readonly IRepositorioComentario _repo;
-
-        public ServicioComentario(IRepositorioComentario repo)
+        private readonly Lazy<INotificacionServicio> notificacionServicio;
+        private readonly Lazy<IPublicacionServicio> publicacionServicio;
+        public ServicioComentario(IRepositorioComentario repo, Lazy<INotificacionServicio> notificacionServicio, Lazy<IPublicacionServicio> publicacionServicio)
         {
             _repo = repo;
+            this.notificacionServicio = notificacionServicio;
+            this.publicacionServicio = publicacionServicio;
         }
 
         public List<ComentarioDTO> ObtenerPorPublicacion(int publicacionId)
@@ -34,10 +39,10 @@ namespace LogicaApp.Servicios
 
         public void AgregarComentario(ComentarioDTO dto)
         {
-            var nuevo = new Comentario
+            Comentario nuevo = new Comentario
             {
                 Contenido = dto.Contenido,
-                PublicacionId = dto.PublicacionId, // SIEMPRE se necesita
+                PublicacionId = dto.PublicacionId,
                 ComentarioPadreId = dto.ComentarioPadreId,
                 ProfesionalId = dto.RolAutor == "Profesional" ? dto.AutorId : null,
                 ClienteId = dto.RolAutor == "Cliente" ? dto.AutorId : null,
@@ -45,15 +50,58 @@ namespace LogicaApp.Servicios
             };
 
             _repo.Agregar(nuevo);
-        }
 
+            // Notificaciones
+            if (dto.ComentarioPadreId == null)
+            {
+                // Comentario sobre una publicación → Notificar al autor de la publicación
+                var publicacion = publicacionServicio.Value.ObtenerPorId(dto.PublicacionId);
 
-        public void EditarComentario(int comentarioId, string nuevoContenido)
-        {
+                if (publicacion != null)
+                {
+                    notificacionServicio.Value.NotificarComentario(publicacion.AutorId, publicacion.RolAutor, publicacion.Id, dto.Contenido);
+                }
+            }
+            else
+            {
+                // Respuesta a otro comentario para notificar al autor del comentario padre
+                var padre = _repo.ObtenerPorId((int)dto.ComentarioPadreId);
+
+                if (padre != null)
+                {
+                    int? receptorId = null;
+                    string rolReceptor = "";
+
+                    //obtengo el id y el rol
+                    if (padre.ClienteId.HasValue)
+                    {
+                        receptorId = padre.ClienteId;
+                        rolReceptor = "Cliente";
+                    }
+                    else if (padre.ProfesionalId.HasValue)
+                    {
+                        receptorId = padre.ProfesionalId;
+                        rolReceptor = "Profesional";
+                    }
+                    else if (padre.AdminId.HasValue)
+                    {
+                        receptorId = padre.AdminId;
+                        rolReceptor = "Admin";
+                    }
+                    if (receptorId != null && !(rolReceptor == dto.RolAutor && receptorId == dto.AutorId))
+                    {
+                        notificacionServicio.Value.NotificarInteraccionComentario((int)receptorId, rolReceptor, padre.ComentarioId,"Comentaron: " + dto.Contenido);
+                            };
+                }
+            }
+            }
+
+        public void EditarComentario(int comentarioId, string nuevoContenido, int usuarioId)
+        {             
             _repo.ActualizarContenido(comentarioId, nuevoContenido);
         }
 
-        public void EliminarComentario(int comentarioId)
+        public void EliminarComentario(int comentarioId, int usuarioId, string rol)
         {
             _repo.Desactivar(comentarioId);
         }

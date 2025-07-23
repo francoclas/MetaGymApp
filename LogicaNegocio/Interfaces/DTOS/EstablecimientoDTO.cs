@@ -13,6 +13,8 @@ namespace LogicaNegocio.Interfaces.DTOS
         public string Nombre { get; set; }
         public string Direccion { get; set; }
         public string? UrlMedia { get; set; }
+        public double? Latitud { get; set; }
+        public double? Longitud { get; set; }
         public Media? Media { get; set; }
         public class EstablecimientoPreviewDTO
         {

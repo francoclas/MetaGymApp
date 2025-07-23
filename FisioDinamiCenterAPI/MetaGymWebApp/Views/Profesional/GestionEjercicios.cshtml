@@ -35,7 +35,7 @@
             @foreach (var ej in Model.EjerciciosProfesional)
             {
                 var img = ej.Media?.Url ?? "/img/default.png";
-                <div class="card ejercicio-card mb-3 d-flex flex-row"
+                <div class="card ejercicio-card mb-3 flex-row"
                      data-nombre="@ej.Nombre"
                      data-tipo="@ej.Tipo"
                      data-grupo="@ej.GrupoMuscular">
@@ -62,7 +62,7 @@
             @foreach (var ej in Model.EjerciciosSistema)
             {
                 var img = ej.Media?.Url ?? "/img/default.png";
-                <div class="card ejercicio-card mb-3 d-flex flex-row"
+                <div class="card ejercicio-card mb-3  flex-row"
                      data-nombre="@ej.Nombre"
                      data-tipo="@ej.Tipo"
                      data-grupo="@ej.GrupoMuscular">

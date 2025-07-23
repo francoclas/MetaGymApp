@@ -39,7 +39,12 @@
                 <td>@pub.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
                 <td>
                     <a asp-action="DetallePublicacion" asp-route-id="@pub.Id" class="btn btn-sm btn-outline-primary">Ver</a>
+                    @if (pub.Estado == LogicaNegocio.Extra.Enum_EstadoPublicacion.Aprobada)
+                    {
+                        <a asp-action="EditarPublicacion" asp-route-id="@pub.Id" class="btn btn-sm btn-outline-warning">Editar</a>
+                    }
                 </td>
+                
             </tr>
         }
     </tbody>

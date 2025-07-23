@@ -178,6 +178,7 @@ namespace LogicaDatos.Repositorio
             return _context.Publicaciones
                 .Include(p => p.ListaMedia)
                 .Include(p => p.Profesional)
+                .Include(p => p.AdminCreador)
                 .Where(p => p.MostrarEnNoticiasPublicas == true).ToList();
         }
     }

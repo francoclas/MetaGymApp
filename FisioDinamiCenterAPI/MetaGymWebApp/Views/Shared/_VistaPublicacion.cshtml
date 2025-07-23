@@ -60,7 +60,10 @@
     
     <!-- Interacciones -->
     <div class="pub-interacciones mt-2">
-        <button class="pub-btn-like">❤️ <span>@Model.CantLikes</span></button>
+        <form asp-action="GestionLike" method="post" style="display: inline;">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="like-button">❤️ @Model.CantLikes</button>
+        </form>
         <button class="pub-btn-comentarios" data-id="@Model.Id">💬 Ver comentarios</button>
     </div>
 

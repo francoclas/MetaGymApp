@@ -1,81 +1,88 @@
 ﻿@using LogicaNegocio.Extra
+@inject IHttpContextAccessor HttpContextAccessor
 @model List<PublicacionDTO>
 @{
     ViewData["Title"] = "Novedades";
+    var sesion = GestionSesion.ObtenerSesion(HttpContextAccessor.HttpContext);
+    var estaLogueado = sesion != null;
 }
-
 <link rel="stylesheet" href="~/css/InicioPublicaciones.css" />
 
 <div class="container mt-4">
-    <div class="text-center mb-5">
-        <h2 class="text-white">🔥 ¡Ponete en forma con nosotros!</h2>
-        <p class="text-muted">Sumate a la comunidad de MetaGym y enterate de las últimas novedades. Hazte miembro y empezá tu transformación.</p>
-        <a class="btn btn-danger" href="@Url.Action("RegistrarUsuario", "Home")">Inscribirse ahora</a>
-    </div>
 
-    @if (Model != null && Model.Any())
+    @if (!estaLogueado)
     {
-        @foreach (var pub in Model.OrderByDescending(p => p.FechaCreacion))
-        {
-            <div class="pub-card mb-4">
-                <!-- Encabezado -->
-                <div class="pub-header">
-                    <img src="@pub.ImagenAutorURL" class="pub-autor-img" alt="autor" />
-                    <div>
-                        <p class="pub-autor-nombre">@pub.NombreAutor</p>
-                        <p class="pub-fecha">@pub.FechaCreacion.ToShortDateString()</p>
-                    </div>
-                </div>
+        <div class="text-center mb-5">
+            <h2 class="text-white">🔥 ¡Ponete en forma con nosotros!</h2>
+            <p class="text-muted">Sumate a la comunidad de MetaGym y enterate de las últimas novedades. Hazte miembro y empezá tu transformación.</p>
+            <a class="btn btn-danger" href="@Url.Action("RegistrarUsuario", "Home")">Inscribirse ahora</a>
+        </div>
+    }
 
-                <!-- Título -->
-                <h5 class="pub-titulo">@pub.Titulo</h5>
-                <!-- Descripción -->
-                <div class="pub-descripcion">
-                    <span>@pub.Descripcion</span>
-                </div>
-                <!-- Slideshow -->
-                @if (pub.Medias != null && pub.Medias.Any())
-                {
-                    <div class="pub-slideshow" id="slideshow-@pub.Id">
-                        <div class="pub-slide-container">
-                            @foreach (var media in pub.Medias)
+    <div class="d-flex flex-column align-items-center justify-content-center min-vh-100">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var pub in Model.OrderByDescending(p => p.FechaCreacion))
+            {
+                <div class="pub-card mb-4 w-100">
+                    <!-- Encabezado -->
+                    <div class="pub-header">
+                        <img src="@pub.ImagenAutorURL" class="pub-autor-img" alt="autor" />
+                        <div>
+                            <p class="pub-autor-nombre">@pub.NombreAutor</p>
+                            <p class="pub-fecha">@pub.FechaCreacion.ToShortDateString()</p>
+                        </div>
+                    </div>
+
+                    <!-- Título -->
+                    <h5 class="pub-titulo">@pub.Titulo</h5>
+                    <!-- Descripción -->
+                    <div class="pub-descripcion">
+                        <span>@pub.Descripcion</span>
+                    </div>
+
+                    <!-- Slideshow -->
+                    @if (pub.Medias != null && pub.Medias.Any())
+                    {
+                        <div class="pub-slideshow" id="slideshow-@pub.Id">
+                            <div class="pub-slide-container">
+                                @foreach (var media in pub.Medias)
+                                {
+                                    <div class="pub-slide">
+                                        @if (media.Tipo == Enum_TipoMedia.Imagen)
+                                        {
+                                            <img src="@media.Url" class="pub-slide-img" />
+                                        }
+                                        else
+                                        {
+                                            <video src="@media.Url" class="pub-slide-video" controls></video>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            @if (pub.Medias.Count > 1)
                             {
-                                <div class="pub-slide">
-                                    @if (media.Tipo == Enum_TipoMedia.Imagen)
+                                <button class="pub-slide-btn left" onclick="cambiarSlide(@pub.Id, -1)">❮</button>
+                                <button class="pub-slide-btn right" onclick="cambiarSlide(@pub.Id, 1)">❯</button>
+
+                                <div class="pub-slide-dots">
+                                    @for (int i = 0; i < pub.Medias.Count; i++)
                                     {
-                                        <img src="@media.Url" class="pub-slide-img" />
-                                    }
-                                    else
-                                    {
-                                        <video src="@media.Url" class="pub-slide-video" controls></video>
+                                        <span class="pub-slide-dot @(i == 0 ? "active" : "")" onclick="cambiarSlide(@pub.Id, @i)"></span>
                                     }
                                 </div>
                             }
                         </div>
-
-                        @if (pub.Medias.Count > 1)
-                        {
-                            <button class="pub-slide-btn left" onclick="cambiarSlide(@pub.Id, -1)">❮</button>
-                            <button class="pub-slide-btn right" onclick="cambiarSlide(@pub.Id, 1)">❯</button>
-
-                            <div class="pub-slide-dots">
-                                @for (int i = 0; i < pub.Medias.Count; i++)
-                                {
-                                    <span class="pub-slide-dot @(i == 0 ? "active" : "")" onclick="cambiarSlide(@pub.Id, @i)"></span>
-                                }
-                            </div>
-                        }
-                    </div>
-                }
-
-                
-            </div>
+                    }
+                </div>
+            }
         }
-    }
-    else
-    {
-        <p class="text-muted text-center">No hay novedades disponibles por el momento.</p>
-    }
+        else
+        {
+            <p class="text-muted text-center">No hay novedades disponibles por el momento.</p>
+        }
+    </div>
 </div>
 
 @section Scripts {
