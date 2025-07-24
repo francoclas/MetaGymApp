@@ -1,4 +1,7 @@
 ﻿@model RutinaAsignadaDTO
+@{
+    ViewData["Title"] = @Model.NombreRutina + " - Informacion de rutina" + @Model.NombreRutina;
+}
 <div class="container">
     <h2>@Model.NombreRutina</h2>
     <p><strong>Tipo:</strong> @Model.Tipo</p>
