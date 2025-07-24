@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
+using LogicaDatos.Migrations;
 
 namespace LogicaDatos
 {
@@ -29,7 +30,8 @@ namespace LogicaDatos
         public DbSet<SesionRutina> SesionesRutina { get; set; }          
         public DbSet<EjercicioRealizado> EjercicioRealizadosPorClientes { get; set; }
         public DbSet<SerieRealizada> SeriesParaEjerciciosDeCliente { get; set; }
-
+        public DbSet<Medicion> Mediciones { get; set; }
+        public DbSet<ValorMedicion> MedicionesEjercicio { get; set; }
         //Publicaciones
         public DbSet<Publicacion> Publicaciones { get; set; }
         public DbSet<Comentario> Comentarios { get; set; }

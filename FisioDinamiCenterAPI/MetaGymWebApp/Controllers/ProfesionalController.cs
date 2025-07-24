@@ -198,7 +198,8 @@ namespace MetaGymWebApp.Controllers
                 GrupoMuscular = dto.GrupoMuscular,
                 Instrucciones = dto.Instrucciones,
                 ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext),
-                Medias = new List<Media>()
+                Medias = new List<Media>(),
+                Mediciones = dto.Mediciones
             };
             try
             {
@@ -222,7 +223,6 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("GestionEjercicios");
 
             }
-
         }
 
         //Editar ejercicio
@@ -258,7 +258,7 @@ namespace MetaGymWebApp.Controllers
                 ejercicio.Tipo = dto.Tipo;
                 ejercicio.GrupoMuscular = dto.GrupoMuscular;
                 ejercicio.Instrucciones = dto.Instrucciones;
-
+                ejercicio.Mediciones = dto.Mediciones;
                 // Agregar nuevos archivos 
                 if (archivos != null && archivos.Count > 0)
                 {
@@ -524,7 +524,12 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("MisPublicaciones");
             }
         }
-
+        [HttpPost]
+        public IActionResult EliminarMedia(int mediaId, int EjercicioId)
+        {
+            mediaServicio.EliminarMedia(mediaId);
+            return RedirectToAction("EditarEjercicio", new { id = EjercicioId });
+        }
     }
 }
 

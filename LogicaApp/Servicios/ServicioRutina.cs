@@ -112,6 +112,7 @@ namespace LogicaApp.Servicios
                 Tipo = ejercicio.Tipo,
                 GrupoMuscular = ejercicio.GrupoMuscular,
                 Medias = ejercicio.Medias,
+                Mediciones = ejercicio.Mediciones
             };
             return e;
 

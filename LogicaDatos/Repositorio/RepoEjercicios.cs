@@ -47,6 +47,7 @@ namespace LogicaDatos.Repositorio
         {
             return _context.Ejercicios
                     .Include(e => e.Medias)
+                    .Include(e => e.Mediciones)
                     .FirstOrDefault(e => e.Id == id);
         }
 
