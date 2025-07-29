@@ -128,8 +128,11 @@ namespace MetaGymWebApp.Controllers
             try
             {
                 int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
-                var rutinas = rutinaServicio.ObtenerRutinasProfesional(profesionalId);
+                //Obtengo la lista de rutinas desde el repo
+                List<Rutina> rutinas = rutinaServicio.ObtenerRutinasProfesional(profesionalId);
+                //Valido que exista
                 if (rutinas == null) throw new Exception("No se obtuvieron las rutinas, intente iniciando sesion nuevamente.");
+                //Devuelvo mapeando la lista de las rutinas
                 return View(rutinas.Select(r => new RutinaDTO
                 {
                     Id = r.Id,
@@ -151,10 +154,11 @@ namespace MetaGymWebApp.Controllers
         public IActionResult GestionEjercicios()
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            //Obtengo la lista de ejercicios
+            List<EjercicioDTO> todos = rutinaServicio.ObtenerTodosEjercicios();
 
-            var todos = rutinaServicio.ObtenerTodosEjercicios();
-
-            var modelo = new GestionEjerciciosModelo
+            //Mapeo para el modelo
+            GestionEjerciciosModelo modelo = new GestionEjerciciosModelo
             {
                 EjerciciosProfesional = todos.Where(e => e.ProfesionalId == profesionalId).ToList(),
                 EjerciciosSistema = todos.Where(e => e.ProfesionalId != profesionalId).ToList()
@@ -168,7 +172,9 @@ namespace MetaGymWebApp.Controllers
         {
             try
             {
+                //Obtengo el ejercicio a mostrar desde el repo
                 EjercicioDTO ejercicio = rutinaServicio.ObtenerEjercicioDTOId(id);
+                //Verifico que existe
                 if (ejercicio == null) throw new Exception("No se encontro ejercicio o no existe.");
                 if (ejercicio.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext)) throw new Exception("No tiene permisos para editar este ejercicio, no es el autor.");
                 return View(ejercicio);
@@ -191,7 +197,8 @@ namespace MetaGymWebApp.Controllers
         [HttpPost]
         public IActionResult RegistrarEjercicio(EjercicioDTO dto, List<IFormFile> archivos)
         {
-            var ejercicio = new Ejercicio
+            //Instancio el ejercicio a registrar
+            Ejercicio ejercicio = new Ejercicio
             {
                 Nombre = dto.Nombre,
                 Tipo = dto.Tipo,
@@ -203,7 +210,9 @@ namespace MetaGymWebApp.Controllers
             };
             try
             {
-                rutinaServicio.GenerarNuevoEjercicio(ejercicio); // primero guardamos para obtener el ID
+                //lo mando al repo para tener id
+                rutinaServicio.GenerarNuevoEjercicio(ejercicio); 
+                //Si salio bien, ahora cargo los archivos.
                 if (archivos != null && archivos.Count > 0)
                 {
                     foreach (var archivo in archivos)
@@ -231,7 +240,8 @@ namespace MetaGymWebApp.Controllers
         {
             try
             {
-                var dto = rutinaServicio.ObtenerEjercicioDTOId(id);
+                //obtengo del repo y mapeo al dto
+                EjercicioDTO dto = rutinaServicio.ObtenerEjercicioDTOId(id);
                 if (dto == null) throw new Exception("No se encontro ejercicio o no existe.");
                 if (dto.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext)) throw new Exception("No tiene permisos para editar este ejercicio.");
                 return View(dto);
@@ -250,10 +260,11 @@ namespace MetaGymWebApp.Controllers
         {
             try
             {
+                //Obtengo el ejercicio desde repo
                 Ejercicio ejercicio = rutinaServicio.ObtenerEjercicioId(dto.Id);
                 if (ejercicio == null) throw new Exception("No se encontro ejercicio o no existe.");
                 if (dto.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext)) throw new Exception("No tiene permisos para editar este ejercicio.");
-                // Actualizar datos principales
+                //Mapeo los cambios
                 ejercicio.Nombre = dto.Nombre;
                 ejercicio.Tipo = dto.Tipo;
                 ejercicio.GrupoMuscular = dto.GrupoMuscular;
@@ -283,22 +294,23 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult RegistrarRutina()
         {
+            //Obtengo ejercicois para listar
             int profesionalId = GestionSesion.ObtenerUsuarioId(this.HttpContext);
             List<EjercicioDTO> todos = rutinaServicio.ObtenerTodosEjercicios();
-            var modelo = new RutinaRegistroDTO
+            //genero modelo para la vista
+            RutinaRegistroDTO modelo = new RutinaRegistroDTO
             {
                 MisEjerciciosDisponibles = todos.Where(e => e.ProfesionalId == profesionalId).ToList(),
                 EjerciciosDisponiblesSistema = todos.Where(e => e.ProfesionalId != profesionalId).ToList(),
                 ClientesDisponibles = clienteServicio.ObtenerTodosDTO()
             };
-            
-
             return View(modelo);
         }
             [HttpPost]
             public IActionResult RegistrarRutina(RutinaRegistroDTO dto)
         {
-            var rutina = new Rutina
+            //instancio la nueva rutina
+            Rutina rutina = new Rutina
             {
                 NombreRutina = dto.NombreRutina,
                 Tipo = dto.Tipo,
@@ -337,10 +349,13 @@ namespace MetaGymWebApp.Controllers
         {
             try
             {
-                var rutina = rutinaServicio.ObtenerRutinaPorId(id);
+                //Obtengo la rutina a modificar
+                Rutina rutina = rutinaServicio.ObtenerRutinaPorId(id);
+                //valido info
                 if (rutina == null) throw new Exception("No se encontro rutina o no existe.");
                 if (rutina.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext)) throw new Exception("No tiene permisos para editar esta rutina.");
-                var dto = new RutinaRegistroDTO
+                //Mapeo a dto
+                RutinaRegistroDTO dto = new RutinaRegistroDTO
                 {
                     Id = rutina.Id,
                     NombreRutina = rutina.NombreRutina,
@@ -365,9 +380,14 @@ namespace MetaGymWebApp.Controllers
         {
             try
             {
-                var rutina = rutinaServicio.ObtenerRutinaPorId(dto.Id);
+                //Obtengo la rutina a modificar
+                Rutina rutina = rutinaServicio.ObtenerRutinaPorId(dto.Id);
+                //Valido info
                 if (rutina == null) throw new Exception("No se encontro rutina o no existe.");
+                //Verifico que quien la edita sea el dueño
                 if (rutina.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext)) throw new Exception("No tiene permisos para editar esta rutina.");
+
+                //mapeo cambios
                 rutina.NombreRutina = dto.NombreRutina;
                 rutina.Tipo = dto.Tipo;
                 rutina.FechaModificacion = DateTime.Now;
@@ -376,7 +396,7 @@ namespace MetaGymWebApp.Controllers
                     EjercicioId = id,
                     Orden = index + 1
                 }).ToList();
-
+                //mando al repo
                 rutinaServicio.ModificarRutina(rutina);
 
                 // Reemplazar asignaciones
@@ -423,7 +443,7 @@ namespace MetaGymWebApp.Controllers
                     ListaMedia = new List<Media>()
                 };
            
-                //Lo creo
+                //Envio al repo
                 publicacionServicio.CrearPublicacionImagenes(publicacion);
                 //Si hay imagenes las registro
                 if (ArchivosMedia != null && ArchivosMedia.Count > 0)
@@ -472,16 +492,16 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult EditarPublicacion(int id)
         {
-            var publicacion = publicacionServicio.ObtenerPorId(id);
-
+            //Obtengo publicacion desde repo
+            PublicacionDTO publicacion = publicacionServicio.ObtenerPorId(id);
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            //Verifico que no sea null. Y que corresponda al autor que la solicita 
             if (publicacion == null || publicacion.AutorId != profesionalId || publicacion.RolAutor != "Profesional")
             {
                 TempData["Mensaje"] = "No tenés permiso para editar esta publicación.";
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("MisPublicaciones");
             }
-
             return View(publicacion);
         }
         [HttpPost]
@@ -489,22 +509,24 @@ namespace MetaGymWebApp.Controllers
         {
             try
             {
-                var pub = publicacionServicio.ObtenerPorId(Id);
+                //Obtengo publicacion por repo
+                PublicacionDTO pub = publicacionServicio.ObtenerPorId(Id);
                 int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
 
+                //Si no es el dueño lo devuevlo al menu
                 if (pub == null || pub.AutorId != profesionalId && pub.RolAutor != "Profesional")
                     throw new Exception("No podés editar esta publicación.");
 
+                //Mapeo cambiois
                 pub.Titulo = Titulo;
                 pub.Descripcion = Descripcion;
                 pub.FechaProgramada = DateTime.Now;
-
-                // Opcional: volver a estado Pendiente tras edición
+                //Queda pendiente de ser aprobada
                 pub.Estado = Enum_EstadoPublicacion.Pendiente;
                 pub.MotivoRechazo = null;
-
+                //Mando al repo
                 publicacionServicio.ActualizarPublicacion(pub);
-
+                //Cargo las fotoso nuevas si corresponde.
                 if (archivos != null && archivos.Any())
                 {
                     foreach (var archivo in archivos)
@@ -512,7 +534,6 @@ namespace MetaGymWebApp.Controllers
                         mediaServicio.GuardarArchivo(archivo, Enum_TipoEntidad.Publicacion, pub.Id);
                     }
                 }
-
                 TempData["Mensaje"] = "Publicación editada correctamente. Queda pendiente de revisión.";
                 TempData["TipoMensaje"] = "success";
                 return RedirectToAction("MisPublicaciones");

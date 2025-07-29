@@ -7,6 +7,12 @@
 <link rel="stylesheet" href="~/css/inicioPublicaciones.css" />
 
 <div class="container mt-4">
+
+    <div class="bg-dark text-white p-4 rounded mb-4 shadow-sm">
+        <h2 class="mb-2">¡Bienvenido a MetaGym!</h2>
+        <p class="mb-0">Acá vas a encontrar las últimas novedades, tips, publicaciones de los profesionales y más. ¡Entrená motivado, informate y seguí progresando!</p>
+    </div>
+    <!-- Publicaciones -->
     @if (Model != null && Model.Any())
     {
         @foreach (var pub in Model.OrderByDescending(p => p.FechaCreacion))
@@ -16,7 +22,9 @@
     }
     else
     {
-        <p class="text-muted">No hay publicaciones para mostrar.</p>
+        <div class="alert alert-info">
+            Todavía no hay publicaciones disponibles. ¡Pronto vas a ver novedades y consejos de tu equipo MetaGym!
+        </div>
     }
 </div>
 

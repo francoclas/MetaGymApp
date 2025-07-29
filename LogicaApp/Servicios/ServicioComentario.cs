@@ -39,23 +39,25 @@ namespace LogicaApp.Servicios
 
         public void AgregarComentario(ComentarioDTO dto)
         {
+            //Instancio nuevo comentario
             Comentario nuevo = new Comentario
             {
                 Contenido = dto.Contenido,
                 PublicacionId = dto.PublicacionId,
                 ComentarioPadreId = dto.ComentarioPadreId,
+                //Asigno rol para manejo dentro de bd y luego busqueda
                 ProfesionalId = dto.RolAutor == "Profesional" ? dto.AutorId : null,
                 ClienteId = dto.RolAutor == "Cliente" ? dto.AutorId : null,
                 AdminId = dto.RolAutor == "Admin" ? dto.AutorId : null
             };
-
+            //Lo mando al repo
             _repo.Agregar(nuevo);
 
             // Notificaciones
             if (dto.ComentarioPadreId == null)
             {
-                // Comentario sobre una publicación → Notificar al autor de la publicación
-                var publicacion = publicacionServicio.Value.ObtenerPorId(dto.PublicacionId);
+                // Comentario sobre una publicación se notifica al autor de la publicación
+                PublicacionDTO publicacion = publicacionServicio.Value.ObtenerPorId(dto.PublicacionId);
 
                 if (publicacion != null)
                 {
@@ -88,6 +90,7 @@ namespace LogicaApp.Servicios
                         receptorId = padre.AdminId;
                         rolReceptor = "Admin";
                     }
+                    //genero notificacion para el autor del comentario padre
                     if (receptorId != null && !(rolReceptor == dto.RolAutor && receptorId == dto.AutorId))
                     {
                         notificacionServicio.Value.NotificarInteraccionComentario((int)receptorId, rolReceptor, padre.ComentarioId,"Comentaron: " + dto.Contenido);
@@ -97,12 +100,25 @@ namespace LogicaApp.Servicios
             }
 
         public void EditarComentario(int comentarioId, string nuevoContenido, int usuarioId)
-        {             
-            _repo.ActualizarContenido(comentarioId, nuevoContenido);
+        {
+            //valido datos
+            if (String.IsNullOrEmpty(nuevoContenido)) throw new Exception("El comentario no puede estar vacio");
+            //obtengo comentario
+            Comentario comentario = _repo.ObtenerPorId(comentarioId);
+            //verifico que existga
+            if (comentario == null) throw new Exception("El comentario no existe o fue eliminado");
+            //valido si son diferentes lo actualizo
+            if (!String.Equals(nuevoContenido, comentario.Contenido)) {
+                _repo.ActualizarContenido(comentarioId, nuevoContenido);
+            }
+
         }
 
         public void EliminarComentario(int comentarioId, int usuarioId, string rol)
         {
+            //este metodo es solo para que se eliminen los comentarios de parte de su autor
+            //obtengo comentario
+            Comentario comentario = _repo.ObtenerPorId(comentarioId);
             _repo.Desactivar(comentarioId);
         }
         public void DarLikeComentario(int comentarioId, int usuarioId, string rol)

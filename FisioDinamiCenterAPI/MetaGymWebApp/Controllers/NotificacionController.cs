@@ -20,14 +20,13 @@ namespace WebApp.Controllers
         // GET: /Notificacion
         public IActionResult Index()
         {
-            var usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var rol = GestionSesion.ObtenerRol(HttpContext);
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
 
-            var notificaciones = _notiServicio.ObtenerPorUsuario(usuarioId, rol);
+            List<NotificacionDTO> notificaciones = _notiServicio.ObtenerPorUsuario(usuarioId, rol);
             return View(notificaciones);
         }
 
-        // POST: /Notificacion/MarcarComoLeida/5
         [HttpPost]
         public IActionResult MarcarComoLeida(int id)
         {
@@ -35,51 +34,49 @@ namespace WebApp.Controllers
             return Ok();
         }
 
-        // POST: /Notificacion/MarcarTodasComoLeidas
         [HttpPost]
         public IActionResult MarcarTodasComoLeidas()
         {
-            var usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var rol = GestionSesion.ObtenerRol(HttpContext);
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
 
             _notiServicio.MarcarTodasComoLeidas(usuarioId, rol);
             return Ok();
         }
 
-        // GET: /Notificacion/NoLeidasCount
         public IActionResult NoLeidasCount()
         {
-            var usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var rol = GestionSesion.ObtenerRol(HttpContext);
-
-            var cantidad = _notiServicio.ContarNoLeidas(usuarioId, rol);
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
+            //Obtengo la cantidad desde el repo
+            int cantidad = _notiServicio.ContarNoLeidas(usuarioId, rol);
             return Json(cantidad);
         }
 
-        // GET: /Notificacion/Ultimas?tipo=Publicacion
         public IActionResult Ultimas(Enum_TipoNotificacion? tipo = null)
         {
-            var usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var rol = GestionSesion.ObtenerRol(HttpContext);
-
-            var ultimas = _notiServicio.ObtenerUltimas(usuarioId, rol);
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
+            //Obtengo notificaciones desde repo
+            List<NotificacionDTO> ultimas = _notiServicio.ObtenerUltimas(usuarioId, rol);
             return PartialView("_MenuNotificaciones", ultimas);
         }
 
         public IActionResult NoLeidas()
         {
-            var usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var rol = GestionSesion.ObtenerRol(HttpContext);
-
-            var ultimas = _notiServicio.ObtenerNoLeidasUsuario(usuarioId, rol);
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
+            //Obtengo notificaciones desde repo
+            List<NotificacionDTO> ultimas = _notiServicio.ObtenerNoLeidasUsuario(usuarioId, rol);
             return PartialView("_MenuNotificaciones", ultimas);
         }
         public IActionResult Leidas()
         {
-            var usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var rol = GestionSesion.ObtenerRol(HttpContext);
+            int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            string rol = GestionSesion.ObtenerRol(HttpContext);
 
-            var ultimas = _notiServicio.ObtenerLeidasUsuario(usuarioId, rol);
+            //Obtengo notificaciones desde repo
+            List<NotificacionDTO> ultimas = _notiServicio.ObtenerLeidasUsuario(usuarioId, rol);
             return PartialView("_MenuNotificaciones", ultimas);
         }
     }

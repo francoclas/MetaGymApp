@@ -59,7 +59,7 @@ namespace LogicaApp.Servicios
             //Obtengo la especialidad y el establecimiento
             Especialidad especialidadAux = repositorioExtra.ObtenerEspecialidadId(cita.EspecialidadId);
             Establecimiento establecimientoAux = repositorioExtra.ObtenerEstablecimientoId(cita.EstablecimientoId);
-            Cita Nueva = new Cita(cita.ClienteId,especialidadAux, establecimientoAux,cita.Descripcion,cita.FechaAsistencia);
+            Cita Nueva = new Cita(cita.ClienteId,especialidadAux, null,establecimientoAux,cita.Descripcion,cita.FechaAsistencia);
             //valido informacion de la cita
             Nueva.Validar();
             //Cargo al sistema
@@ -143,6 +143,12 @@ namespace LogicaApp.Servicios
                                 .Where(c => especialidadesId.Contains(c.EspecialidadId))
                                 .ToList();
         }
+
+        public List<DateTime> ObtenerHorariosDisponibles(int profesionalId, DateTime fecha, int duracionMin)
+        {
+            return null;
+        }
+
     }
 
 }

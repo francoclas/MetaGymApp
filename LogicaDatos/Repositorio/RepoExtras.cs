@@ -78,5 +78,33 @@ namespace LogicaDatos.Repositorio
         {
             _context.SaveChanges();
         }
+        public void CrearTipoAtencion(TipoAtencion tipo)
+        {
+            _context.Add(tipo);
+            _context.SaveChanges();
+        }
+
+        public List<TipoAtencion> ObtenerTiposAtencionPorEspecialidad(int especialidadId)
+        {
+            return _context.TipoAtenciones
+                .Where(t => t.EspecialidadId == especialidadId)
+                .ToList();
+        }
+        public List<TipoAtencion> ObtenerTiposAtencionPorEspecialidades(List<int> especialidadIds)
+        {
+            return _context.TipoAtenciones
+                .Where(t => especialidadIds.Contains(t.EspecialidadId))
+                .ToList();
+        }
+        public TipoAtencion ObtenerTipoPorId(int id)
+        {
+            return _context.TipoAtenciones.Find(id);
+        }
+        public List<TipoAtencion> ObtenerTiposAtencionPorIds(List<int> ids)
+        {
+            return _context.TipoAtenciones
+                .Where(t => ids.Contains(t.Id))
+                .ToList();
+        }
     }
 }

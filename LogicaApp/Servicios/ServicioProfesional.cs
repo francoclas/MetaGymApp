@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LogicaDatos.Interfaces.Repos;
+using LogicaDatos.Repositorio;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Interfaces.Servicios;
+using Microsoft.EntityFrameworkCore;
 
 namespace LogicaApp.Servicios
 {
@@ -13,10 +15,11 @@ namespace LogicaApp.Servicios
 
     {
         private readonly IRepositorioProfesional _repoProfesional;
-
-        public ServicioProfesional (IRepositorioProfesional repoProfesional)
+        private readonly IExtraServicio _extraServicio;
+        public ServicioProfesional (IRepositorioProfesional repoProfesional, IExtraServicio extraServicio)
         {
             _repoProfesional = repoProfesional;
+            _extraServicio = extraServicio;
         }
         public void ActualizarProfesional(Profesional profesional)
         {
@@ -81,6 +84,36 @@ namespace LogicaApp.Servicios
         public void RegistrarProfesional(Profesional profesional)
         {
             throw new NotImplementedException();
+        }
+        public void AsignarTiposAtencion(int profesionalId, List<int> tipoAtencionIds)
+        {
+            var profesional = ObtenerProfesional(profesionalId);
+            if (profesional == null) throw new Exception("Profesional no encontrado.");
+
+            var tipos = _extraServicio.ObtenerTiposAtencionPorIds(tipoAtencionIds);
+            profesional.TiposAtencion = tipos;
+
+            _repoProfesional.Actualizar(profesional);
+        }
+        public void AgregarTipoAtencion(TipoAtencion tipo, Profesional profesional)
+        {
+            if (!profesional.TiposAtencion.Contains(tipo))
+            {
+                profesional.TiposAtencion.Add(tipo);
+                _repoProfesional.Actualizar(profesional);
+            }
+        }
+        public void EliminarTipoAtencion(int profesionalId, int tipoAtencionId)
+        {
+            var profesional = ObtenerProfesional(profesionalId);
+            if (profesional == null) throw new Exception("Profesional no encontrado.");
+
+            var tipo = profesional.TiposAtencion.FirstOrDefault(t => t.Id == tipoAtencionId);
+            if (tipo != null)
+            {
+                profesional.TiposAtencion.Remove(tipo);
+                _repoProfesional.Actualizar(profesional);
+            }
         }
     }
 }

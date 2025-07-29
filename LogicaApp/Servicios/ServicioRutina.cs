@@ -111,6 +111,7 @@ namespace LogicaApp.Servicios
                 Nombre = ejercicio.Nombre,
                 Tipo = ejercicio.Tipo,
                 GrupoMuscular = ejercicio.GrupoMuscular,
+                Media = ejercicio.Medias[0],
                 Medias = ejercicio.Medias,
                 Mediciones = ejercicio.Mediciones,
                 Instrucciones = ejercicio.Instrucciones
@@ -161,8 +162,40 @@ namespace LogicaApp.Servicios
 
         public SesionRutina RegistrarSesion(SesionRutina sesion)
         {
-            repositorioRutina.RegistrarSesion(sesion);
-            return sesion;
+            if (sesion == null)
+                throw new Exception("La sesión no puede ser nula");
+
+            var rutinaAsignada = repositorioRutina.ObtenerAsignacion(sesion.RutinaAsignadaId);
+            if (rutinaAsignada == null)
+                throw new Exception("No se encontró la rutina asignada");
+
+            if (rutinaAsignada.ClienteId != sesion.ClienteId)
+                throw new Exception("No coincide el cliente con la rutina asignada");
+
+            if (sesion.EjerciciosRealizados == null || !sesion.EjerciciosRealizados.Any())
+                throw new Exception("Debe registrar al menos un ejercicio");
+
+            foreach (var ej in sesion.EjerciciosRealizados)
+            {
+                if (ej.SeRealizo)
+                {
+                    if (ej.Series == null || !ej.Series.Any())
+                        throw new Exception($"El ejercicio {ej.EjercicioId} está marcado como realizado pero no tiene series");
+
+                    // Validación de mediciones obligatorias
+                    var ejercicioOriginal = repositorioEjercicio.ObtenerPorId(ej.EjercicioId);
+                    var obligatorias = ejercicioOriginal.Mediciones.Where(m => m.EsObligatoria).ToList();
+
+                    foreach (var ob in obligatorias)
+                    {
+                        if (!ej.ValoresMediciones.Any(vm => vm.MedicionId == ob.Id && !string.IsNullOrWhiteSpace(vm.Valor)))
+                            throw new Exception($"Falta valor para medición obligatoria '{ob.Nombre}' del ejercicio {ejercicioOriginal.Nombre}");
+                    }
+                }
+            }
+
+            sesion.FechaRealizada = DateTime.Now;
+            return repositorioRutina.RegistrarSesion(sesion);
         }
         public List<SesionRutina> ObtenerSesionesPorAsignacion(int rutinaAsignadaId)
         {
@@ -237,5 +270,11 @@ namespace LogicaApp.Servicios
             return dto;
         }
 
+        public string ObtenerNombreRutina(int idRutina)
+        {
+            Rutina salida = repositorioRutina.ObtenerPorId(idRutina);
+
+            return salida.NombreRutina;
+        }
     }
 }

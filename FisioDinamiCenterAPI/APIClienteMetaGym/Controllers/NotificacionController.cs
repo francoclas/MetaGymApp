@@ -2,6 +2,7 @@
 using LogicaNegocio.Interfaces.Servicios;
 using APIClienteMetaGym.DTO;
 using LogicaNegocio.Interfaces.DTOS;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ApiClienteMetaGym.Controllers;
 
@@ -10,6 +11,7 @@ namespace ApiClienteMetaGym.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/notificaciones")]
+[Authorize]
 public class NotificacionController : ControllerBase
 {
     private readonly INotificacionServicio _notificacionServicio;

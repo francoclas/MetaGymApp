@@ -26,6 +26,9 @@ namespace LogicaNegocio.Clases
         //Relaciones Establecimiento
         public int EstablecimientoId { get; set; }
         public Establecimiento Establecimiento { get; set; }
+        //relacion tipo atencion
+        public int TipoAtencionId { get; set; }
+        public TipoAtencion TipoAtencion { get; set; }
         public EstadoCita Estado { get; set; } = EstadoCita.EnEspera;
         public string Descripcion { get; set; } = "";
         public string? Conclusion { get; set; } = "";
@@ -34,19 +37,22 @@ namespace LogicaNegocio.Clases
         public DateTime? FechaFinalizacion { get; set; }
         public Cita() { }
 
-        public Cita (int ClienteId,
-            Especialidad especialidad,
-            Establecimiento establecimiento,
-            string descripcion,DateTime fechaAsistencia)
+        public Cita(int ClienteId,
+             Especialidad especialidad,
+             TipoAtencion tipo,
+             Establecimiento establecimiento,
+             string descripcion,
+             DateTime fechaAsistencia)
         {
             this.ClienteId = ClienteId;
             this.FechaCreacion = DateTime.Now;
             this.Especialidad = especialidad;
+            this.TipoAtencion = tipo;
             this.Establecimiento = establecimiento;
             this.Descripcion = descripcion;
             this.FechaAsistencia = fechaAsistencia;
         }
-        
+
         //Funciones
         /*
          Flujo de citas

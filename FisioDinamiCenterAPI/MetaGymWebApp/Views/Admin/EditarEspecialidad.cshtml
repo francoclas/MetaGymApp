@@ -24,3 +24,24 @@
         <button type="submit" class="btn btn-warning mt-3">Guardar cambios</button>
     </form>
 </div>
+
+<hr />
+
+<div class="card py-2 container mt-4">
+    <h4>Agregar Tipo de Atención</h4>
+
+    <form asp-action="AgregarTipoAtencion" method="post">
+        <input type="hidden" name="especialidadId" value="@Model.Id" />
+
+        <div class="mb-2">
+            <label>Nombre</label>
+            <input name="nombre" class="form-control" required />
+        </div>
+
+        <div class="mb-2">
+            <label>Descripción</label>
+            <input name="descripcion" class="form-control" required />
+        </div>
+        <button class="btn btn-success">Agregar tipo</button>
+    </form>
+</div>

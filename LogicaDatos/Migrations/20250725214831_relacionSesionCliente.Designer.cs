@@ -4,6 +4,7 @@ using LogicaDatos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LogicaDatos.Migrations
 {
     [DbContext(typeof(DbContextApp))]
-    partial class DbContextAppModelSnapshot : ModelSnapshot
+    [Migration("20250725214831_relacionSesionCliente")]
+    partial class relacionSesionCliente
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,36 +77,6 @@ namespace LogicaDatos.Migrations
                     b.ToTable("Administradores");
                 });
 
-            modelBuilder.Entity("LogicaNegocio.Clases.AgendaProfesional", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Dia")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan>("HoraFin")
-                        .HasColumnType("time");
-
-                    b.Property<TimeSpan>("HoraInicio")
-                        .HasColumnType("time");
-
-                    b.Property<int>("ProfesionalId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProfesionalId");
-
-                    b.ToTable("AgendaProfesionales");
-                });
-
             modelBuilder.Entity("LogicaNegocio.Clases.Cita", b =>
                 {
                     b.Property<int>("Id")
@@ -144,9 +117,6 @@ namespace LogicaDatos.Migrations
                     b.Property<int?>("ProfesionalId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TipoAtencionId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId");
@@ -156,8 +126,6 @@ namespace LogicaDatos.Migrations
                     b.HasIndex("EstablecimientoId");
 
                     b.HasIndex("ProfesionalId");
-
-                    b.HasIndex("TipoAtencionId");
 
                     b.ToTable("Citas");
                 });
@@ -819,35 +787,6 @@ namespace LogicaDatos.Migrations
                     b.ToTable("SesionesRutina");
                 });
 
-            modelBuilder.Entity("LogicaNegocio.Clases.TipoAtencion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DuracionMin")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EspecialidadId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EspecialidadId");
-
-                    b.ToTable("TipoAtenciones");
-                });
-
             modelBuilder.Entity("LogicaNegocio.Clases.ValorMedicion", b =>
                 {
                     b.Property<int>("Id")
@@ -899,21 +838,6 @@ namespace LogicaDatos.Migrations
                     b.ToTable("SeriesParaEjerciciosDeCliente");
                 });
 
-            modelBuilder.Entity("ProfesionalTipoAtencion", b =>
-                {
-                    b.Property<int>("ProfesionalesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TiposAtencionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProfesionalesId", "TiposAtencionId");
-
-                    b.HasIndex("TiposAtencionId");
-
-                    b.ToTable("ProfesionalTipoAtencion");
-                });
-
             modelBuilder.Entity("EspecialidadProfesional", b =>
                 {
                     b.HasOne("LogicaNegocio.Clases.Especialidad", null)
@@ -927,17 +851,6 @@ namespace LogicaDatos.Migrations
                         .HasForeignKey("ProfesionalesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("LogicaNegocio.Clases.AgendaProfesional", b =>
-                {
-                    b.HasOne("LogicaNegocio.Clases.Profesional", "Profesional")
-                        .WithMany()
-                        .HasForeignKey("ProfesionalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Profesional");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Cita", b =>
@@ -964,12 +877,6 @@ namespace LogicaDatos.Migrations
                         .WithMany("Citas")
                         .HasForeignKey("ProfesionalId");
 
-                    b.HasOne("LogicaNegocio.Clases.TipoAtencion", "TipoAtencion")
-                        .WithMany("Citas")
-                        .HasForeignKey("TipoAtencionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Cliente");
 
                     b.Navigation("Especialidad");
@@ -977,8 +884,6 @@ namespace LogicaDatos.Migrations
                     b.Navigation("Establecimiento");
 
                     b.Navigation("Profesional");
-
-                    b.Navigation("TipoAtencion");
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Comentario", b =>
@@ -1262,17 +1167,6 @@ namespace LogicaDatos.Migrations
                     b.Navigation("RutinaAsignada");
                 });
 
-            modelBuilder.Entity("LogicaNegocio.Clases.TipoAtencion", b =>
-                {
-                    b.HasOne("LogicaNegocio.Clases.Especialidad", "Especialidad")
-                        .WithMany()
-                        .HasForeignKey("EspecialidadId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Especialidad");
-                });
-
             modelBuilder.Entity("LogicaNegocio.Clases.ValorMedicion", b =>
                 {
                     b.HasOne("LogicaNegocio.Clases.EjercicioRealizado", "EjercicioRealizado")
@@ -1301,21 +1195,6 @@ namespace LogicaDatos.Migrations
                         .IsRequired();
 
                     b.Navigation("EjercicioRealizado");
-                });
-
-            modelBuilder.Entity("ProfesionalTipoAtencion", b =>
-                {
-                    b.HasOne("LogicaNegocio.Clases.Profesional", null)
-                        .WithMany()
-                        .HasForeignKey("ProfesionalesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LogicaNegocio.Clases.TipoAtencion", null)
-                        .WithMany()
-                        .HasForeignKey("TiposAtencionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("LogicaNegocio.Clases.Admin", b =>
@@ -1432,11 +1311,6 @@ namespace LogicaDatos.Migrations
             modelBuilder.Entity("LogicaNegocio.Clases.SesionRutina", b =>
                 {
                     b.Navigation("EjerciciosRealizados");
-                });
-
-            modelBuilder.Entity("LogicaNegocio.Clases.TipoAtencion", b =>
-                {
-                    b.Navigation("Citas");
                 });
 #pragma warning restore 612, 618
         }

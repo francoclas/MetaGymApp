@@ -12,12 +12,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Reflection;
+using LogicaNegocio.Extra;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ---------- Servicios base ----------
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 //------------- Token -------------
 // Configuración de JWT
@@ -69,7 +75,8 @@ builder.Services.AddScoped<IMediaServicio, ServicioMedia>();
 builder.Services.AddScoped<IComentarioServicio, ServicioComentario>();
 builder.Services.AddScoped<IPublicacionServicio, ServicioPublicacion>();
 builder.Services.AddScoped<INotificacionServicio, ServicioNotificacion>();
-
+builder.Services.AddScoped<IRutinaServicio, ServicioRutina>();
+builder.Services.AddScoped(typeof(Lazy<>), typeof(LazyResolver<>));
 
 // ---------- CORS ----------
 builder.Services.AddCors(options =>

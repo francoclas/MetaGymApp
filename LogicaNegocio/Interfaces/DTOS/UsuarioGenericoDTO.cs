@@ -18,6 +18,8 @@ namespace LogicaNegocio.Interfaces.DTOS
         public Media Perfil { get; set; }
         public List<Media> Medias { get; set; }
         public List<Especialidad> Especialidades { get; set; } = new List<Especialidad>();
+        public List<int> TiposAtencionIds { get; set; } = new List<int>();
+        public List<TipoAtencion> TiposAtencionAsignadas { get; set; } = new List<TipoAtencion>();
         public List<NotificacionDTO> Notificaciones { get; set; } = new List<NotificacionDTO>();
         public string Rol { get; set; } // "Cliente", "Profesional", "Admin"
     }

@@ -22,6 +22,8 @@ namespace LogicaDatos
         public DbSet<Admin> Administradores { get; set; }
         //Citas
         public DbSet<Cita> Citas { get; set; }
+        public DbSet<TipoAtencion> TipoAtenciones { get; set; }
+        public DbSet<AgendaProfesional> AgendaProfesionales { get; set; }
         //Ejercicios
         public DbSet<Ejercicio> Ejercicios { get; set; }
         public DbSet<Rutina> Rutinas { get; set; }  
@@ -81,7 +83,7 @@ namespace LogicaDatos
                 .HasOne(lp => lp.Publicacion)
                 .WithMany(p => p.Likes)
                 .HasForeignKey(lp => lp.PublicacionId);
-
+     
             modelBuilder.Entity<LikeComentario>()
                 .HasOne(lc => lc.Comentario)
                 .WithMany(c => c.Likes)
@@ -91,12 +93,17 @@ namespace LogicaDatos
                 .WithMany()
                 .HasForeignKey(vm => vm.MedicionId)
                 .OnDelete(DeleteBehavior.Restrict); 
-
+            //Rutinas
             modelBuilder.Entity<ValorMedicion>()
                 .HasOne(vm => vm.EjercicioRealizado)
                 .WithMany(er => er.ValoresMediciones)
                 .HasForeignKey(vm => vm.EjercicioRealizadoId)
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<SesionRutina>()
+                .HasOne(sr => sr.Cliente)
+                .WithMany(c => c.Entrenamientos)
+                .HasForeignKey(sr => sr.ClienteId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 

@@ -11,13 +11,13 @@ namespace LogicaNegocio.Clases
     {
         public SesionRutina() { }
         public int Id { get; set; }
-       
-
         public int RutinaAsignadaId { get; set; }
         public RutinaAsignada RutinaAsignada { get; set; }
-
         public DateTime FechaRealizada { get; set; }
         public int? DuracionMin { get; set; }
+        //Cliente
+        public int ClienteId { get; set; }
+        public Cliente Cliente { get; set; }
 
         //Ejercicios
         public List<EjercicioRealizado> EjerciciosRealizados { get; set; }

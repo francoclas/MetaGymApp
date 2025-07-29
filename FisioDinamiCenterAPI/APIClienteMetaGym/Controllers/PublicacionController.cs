@@ -16,6 +16,8 @@ namespace APIClienteMetaGym.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/publicaciones")]
+[Authorize]
+
 public class PublicacionController : ControllerBase
 {
     private readonly IPublicacionServicio _publicacionServicio;

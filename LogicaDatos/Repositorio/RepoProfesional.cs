@@ -37,6 +37,7 @@ namespace LogicaDatos.Repositorio
         {
             return _context.Profesionales
             .Include(p => p.Especialidades)
+            .Include(p => p.TiposAtencion)
             .Include(p => p.Citas)
             .Include(p => p.Rutinas)
             .Include(p => p.Publicaciones)
@@ -69,6 +70,7 @@ namespace LogicaDatos.Repositorio
         {
             return _context.Profesionales
                 .Include(p => p.Especialidades)
+            .Include(p => p.TiposAtencion)
                 .Include(p => p.Citas)
                 .Include(p => p.Rutinas)
                 .Include(p => p.FotosPerfil)

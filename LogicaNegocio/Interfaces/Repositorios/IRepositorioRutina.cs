@@ -19,9 +19,10 @@ namespace LogicaDatos.Interfaces.Repos
         void RemoverAsignacion(int rutinaAsignadaId);
         List<RutinaAsignada> ObtenerAsignacionesPorRutina(int rutinaId);
         // Gestión de sesiones
-        void RegistrarSesion(SesionRutina sesion);
         List<SesionRutina> ObtenerSesionesPorCliente(int clienteId);
         SesionRutina? ObtenerSesionPorId(int sesionId);
         List<SesionRutina> ObtenerSesionesPorAsignacion(int rutinaAsignadaId);
+        SesionRutina RegistrarSesion(SesionRutina sesion);
+        RutinaAsignada? ObtenerAsignacion(int asignacionId);
     }
 }

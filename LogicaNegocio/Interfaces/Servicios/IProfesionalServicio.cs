@@ -13,6 +13,9 @@ namespace LogicaNegocio.Interfaces.Servicios
         //Funciones basicas
             void RegistrarProfesional(Profesional profesional);
             void AgregarEspecialidad (Especialidad especialidad, Profesional profesional);
+            void AsignarTiposAtencion(int profesionalId, List<int> tipoAtencionIds);
+            void AgregarTipoAtencion(TipoAtencion tipo, Profesional profesional);
+            void EliminarTipoAtencion(int profesionalId, int tipoAtencionId);
             void EliminarEspecialidad(Especialidad especialidad, Profesional profesional);
             List<int> ObtenerEspecialidadesProfesional(int profesionalId);
             List<Profesional> ObtenerTodos();

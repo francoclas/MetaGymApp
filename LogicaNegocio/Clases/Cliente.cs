@@ -22,6 +22,7 @@ namespace LogicaNegocio.Clases
 
         public List<Cita> Citas { get; set; } = new List<Cita>();
         public List<RutinaAsignada> RutinasAsignadas { get; set; } = new List<RutinaAsignada>() ;
+        public List<SesionRutina> Entrenamientos { get; set; } = new List<SesionRutina>(){ };
         public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
         public List<Media> FotosPerfil { get; set; } = new List<Media>();
         public List<Notificacion> Notificaciones { get; set; } = new List<Notificacion>();

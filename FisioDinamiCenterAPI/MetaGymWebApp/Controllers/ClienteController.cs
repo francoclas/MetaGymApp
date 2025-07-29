@@ -52,9 +52,9 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult GenerarConsultaCita()
         {
-
-            var especialidades = extraServicio.ObtenerEspecialidades();
-            var establecimientos = extraServicio.ObtenerEstablecimientos();
+            //Obtengo especialidades y establecimientos
+            List<Especialidad> especialidades = extraServicio.ObtenerEspecialidades();
+            List<Establecimiento> establecimientos = extraServicio.ObtenerEstablecimientos();
             //Mapeo a DTOs para vista
             var establecimientosDTO = establecimientos.Select(e => new EstablecimientoPreviewDTO
             {
@@ -163,16 +163,17 @@ namespace MetaGymWebApp.Controllers
         public IActionResult MisRutinas()
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var asignaciones = rutinaServicio.ObtenerRutinasAsignadasCliente(clienteId);
-
+            //Obtengo rutinas del cliente
+            List<RutinaAsignada> asignaciones = rutinaServicio.ObtenerRutinasAsignadasCliente(clienteId);
             return View(asignaciones);
         }
         [HttpGet]
         public IActionResult DetallesRutinaAsignada(int id)
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            //OBtengo rutina del repo
             var dto = rutinaServicio.ObtenerDetalleRutinaAsignadaDTO(id, clienteId);
-
+            //Devuelvo a menu si no existe
             if (dto == null)
             {
                 TempData["Mensaje"] = "No tenés acceso a esta rutina.";
@@ -187,7 +188,7 @@ namespace MetaGymWebApp.Controllers
         public IActionResult SesionEntrenada(int id)
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var sesion = rutinaServicio.ObtenerSesionPorId(id);
+            SesionRutina sesion = rutinaServicio.ObtenerSesionPorId(id);
 
             // Cargar datos necesarios para vista (Rutina y Ejercicios completos)
             var rutina = rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignadaId);
@@ -195,7 +196,7 @@ namespace MetaGymWebApp.Controllers
             foreach (var er in sesion.EjerciciosRealizados)
             {
                 er.Ejercicio = rutina.Ejercicios
-                    .FirstOrDefault(re => re.EjercicioId == er.EjercicioId)?.Ejercicio;
+                    .FirstOrDefault(re => re.Ejercicio.Id== er.EjercicioId)?.Ejercicio;
             }
 
             ViewBag.RutinaNombre = rutina.NombreRutina;

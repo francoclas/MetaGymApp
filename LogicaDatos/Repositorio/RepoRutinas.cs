@@ -127,12 +127,19 @@ namespace LogicaDatos.Repositorio
                 .ToList();
         }
 
-        public void RegistrarSesion(SesionRutina sesion)
+        public SesionRutina RegistrarSesion(SesionRutina sesion)
         {
             _context.SesionesRutina.Add(sesion);
             _context.SaveChanges();
+            return sesion;
         }
 
+        public RutinaAsignada? ObtenerAsignacion(int asignacionId)
+        {
+            return _context.RutinasAsignadas
+                .Include(r => r.Rutina)
+                .FirstOrDefault(r => r.Id == asignacionId);
+        }
         public void RemoverAsignacion(int rutinaAsignadaId)
         {
             var asignacion = _context.RutinasAsignadas.Find(rutinaAsignadaId);

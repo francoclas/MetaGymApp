@@ -8,6 +8,7 @@ using LogicaDatos.Repositorio;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
+using Microsoft.EntityFrameworkCore;
 
 namespace LogicaApp.Servicios
 {
@@ -21,10 +22,12 @@ namespace LogicaApp.Servicios
 
         public List<Especialidad> BuscarEspecialidad(string Nombre)
         {
+            //Valido especialidad
             if (string.IsNullOrEmpty(Nombre))
             {
                 throw new Exception("La especialidad a buscar no puede estar vacia.");
             }
+            //Devuelvo desde repo
             return repoExtras.BuscarEspecialidad(Nombre);
         }
 
@@ -59,6 +62,7 @@ namespace LogicaApp.Servicios
 
         public Establecimiento ObtenerEstablecimiento(int Id)
         {
+            
             return repoExtras.ObtenerEstablecimientoId(Id);
         }
 
@@ -110,31 +114,55 @@ namespace LogicaApp.Servicios
         //registros solo con dtos
         public void RegistrarEspecialidad(EspecialidadDTO dto)
         {
-            var nueva = new Especialidad
+            //Instancio especialidad desde el dto
+            Especialidad nueva = new Especialidad
             {
                 NombreEspecialidad = dto.NombreEspecialidad,
                 DescripcionEspecialidad = dto.DescripcionEspecialidad
             };
+            //Mando al repo
             repoExtras.AltaEspecialidad(nueva);
          
         }
 
         public void RegistrarEstablecimiento(EstablecimientoDTO dto)
         {
-
-            var nuevo = new Establecimiento
+            //Instancio nuevo establecimiento desde DTO
+            Establecimiento nuevo = new Establecimiento
             {
                 Nombre = dto.Nombre,
                 Direccion = dto.Direccion,
                 Latitud = dto.Latitud,
                 Longitud = dto.Longitud,
             };
+            //Mando al repo
                 repoExtras.AltaEstablecimiento(nuevo);
-            }
+        }
 
         public void GuardarCambios()
         {
             repoExtras.GuardarCambios();
+        }
+        public void CrearTipoAtencion(TipoAtencion tipo)
+        {
+            repoExtras.CrearTipoAtencion(tipo);
+        }
+        public TipoAtencion ObtenerTipoAtencion(int id)
+        {
+            return repoExtras.ObtenerTipoPorId(id);
+        }
+        public List<TipoAtencion> ObtenerTiposAtencionPorEspecialidad(int especialidadId)
+        {
+            return repoExtras.ObtenerTiposAtencionPorEspecialidad(especialidadId);
+        }
+        public List<TipoAtencion> ObtenerTiposAtencionPorEspecialidades(List<int> especialidadIds)
+        {
+            return repoExtras.ObtenerTiposAtencionPorEspecialidades(especialidadIds);
+        }
+
+        public List<TipoAtencion> ObtenerTiposAtencionPorIds(List<int> ids)
+        {
+            return repoExtras.ObtenerTiposAtencionPorIds(ids);
         }
     }
 }
