@@ -106,5 +106,20 @@ namespace LogicaDatos.Repositorio
                 .Where(t => ids.Contains(t.Id))
                 .ToList();
         }
+
+        public List<TipoAtencion> ObtenerTiposAtencionTodos()
+        {
+            return _context.TipoAtenciones
+                .Include(t => t.Especialidad)
+                .ToList();
+
+        }
+
+        public TipoAtencion ObtenerTipoAtencionId(int? tipoAtencionId)
+        {
+            return _context.TipoAtenciones
+                .Include(t => t.Especialidad)
+                .FirstOrDefault(ta => ta.Id == tipoAtencionId);
+        }
     }
 }

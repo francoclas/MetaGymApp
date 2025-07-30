@@ -94,6 +94,9 @@ namespace LogicaDatos.Repositorio
         public List<Cita> ObtenerPorProfesionalYEstado(int profesionalId, EstadoCita estado)
         {
             return _context.Citas
+                .Include(C => C.Cliente)
+                .Include(c => c.Especialidad)
+                .Include(c => c.Establecimiento)
                 .Where(c => c.ProfesionalId == profesionalId && c.Estado == estado)
                 .ToList();
         }
@@ -101,6 +104,7 @@ namespace LogicaDatos.Repositorio
         public IEnumerable<Cita> ObtenerTodos()
         {
             return _context.Citas.ToList();
+
         }
 
         public Cita ObtenerPorId(int id)
@@ -124,6 +128,7 @@ namespace LogicaDatos.Repositorio
                 .Include(C => C.Cliente)
                 .Include(c => c.Especialidad)
                 .Include(c => c.Establecimiento)
+                .Where(c=> c.Estado == estado)
                 .ToList();
         }
 

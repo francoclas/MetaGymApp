@@ -37,21 +37,7 @@ namespace LogicaNegocio.Clases
         public DateTime? FechaFinalizacion { get; set; }
         public Cita() { }
 
-        public Cita(int ClienteId,
-             Especialidad especialidad,
-             TipoAtencion tipo,
-             Establecimiento establecimiento,
-             string descripcion,
-             DateTime fechaAsistencia)
-        {
-            this.ClienteId = ClienteId;
-            this.FechaCreacion = DateTime.Now;
-            this.Especialidad = especialidad;
-            this.TipoAtencion = tipo;
-            this.Establecimiento = establecimiento;
-            this.Descripcion = descripcion;
-            this.FechaAsistencia = fechaAsistencia;
-        }
+  
 
         //Funciones
         /*

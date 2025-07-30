@@ -29,6 +29,6 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<TipoAtencion> ObtenerTiposAtencionPorEspecialidad(int especialidadId);
         List<TipoAtencion> ObtenerTiposAtencionPorEspecialidades(List<int> especialidadIds);
         List<TipoAtencion> ObtenerTiposAtencionPorIds(List<int> ids);
-
+        List<TipoAtencion> ObtenerTiposAtencion();
     }
 }

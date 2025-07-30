@@ -52,10 +52,10 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult GenerarConsultaCita()
         {
-            //Obtengo especialidades y establecimientos
             List<Especialidad> especialidades = extraServicio.ObtenerEspecialidades();
             List<Establecimiento> establecimientos = extraServicio.ObtenerEstablecimientos();
-            //Mapeo a DTOs para vista
+            List<TipoAtencion> tiposAtencion = extraServicio.ObtenerTiposAtencion();
+
             var establecimientosDTO = establecimientos.Select(e => new EstablecimientoPreviewDTO
             {
                 Id = e.Id,
@@ -63,9 +63,10 @@ namespace MetaGymWebApp.Controllers
                 Direccion = e.Direccion,
                 UrlMedia = e.Media?.FirstOrDefault()?.Url
             }).ToList();
+
             ViewBag.Especialidades = especialidades;
             ViewBag.Establecimientos = establecimientos;
-            //Serializo para poder mostrar imagenes desde la vista
+            ViewBag.TiposAtencion = tiposAtencion;
             ViewBag.EstablecimientosJson = JsonSerializer.Serialize(establecimientosDTO, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -73,6 +74,7 @@ namespace MetaGymWebApp.Controllers
 
             return View(new CitaDTO());
         }
+
         [HttpPost]
         public IActionResult GenerarConsultaCita(CitaDTO dto)
         {
@@ -80,11 +82,12 @@ namespace MetaGymWebApp.Controllers
             {
                 int clienteId = GestionSesion.ObtenerUsuarioId(this.HttpContext);
                 dto.ClienteId = clienteId;
-                //Valido informcion
-                if (dto.ClienteId == 0) throw new Exception("Vuelva a iniciar sesion.");
-                if (string.IsNullOrEmpty(dto.Descripcion)) throw new Exception("La descripcion no puede estar vacia.");
+
+                if (dto.ClienteId == 0) throw new Exception("Vuelva a iniciar sesión.");
+                if (string.IsNullOrEmpty(dto.Descripcion)) throw new Exception("La descripción no puede estar vacía.");
                 if (dto.FechaAsistencia < DateTime.Today) throw new Exception("La fecha deseada debe ser posterior a hoy.");
-                //Llamo al repo
+                if (dto.TipoAtencionId == 0) throw new Exception("Debe seleccionar un tipo de atención.");
+
                 citaServicio.GenerarNuevaCita(dto);
                 return RedirectToAction("MisCitas");
             }
@@ -92,11 +95,28 @@ namespace MetaGymWebApp.Controllers
             {
                 TempData["Mensaje"] = e.Message;
                 TempData["TipoMensaje"] = "danger";
+
+                List<Especialidad> especialidades = extraServicio.ObtenerEspecialidades();
+                List<Establecimiento> establecimientos = extraServicio.ObtenerEstablecimientos();
+                List<TipoAtencion> tiposAtencion = extraServicio.ObtenerTiposAtencion();
+                ViewBag.Especialidades = especialidades;
+                ViewBag.Establecimientos = establecimientos;
+                ViewBag.TiposAtencion = tiposAtencion;
+
+                var establecimientosDTO = establecimientos.Select(e => new EstablecimientoPreviewDTO
+                {
+                    Id = e.Id,
+                    Nombre = e.Nombre,
+                    Direccion = e.Direccion,
+                    UrlMedia = e.Media?.FirstOrDefault()?.Url
+                }).ToList();
+                ViewBag.EstablecimientosJson = JsonSerializer.Serialize(establecimientosDTO, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
+
                 return View(dto);
             }
-            //Obtengo id del cliente logueado
-
-
         }
         //Seccion de citas del cliente
         [HttpGet]

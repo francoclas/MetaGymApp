@@ -164,5 +164,10 @@ namespace LogicaApp.Servicios
         {
             return repoExtras.ObtenerTiposAtencionPorIds(ids);
         }
+
+        public List<TipoAtencion> ObtenerTiposAtencion()
+        {
+            return repoExtras.ObtenerTiposAtencionTodos();
+        }
     }
 }

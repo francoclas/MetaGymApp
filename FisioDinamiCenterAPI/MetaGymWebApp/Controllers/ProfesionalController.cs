@@ -69,59 +69,98 @@ namespace MetaGymWebApp.Controllers
         [HttpPost]
         public IActionResult RevisarCita(CitaDTO citaDTO)
         {
-            //Valido
+            try
+            {
+                int profesionalId = GestionSesion.ObtenerUsuarioId(this.HttpContext);
 
-            //Mando a repo
+                // Obtener la cita original
+                Cita cita = citaServicio.ObtenerPorId(citaDTO.CitaId);
 
-            //Redireccion
-            return View();
+                if (cita.Estado != EstadoCita.EnEspera)
+                    throw new Exception("La cita ya fue gestionada.");
+
+                // Asignar profesional y cambiar estado
+                cita.ProfesionalId = profesionalId;
+                cita.Estado = EstadoCita.Aceptada;
+
+                // Validar que esté dentro del horario profesional (esto lo implementás después si querés)
+                cita.Validar();
+
+                // Guardar cambios
+                citaServicio.ActualizarEntidad(cita);
+
+                TempData["Mensaje"] = "Cita aceptada correctamente.";
+                return RedirectToAction("GestionCitas");
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return View(citaDTO);
+            }
         }
 
-        public IActionResult GestionCitas(EstadoCita estado = EstadoCita.EnEspera)
+        public IActionResult GestionCitas()
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
 
-            List<Cita> citas;
+            // Obtener las citas correspondientes
+            var citasEnEspera = citaServicio
+                .BuscarSolicitudesSegunTiposAtencion(profesionalServicio.ObtenerTiposAtencionProfesional(profesionalId));
 
-            if (estado == EstadoCita.EnEspera)
-            {
-                citas = citaServicio.BuscarSolicitudesSegunEspecialidades(profesionalServicio.ObtenerEspecialidadesProfesional(profesionalId));
-            }
-            else if (estado == EstadoCita.Aceptada)
-            {
-                citas = citaServicio.SolicitarProximasProfesional(profesionalId);
-            }
-            else if (estado == EstadoCita.Finalizada)
-            {
-                citas = citaServicio.SolicitarHistorialProfesional(profesionalId);
-            }
-            else
-            {
-                citas = new List<Cita>();
-            }
-            //Gestion de rutinas
-            // Mapear a DTOs
-            var dtoList = citas.Select(c => new CitaDTO
-            {
-                CitaId = c.Id,
-                Cliente = c.Cliente,
-                Especialidad = c.Especialidad,
-                Establecimiento = c.Establecimiento,
-                Descripcion = c.Descripcion,
-                FechaAsistencia = c.FechaAsistencia.Value,
-                FechaCreacion = c.FechaCreacion,
-                ProfesionalId = c.ProfesionalId,
-                Conclusion = c.Conclusion
-            }).ToList();
+            var citasProximas = citaServicio
+                .SolicitarProximasProfesional(profesionalId);
 
+            var citasFinalizadas = citaServicio
+                .SolicitarHistorialProfesional(profesionalId)
+                .Where(c => c.Estado == EstadoCita.Finalizada)
+                .ToList();
+
+            // Mapeo a DTOs
             var model = new GestionCitasModelo
             {
-                Citas = dtoList,
-                EstadoSeleccionado = estado
+                CitasEnEspera = citasEnEspera.Select(c => new CitaDTO
+                {
+                    CitaId = c.Id,
+                    Cliente = c.Cliente,
+                    Especialidad = c.Especialidad,
+                    Establecimiento = c.Establecimiento,
+                    Descripcion = c.Descripcion,
+                    FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
+                    FechaCreacion = c.FechaCreacion,
+                    ProfesionalId = c.ProfesionalId,
+                    Conclusion = c.Conclusion
+                }).ToList(),
+
+                CitasProximasDeProfesional = citasProximas.Select(c => new CitaDTO
+                {
+                    CitaId = c.Id,
+                    Cliente = c.Cliente,
+                    Especialidad = c.Especialidad,
+                    Establecimiento = c.Establecimiento,
+                    Descripcion = c.Descripcion,
+                    FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
+                    FechaCreacion = c.FechaCreacion,
+                    ProfesionalId = c.ProfesionalId
+                }).ToList(),
+
+                CitasAtendidasProfesional = citasFinalizadas.Select(c => new CitaDTO
+                {
+                    CitaId = c.Id,
+                    Cliente = c.Cliente,
+                    Especialidad = c.Especialidad,
+                    Establecimiento = c.Establecimiento,
+                    Descripcion = c.Descripcion,
+                    FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
+                    FechaCreacion = c.FechaCreacion,
+                    ProfesionalId = c.ProfesionalId,
+                    Conclusion = c.Conclusion
+                }).ToList(),
             };
 
             return View(model);
         }
+
         [HttpGet]
         public IActionResult GestionRutinas()
         {

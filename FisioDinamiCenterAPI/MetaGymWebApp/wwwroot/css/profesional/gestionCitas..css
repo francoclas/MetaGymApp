@@ -1,0 +1,10 @@
+﻿.cita-card {
+    background-color: #1e1e1e;
+    color: #fff;
+    border-left: 5px solid #dc3545;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #dc3545;
+    color: white;
+}

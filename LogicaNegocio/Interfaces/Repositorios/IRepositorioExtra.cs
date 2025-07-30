@@ -26,5 +26,7 @@ namespace LogicaDatos.Interfaces.Repos
         List<TipoAtencion> ObtenerTiposAtencionPorEspecialidad(int especialidadId);
         List<TipoAtencion> ObtenerTiposAtencionPorEspecialidades(List<int> especialidadIds);
         List<TipoAtencion> ObtenerTiposAtencionPorIds(List<int> ids);
+        List<TipoAtencion> ObtenerTiposAtencionTodos();
+        TipoAtencion ObtenerTipoAtencionId(int? tipoAtencionId);
     }
 }

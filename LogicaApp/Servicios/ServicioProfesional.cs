@@ -115,5 +115,14 @@ namespace LogicaApp.Servicios
                 _repoProfesional.Actualizar(profesional);
             }
         }
+        public List<int> ObtenerTiposAtencionProfesional(int profesionalId)
+        {
+            Profesional profe = _repoProfesional.ObtenerPorId(profesionalId);
+
+            if (profe == null)
+                throw new Exception("No se encontró el profesional.");
+
+            return profe.TiposAtencion.Select(ta => ta.Id).ToList();
+        }
     }
 }

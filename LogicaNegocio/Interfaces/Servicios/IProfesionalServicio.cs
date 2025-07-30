@@ -21,9 +21,11 @@ namespace LogicaNegocio.Interfaces.Servicios
             List<Profesional> ObtenerTodos();
             Profesional ObtenerProfesional(int id);
             void ActualizarProfesional(Profesional profesional);
+        List<int> ObtenerTiposAtencionProfesional(int profesionalId);
+
         //Relacionado a gestion de citas
-            //Generacion
-            void GenerarCita(Cita cita);
+        //Generacion
+        void GenerarCita(Cita cita);
             void RechazarCita(Cita cita);
 
            

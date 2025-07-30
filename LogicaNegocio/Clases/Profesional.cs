@@ -23,6 +23,7 @@ namespace LogicaNegocio.Clases
         //atencion citas
         public List<TipoAtencion> TiposAtencion { get; set; } = new List<TipoAtencion>();
         public List<Especialidad> Especialidades { get; set; } = new List<Especialidad>();
+        public List<AgendaProfesional> Agendas { get; set; } = new List<AgendaProfesional>();
         public List<Cita> Citas { get; set; } = new List<Cita>();
         //Rutinas y ejercicios
         public List<Ejercicio> Ejercicios { get; set; } = new List<Ejercicio>();

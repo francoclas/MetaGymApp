@@ -32,6 +32,7 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<Cita> BuscarPorEstado(EstadoCita estado);
         Cita ObtenerPorId(int citaId);
         public List<DateTime> ObtenerHorariosDisponibles(int profesionalId, DateTime fecha, int duracionMin);
-
+        List<Cita> BuscarSolicitudesSegunTiposAtencion(List<int> tiposAtencionId);
+        void ActualizarEntidad(Cita cita);
     }
 }

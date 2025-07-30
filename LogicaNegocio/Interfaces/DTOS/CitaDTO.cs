@@ -17,6 +17,8 @@ namespace LogicaApp.DTOS
         public EstadoCita Estado { get; set; }
         public int EspecialidadId { get; set; }
         public Especialidad Especialidad { get; set; }
+        public int? TipoAtencionId { get; set; }
+        public TipoAtencion TipoAtencion { get; set; }
         public int EstablecimientoId { get; set; }
         public Establecimiento Establecimiento { get; set; }
         public string? Descripcion {  get; set; }
