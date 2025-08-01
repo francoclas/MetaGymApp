@@ -31,5 +31,6 @@ namespace LogicaNegocio.Interfaces.Servicios
            
         //Relacionado a publicacion
             void EnviarPublicacion (Publicacion publicacion);
+        List<EspecialidadDTO> ObtenerEspecialidadesProfesionalDTO(int profesionalId);
     }
 }

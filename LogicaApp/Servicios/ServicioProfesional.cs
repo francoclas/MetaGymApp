@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LogicaDatos.Interfaces.Repos;
 using LogicaDatos.Repositorio;
 using LogicaNegocio.Clases;
+using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
 using Microsoft.EntityFrameworkCore;
 
@@ -61,8 +62,9 @@ namespace LogicaApp.Servicios
 
         public List<int> ObtenerEspecialidadesProfesional(int profesionalId)
         {
-            //Obtengo pro
+            //Obtengo profesional
             Profesional pro = _repoProfesional.ObtenerPorId(profesionalId);
+            // mando las ids
             return pro.Especialidades.Select(x => x.Id).ToList();
         }
 
@@ -123,6 +125,23 @@ namespace LogicaApp.Servicios
                 throw new Exception("No se encontró el profesional.");
 
             return profe.TiposAtencion.Select(ta => ta.Id).ToList();
+        }
+
+        public List<EspecialidadDTO> ObtenerEspecialidadesProfesionalDTO(int profesionalId)
+        {
+            Profesional profe = _repoProfesional.ObtenerPorId(profesionalId);
+
+            List<EspecialidadDTO> salida = new List<EspecialidadDTO>();
+            foreach (var item in profe.Especialidades)
+            {
+                salida.Add(new EspecialidadDTO
+                {
+                    Id = item.Id,
+                    DescripcionEspecialidad = item.DescripcionEspecialidad,
+                    NombreEspecialidad = item.NombreEspecialidad
+                });
+            }
+            return salida;
         }
     }
 }

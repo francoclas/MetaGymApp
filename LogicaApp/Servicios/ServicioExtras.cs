@@ -164,10 +164,45 @@ namespace LogicaApp.Servicios
         {
             return repoExtras.ObtenerTiposAtencionPorIds(ids);
         }
-
+        public List<TipoAtencion> ObtenerTiposAtencionPorProfesional(int profesionalId)
+        {
+            return repoExtras.ObtenerTiposAtencionPorProfesional(profesionalId);
+        }
         public List<TipoAtencion> ObtenerTiposAtencion()
         {
             return repoExtras.ObtenerTiposAtencionTodos();
+        }
+
+        public List<TipoAtencionDTO> ObtenerTiposAtencionPorProfesionalDTO(int profesionalId)
+        {
+            List<TipoAtencionDTO> salida = new List<TipoAtencionDTO> ();
+            foreach (var item in repoExtras.ObtenerTiposAtencionPorProfesional(profesionalId))
+            {
+                salida.Add(new TipoAtencionDTO
+                {
+                    Id = item.Id,
+                    Nombre = item.Nombre,
+                    Desc = item.Descripcion,
+                });
+            }
+            return salida;
+        }
+
+        public List<EstablecimientoDTO> ObtenerEstablecimientosDTO()
+        {
+            List<EstablecimientoDTO> salida = new List<EstablecimientoDTO>();
+            foreach (var item in repoExtras.ListarEstablecimientos()) {
+                salida.Add(new EstablecimientoDTO
+                {
+                    Id = item.Id,
+                    Nombre = item.Nombre,
+                    Direccion = item.Direccion,
+                    Latitud = item.Latitud,
+                    Longitud = item.Longitud,
+                    UrlMedia = item.Media.FirstOrDefault().Url,
+                });
+            }
+            return salida;
         }
     }
 }

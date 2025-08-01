@@ -34,31 +34,24 @@ namespace LogicaApp.Servicios
         }
         public void ActualizarCita(CitaDTO cita)
         {
-            Cita Actualizada = repositorioCita.ObtenerPorId(cita.CitaId);
+            Cita actual = repositorioCita.ObtenerPorId(cita.CitaId);
 
-            Actualizada.Descripcion = cita.Descripcion;
+            if (!string.IsNullOrWhiteSpace(cita.Descripcion))
+                actual.Descripcion = cita.Descripcion;
 
-            if (cita.EstablecimientoId != Actualizada.EstablecimientoId)
-            {
-                Actualizada.EstablecimientoId = cita.EstablecimientoId;
-            }
+            if (cita.EstablecimientoId != actual.EstablecimientoId)
+                actual.EstablecimientoId = cita.EstablecimientoId;
 
-            if (cita.EspecialidadId != Actualizada.EspecialidadId)
-            {
-                Actualizada.EspecialidadId = cita.EspecialidadId;
-            }
+            if (cita.EspecialidadId != 0 && cita.EspecialidadId != actual.EspecialidadId)
+                actual.EspecialidadId = cita.EspecialidadId;
 
-            if (cita.TipoAtencionId != Actualizada.TipoAtencionId)
-            {
-                Actualizada.TipoAtencionId = (int)cita.TipoAtencionId;
-            }
+            if (cita.TipoAtencionId.HasValue && cita.TipoAtencionId != actual.TipoAtencionId)
+                actual.TipoAtencionId = (int)cita.TipoAtencionId;
 
-            if (cita.FechaAsistencia != Actualizada.FechaAsistencia)
-            {
-                Actualizada.FechaAsistencia = cita.FechaAsistencia;
-            }
+            if (cita.FechaAsistencia != actual.FechaAsistencia)
+                actual.FechaAsistencia = cita.FechaAsistencia;
 
-            repositorioCita.Actualizar(Actualizada);
+            repositorioCita.Actualizar(actual);
         }
         public void ActualizarEntidad(Cita cita)
         {
@@ -106,6 +99,22 @@ namespace LogicaApp.Servicios
 
             // Cargo al sistema
             repositorioCita.Agregar(Nueva);
+        }
+        public void CrearCita(Cita cita)
+        {
+            if (cita == null)
+                throw new ArgumentNullException("La cita no puede ser nula.");
+
+            // Validaciones mínimas
+            if (cita.ClienteId == 0 || cita.ProfesionalId == 0 || cita.FechaAsistencia == null)
+                throw new Exception("Faltan datos requeridos para registrar la cita.");
+
+            if (cita.FechaAsistencia <= DateTime.Now)
+                throw new Exception("La fecha de asistencia debe ser posterior al momento actual.");
+
+            cita.FechaCreacion = DateTime.Now;
+
+            repositorioCita.Agregar(cita);
         }
 
         public void CancelarCita(CitaDTO cita)
@@ -195,6 +204,23 @@ namespace LogicaApp.Servicios
             return repositorioCita.BuscarPorEstado(EstadoCita.EnEspera)
                                   .Where(c => tiposAtencionId.Contains(c.TipoAtencionId))
                                   .ToList();
+        }
+
+        public void RegistrarCitaPorProfesional(CitaDTO cita)
+        {
+            //mapeo
+            Cita nueva = new Cita
+            {
+                ProfesionalId = cita.ProfesionalId,
+                ClienteId = cita.ClienteId,
+                EspecialidadId = cita.EspecialidadId,
+                TipoAtencionId = (int)cita.TipoAtencionId,
+                EstablecimientoId = cita.EstablecimientoId,
+                Descripcion = cita.Descripcion,
+                FechaAsistencia = cita.FechaAsistencia,
+                Estado = EstadoCita.Aceptada
+            };
+            CrearCita(nueva);
         }
     }
 

@@ -13,6 +13,7 @@ namespace LogicaNegocio.Interfaces.Servicios
     {
         //ABM
         void GenerarNuevaCita(CitaDTO cita);
+        void CrearCita(Cita cita);
         //Flujo cita
         void FinalizarCita(CitaDTO cita);
         void ActualizarCita(CitaDTO cita);
@@ -34,5 +35,6 @@ namespace LogicaNegocio.Interfaces.Servicios
         public List<DateTime> ObtenerHorariosDisponibles(int profesionalId, DateTime fecha, int duracionMin);
         List<Cita> BuscarSolicitudesSegunTiposAtencion(List<int> tiposAtencionId);
         void ActualizarEntidad(Cita cita);
+        void RegistrarCitaPorProfesional(CitaDTO cita);
     }
 }

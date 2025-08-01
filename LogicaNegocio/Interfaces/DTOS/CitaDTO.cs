@@ -27,5 +27,6 @@ namespace LogicaApp.DTOS
         public DateTime? FechaCreacion { get; set; }
         public int? ProfesionalId { get; set; }
         public string? Conclusion { get; set; }
+
     }
 }

@@ -10,6 +10,7 @@ using LogicaNegocio.Interfaces.Servicios;
 using MetaGymWebApp.Filtros;
 using MetaGymWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MetaGymWebApp.Controllers
 {
@@ -160,6 +161,101 @@ namespace MetaGymWebApp.Controllers
 
             return View(model);
         }
+        [HttpGet]
+        public IActionResult EditarCita(int id)
+        {
+            int ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            var cita = citaServicio.ObtenerPorId(id);
+
+            if (cita.Estado != EstadoCita.Aceptada)
+            {
+                TempData["Mensaje"] = "Solo se pueden editar citas aceptadas.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionCitas");
+            }
+            if (cita.ProfesionalId != ProfesionalId)
+            {
+                TempData["Mensaje"] = "No tenes asignada la rutina a editar";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionCitas");
+
+            }
+            var dto = new CitaDTO
+            {
+                CitaId = cita.Id,
+                FechaAsistencia = cita.FechaAsistencia ?? DateTime.Now,
+                EstablecimientoId = cita.EstablecimientoId,
+                ClienteId = cita.ClienteId,
+                ProfesionalId = cita.ProfesionalId,
+                EspecialidadId = cita.EspecialidadId,
+                Descripcion = cita.Descripcion,
+                TipoAtencionId = cita.TipoAtencionId
+            };
+
+            ViewBag.TiposAtencion = new SelectList(extraServicio.ObtenerTiposAtencionPorProfesional(ProfesionalId), "Id", "Nombre", dto.TipoAtencionId);
+            return View(dto);
+        }
+
+        [HttpPost]
+        public IActionResult EditarCita(CitaDTO citaDTO)
+        {
+            int ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            try
+            {
+
+                Cita cita = citaServicio.ObtenerPorId(citaDTO.CitaId);
+
+                if (cita == null)
+                    throw new Exception("No se encontró la cita.");
+                if (cita.ProfesionalId != ProfesionalId)
+                {
+                    TempData["Mensaje"] = "No tenes asignada la rutina a editar";
+                    TempData["TipoMensaje"] = "danger";
+                    return RedirectToAction("GestionCitas");
+
+                }
+                // Validaciones según nuevo estado
+                if (citaDTO.Estado == EstadoCita.Finalizada ||
+                    citaDTO.Estado == EstadoCita.Cancelada ||
+                    citaDTO.Estado == EstadoCita.NoAsistio ||
+                    citaDTO.Estado == EstadoCita.Rechazada)
+                {
+                    if (string.IsNullOrWhiteSpace(citaDTO.Conclusion))
+                        throw new Exception("Debe ingresar una conclusión para finalizar o cancelar la cita.");
+
+                    cita.Conclusion = citaDTO.Conclusion;
+                    cita.Estado = citaDTO.Estado;
+                    cita.FechaFinalizacion = DateTime.Now;
+                }
+                else
+                {
+                    cita.Estado = citaDTO.Estado; // Aceptada u otro cambio
+                }
+
+                // Fecha o descripción
+                cita.FechaAsistencia = citaDTO.FechaAsistencia;
+                cita.Descripcion = citaDTO.Descripcion;
+
+                // Tipo atención si vino
+                if (citaDTO.TipoAtencionId.HasValue)
+                    cita.TipoAtencionId = citaDTO.TipoAtencionId.Value;
+
+                cita.Validar(); // si usás validaciones internas
+
+                citaServicio.ActualizarEntidad(cita);
+
+                TempData["Mensaje"] = "Cita actualizada correctamente.";
+                return RedirectToAction("GestionCitas");
+            }
+            catch (Exception ex)
+            {
+                TempData["Mensaje"] = ex.Message;
+                TempData["TipoMensaje"] = "danger";
+
+                ViewBag.TiposAtencion = new SelectList(extraServicio.ObtenerTiposAtencionPorProfesional(ProfesionalId), "Id", "Nombre", citaDTO.TipoAtencionId);
+                return View(citaDTO);
+            }
+        }
 
         [HttpGet]
         public IActionResult GestionRutinas()
@@ -188,6 +284,87 @@ namespace MetaGymWebApp.Controllers
             }
             
         }
+        [HttpGet]
+        public IActionResult VerCita(int id)
+        {
+            var cita = citaServicio.ObtenerPorId(id);
+            return View("VerCita", new CitaDTO
+            {
+                CitaId = cita.Id,
+                Cliente = cita.Cliente,
+                Establecimiento = cita.Establecimiento,
+                Especialidad = cita.Especialidad,
+                Descripcion = cita.Descripcion,
+                FechaAsistencia = cita.FechaAsistencia ?? DateTime.Now,
+                Conclusion = cita.Conclusion
+            });
+        }
+        [HttpGet]
+        public IActionResult CrearCita()
+        {
+            int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+
+            RegistroCitaModelo modelo = new RegistroCitaModelo
+            {
+                Clientes = clienteServicio.ObtenerTodosDTO(),
+                Especialidades = profesionalServicio.ObtenerEspecialidadesProfesionalDTO(profesionalId),
+                TiposAtencion = extraServicio.ObtenerTiposAtencionPorProfesionalDTO(profesionalId),
+                Establecimientos = extraServicio.ObtenerEstablecimientosDTO(),
+                Cita = new CitaDTO()
+            };
+
+            return View(modelo);
+        }
+        [HttpPost]
+        public IActionResult CrearCita(RegistroCitaModelo modelo)
+        {
+            try
+            {
+                CitaDTO cita = modelo.Cita;
+                cita.ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+                //Valido la info ingresada
+                if (cita.ClienteId <= 0)
+                    throw new Exception("Debe seleccionar un cliente.");
+
+                if (cita.EspecialidadId <= 0)
+                    throw new Exception("Debe seleccionar una especialidad.");
+
+                if (cita.TipoAtencionId <= 0)
+                    throw new Exception("Debe seleccionar un tipo de atención.");
+
+                if (cita.EstablecimientoId <= 0)
+                    throw new Exception("Debe seleccionar un establecimiento.");
+
+                if (string.IsNullOrWhiteSpace(cita.Descripcion))
+                    throw new Exception("Debe ingresar una descripción para la cita.");
+
+                if (cita.FechaAsistencia == default || cita.FechaAsistencia < DateTime.Now)
+                    throw new Exception("Debe ingresar una fecha y hora válida y futura.");
+                //mando al repo
+                citaServicio.RegistrarCitaPorProfesional(cita);
+
+
+                TempData["Mensaje"] = "Cita registrada correctamente.";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("GestionCitas");
+            }
+            catch (Exception ex)
+            {
+                TempData["Mensaje"] = ex.Message;
+                TempData["TipoMensaje"] = "danger";
+
+                // Recargar listas
+                int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+                modelo.Clientes = clienteServicio.ObtenerTodosDTO();
+                modelo.Especialidades = profesionalServicio.ObtenerEspecialidadesProfesionalDTO(profesionalId);
+                modelo.TiposAtencion = extraServicio.ObtenerTiposAtencionPorProfesionalDTO(profesionalId);
+                modelo.Establecimientos = extraServicio.ObtenerEstablecimientosDTO();
+
+                return View(modelo);
+            }
+        }
+
+
         //Ejercicios
         [HttpGet]
         public IActionResult GestionEjercicios()

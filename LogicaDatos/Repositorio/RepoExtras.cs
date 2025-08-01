@@ -114,7 +114,13 @@ namespace LogicaDatos.Repositorio
                 .ToList();
 
         }
-
+        public List<TipoAtencion> ObtenerTiposAtencionPorProfesional(int profesionalId)
+        {
+            return _context.TipoAtenciones
+                .Include(t => t.Especialidad)
+                .Where(t => t.Especialidad.Profesionales.Any(p => p.Id == profesionalId))
+                .ToList();
+        }
         public TipoAtencion ObtenerTipoAtencionId(int? tipoAtencionId)
         {
             return _context.TipoAtenciones

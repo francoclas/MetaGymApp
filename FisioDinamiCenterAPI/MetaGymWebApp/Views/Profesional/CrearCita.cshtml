@@ -1,0 +1,73 @@
+﻿@model RegistroCitaModelo
+@{
+    ViewData["Title"] = "Crear Cita";
+}
+
+<div class="container mt-4 bg-dark text-white p-4 rounded">
+    <h2 class="mb-4">Crear nueva cita</h2>
+
+    <form asp-action="CrearCita" method="post">
+
+        <div class="mb-3">
+            <label asp-for="Cita.ClienteId" class="form-label">Cliente</label>
+            <select asp-for="Cita.ClienteId" class="form-select">
+                <option value="">Seleccione un cliente</option>
+                @foreach (var cliente in Model.Clientes)
+                {
+                    <option value="@cliente.Id">
+                        @cliente.NombreCompleto - @cliente.Ci - @cliente.Correo
+                    </option>
+                }
+            </select>
+            <span asp-validation-for="Cita.ClienteId" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Cita.Descripcion" class="form-label">Descripcion</label>
+            <input asp-for="Cita.Descripcion" type="text" class="form-control" />
+            <span asp-validation-for="Cita.Descripcion" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Cita.EspecialidadId" class="form-label">Especialidad</label>
+            <select asp-for="Cita.EspecialidadId" class="form-select">
+                <option value="">Seleccione una especialidad</option>
+                @foreach (var esp in Model.Especialidades)
+                {
+                    <option value="@esp.Id">@esp.NombreEspecialidad</option>
+                }
+            </select>
+            <span asp-validation-for="Cita.EspecialidadId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Cita.TipoAtencionId" class="form-label">Tipo de atención</label>
+            <select asp-for="Cita.TipoAtencionId" class="form-select">
+                <option value="">Seleccione un tipo de atención</option>
+                @foreach (var tipo in Model.TiposAtencion)
+                {
+                    <option value="@tipo.Id">@tipo.Nombre</option>
+                }
+            </select>
+            <span asp-validation-for="Cita.TipoAtencionId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Cita.EstablecimientoId" class="form-label">Establecimiento</label>
+            <select asp-for="Cita.EstablecimientoId" class="form-select">
+                <option value="">Seleccione un establecimiento</option>
+                @foreach (var est in Model.Establecimientos)
+                {
+                    <option value="@est.Id">@est.Nombre</option>
+                }
+            </select>
+            <span asp-validation-for="Cita.EstablecimientoId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Cita.FechaAsistencia" class="form-label">Fecha y Hora</label>
+            <input asp-for="Cita.FechaAsistencia" type="datetime-local" class="form-control" />
+            <span asp-validation-for="Cita.FechaAsistencia" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Registrar Cita</button>
+    </form>
+</div>

@@ -11,7 +11,9 @@
     <a class="btn btn-outline-light mb-3" asp-controller="Agenda" asp-action="MisAgendas">
         Gestionar mi tiempo de trabajo
     </a>
-
+    <div>
+        <a href="@Url.Action("CrearCita", "Profesional")" class="btn btn-success">➕ Agendar una cita</a>
+    </div>
     <ul class="nav nav-tabs mb-4" id="tabsCitas">
         <li class="nav-item">
             <a class="nav-link active" data-tab="espera">Solicitudes</a>
@@ -67,6 +69,12 @@
                     </div>
                     <div>
                         <span class="badge bg-success">Confirmada</span>
+                        <a href="@Url.Action("VerCita", "Profesional", new { id = cita.CitaId })" class="btn btn-outline-primary btn-sm">
+                            Ver
+                        </a>
+                        <a href="@Url.Action("EditarCita", "Profesional", new { id = cita.CitaId })" class="btn btn-outline-primary btn-sm">
+                            Editar
+                        </a>
                     </div>
                 </div>
             </div>
@@ -85,6 +93,13 @@
                     <p class="card-text"><small class="text-muted">Fecha: @cita.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</small></p>
                     <p class="card-text"><strong>Conclusión:</strong> @cita.Conclusion</p>
                 </div>
+                <div>
+                    <span class="badge bg-success">Finalizada</span>
+                    <a href="@Url.Action("VerCita", "Profesional", new { id = cita.CitaId })" class="btn btn-outline-primary btn-sm">
+                        Ver
+                    </a>
+                </div>
+
             </div>
         }
     </div>
