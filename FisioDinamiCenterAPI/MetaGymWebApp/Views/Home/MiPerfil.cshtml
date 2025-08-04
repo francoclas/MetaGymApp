@@ -5,8 +5,8 @@
 }
 
 <div class="container">
-<h2>Mi Perfil</h2>
-    <div class="card shadow p-3" style="max-width: 400px;">
+    <h2 class="text-white">Mi Perfil</h2>
+    <div class="card shadow p-3 bg-dark text-light" style="max-width: 400px;">
         <div class="text-center">
             @if (Model.Perfil != null)
             {
@@ -18,6 +18,9 @@
                      style="width:150px;height:150px;">
                     Sin foto
                 </div>
+                <div class="mt-2 text-warning small">
+                    Aún no tenés una foto de perfil. Te recomendamos agregar una para personalizar tu cuenta.
+                </div>
             }
 
             <h4 class="mt-3">@Model.Nombre</h4>
@@ -26,12 +29,13 @@
             <a asp-action="EditarPerfil" class="btn btn-primary mt-2">Editar Perfil</a>
         </div>
     </div>
-    <div class="mt-4">
-        <h3>Historial de notificaciones</h3>
+
+    <div class="mt-5">
+        <h3 class="text-white">Historial de notificaciones</h3>
 
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
             <div>
-                <label class="me-2">Filtrar por tipo:</label>
+                <label class="me-2 text-white">Filtrar por tipo:</label>
                 <select id="filtroTipo" class="form-select d-inline-block w-auto">
                     <option value="todos">Todos</option>
                     @foreach (var tipo in ViewBag.TiposNotificacion as List<string>)
@@ -42,7 +46,7 @@
             </div>
 
             <div>
-                <label class="me-2">Ordenar:</label>
+                <label class="me-2 text-white">Ordenar:</label>
                 <select id="ordenFecha" class="form-select d-inline-block w-auto">
                     <option value="desc">Más recientes</option>
                     <option value="asc">Más antiguas</option>
@@ -50,10 +54,17 @@
             </div>
         </div>
 
+        <div class="mb-3">
+            <input type="text" id="buscadorTexto" class="form-control" placeholder="Buscar por palabra clave...">
+        </div>
+
         <ul id="listaNotificaciones" class="list-group">
             @foreach (var n in Model.Notificaciones.OrderByDescending(n => n.Fecha))
             {
-                <li class="list-group-item justify-content-between align-items-start noti-item" data-tipo="@n.Tipo" data-fecha="@n.Fecha.Ticks">
+                <li class="list-group-item bg-dark text-light mb-3 noti-item"
+                    data-tipo="@n.Tipo"
+                    data-fecha="@n.Fecha.Ticks"
+                    data-texto="@($"{n.Titulo} {n.Mensaje}".ToLower())">
                     <div class="ms-2 me-auto">
                         <div class="fw-bold">@n.Titulo</div>
                         <span>@n.Mensaje</span><br />
@@ -61,11 +72,12 @@
                     </div>
                     @if (!n.Leido)
                     {
-                        <span class="badge bg-danger rounded-pill">Nuevo</span>
+                        <span class="badge bg-danger">Nuevo</span>
                     }
                 </li>
             }
         </ul>
     </div>
 </div>
+
 <script src="~/js/perfilUsuario.js"></script>

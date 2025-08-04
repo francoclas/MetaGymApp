@@ -1,0 +1,56 @@
+﻿@using LogicaApp.DTOS
+@model List<CitaDTO>
+@{
+    ViewData["Title"] = "Historial Clínico";
+    var nombreCliente = Model.FirstOrDefault()?.Cliente?.NombreCompleto ?? "Cliente";
+}
+
+<div class="container mt-4">
+    <h2>Historial clínico de @nombreCliente</h2>
+
+    @if (Model.Count == 0)
+    {
+        <div class="bg-dark p-4 rounded border text-center mt-4">
+            <h5 class="text-muted">Todavía no hay citas finalizadas para este cliente.</h5>
+            <p>Cuando se finalice alguna cita, aparecerá registrada aquí.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" id="buscadorHistorial" class="form-control" placeholder="Buscar por especialidad o tipo atención" onkeyup="filtrarHistorial()" />
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped" id="tablaHistorial">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Especialidad</th>
+                    <th>Tipo de Atención</th>
+                    <th>Fecha Finalización</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cita in Model)
+                {
+                    <tr>
+                        <td>@cita.CitaId</td>
+                        <td>@cita.Especialidad?.NombreEspecialidad</td>
+                        <td>@cita.TipoAtencion?.Nombre</td>
+                        <td>@(cita.FechaFinalizacion?.ToString("dd/MM/yyyy") ?? "-")</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-info" asp-action="VerCita" asp-route-id="@cita.CitaId" target="_blank">Ver detalles</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/profesional/historialClinicoCliente.js"></script>
+}

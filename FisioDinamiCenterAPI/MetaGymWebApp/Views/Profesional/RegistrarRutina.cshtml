@@ -29,8 +29,7 @@
                     <img src="@img" alt="Imagen ejercicio" class="img-ejercicio rounded mb-1" />
                     <strong>@ejercicio.Nombre</strong><br />
                     <button class="btn btn-sm btn-outline-light mt-1" type="button" onclick="agregarEjercicio(@ejercicio.Id, '@ejercicio.Nombre')">Agregar</button>
-                    <button class="btn btn-sm btn-outline-light mt-1" type="button" onclick="VerDetalles(@ejercicio.Id, '@ejercicio.Nombre')">Ver</button>
-
+                    <a class="btn btn-sm btn-outline-light mt-1" target="_blank" href="/Profesional/InformacionEjercicio/@ejercicio.Id">Ver</a>
                 </div>
             }
         </div>
@@ -46,7 +45,8 @@
                     <img src="@img" alt="Imagen ejercicio" class="img-ejercicio rounded mb-1" />
                     <strong>@ejercicio.Nombre</strong><br />
                     <button class="btn btn-sm btn-outline-light mt-1" type="button" onclick="agregarEjercicio(@ejercicio.Id, '@ejercicio.Nombre')">Agregar</button>
-                    <button class="btn btn-sm btn-outline-light mt-1" type="button" onclick="VerDetalles(@ejercicio.Id)">Ver</button>
+                    <a class="btn btn-sm btn-outline-light mt-1" target="_blank" href="/Profesional/InformacionEjercicio/@ejercicio.Id">Ver</a>
+
                 </div>
             }
         </div>

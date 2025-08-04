@@ -1,24 +1,16 @@
-﻿        document.querySelectorAll('#tabFiltro .nav-link').forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
+﻿document.querySelectorAll('#tabFiltro .nav-link').forEach(link => {
+    link.addEventListener('click', function (e) {
+        e.preventDefault();
 
-                // Activar la pestaña
-                document.querySelectorAll('#tabFiltro .nav-link').forEach(tab => tab.classList.remove('active'));
-                this.classList.add('active');
+        document.querySelectorAll('#tabFiltro .nav-link').forEach(tab => tab.classList.remove('active'));
+        this.classList.add('active');
 
-                // Filtrar filas
-                const estado = this.dataset.estado;
-                document.querySelectorAll('#tablaPublicaciones tbody tr').forEach(row => {
-                    if (row.dataset.estado === estado) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            });
-        });
+        const tab = this.dataset.tab;
+        document.querySelectorAll('.tab-publicaciones').forEach(div => div.classList.add('d-none'));
+        document.querySelector(`#tabla-${tab}`).classList.remove('d-none');
+    });
+});
 
-        // Activar filtro inicial (mostrar solo Pendientes)
-        window.addEventListener('DOMContentLoaded', () => {
-            document.querySelector('#tabFiltro .nav-link.active').click();
-        });
+window.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('#tabFiltro .nav-link.active').click();
+});

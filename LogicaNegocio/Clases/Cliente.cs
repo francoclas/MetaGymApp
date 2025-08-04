@@ -18,6 +18,7 @@ namespace LogicaNegocio.Clases
         public string Pass { get; set; }
         public string Correo { get; set; }
         public string? Telefono { get; set; }
+        public bool UsuarioActivo { get; set; } = true;
         public Cliente() { }
 
         public List<Cita> Citas { get; set; } = new List<Cita>();

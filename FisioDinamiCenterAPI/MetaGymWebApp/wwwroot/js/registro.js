@@ -1,53 +1,51 @@
-﻿document.getElementById("registroForm").addEventListener("submit", function (e) {
-    let errores = [];
+﻿document.addEventListener("DOMContentLoaded", () => {
+    const campos = {
+        ci: { selector: "#ci", error: "#error-ci", validador: v => /^\d{8}$/.test(v), mensaje: "El CI debe tener 8 dígitos." },
+        usuario: { selector: "#usuario", error: "#error-usuario", validador: v => v.length >= 4, mensaje: "Mínimo 4 caracteres." },
+        nombre: { selector: "#nombre", error: "#error-nombre", validador: v => v.trim() !== "", mensaje: "Campo obligatorio." },
+        correo: { selector: "#correo", error: "#error-correo", validador: v => /^\S+@\S+\.\S+$/.test(v), mensaje: "Correo no válido." },
+        telefono: { selector: "#telefono", error: "#error-telefono", validador: v => /^\d{8,}$/.test(v), mensaje: "Al menos 8 dígitos." },
+        pass: { selector: "#pass", error: "#error-pass", validador: v => v.length >= 6, mensaje: "Mínimo 6 caracteres." },
+        confpass: {
+            selector: "#confpass",
+            error: "#error-confpass",
+            validador: () => document.querySelector("#pass").value === document.querySelector("#confpass").value,
+            mensaje: "Las contraseñas no coinciden."
+        }
+    };
 
-    const ci = document.getElementById("ci").value.trim();
-    const usuario = document.getElementById("usuario").value.trim();
-    const nombre = document.getElementById("nombre").value.trim();
-    const correo = document.getElementById("correo").value.trim();
-    const telefono = document.getElementById("telefono").value.trim();
-    const pass = document.getElementById("pass").value.trim();
-    const confpass = document.getElementById("confpass").value.trim();
+    const btnSubmit = document.querySelector("#btn-submit");
 
-    // Validaciones
-    if (!/^\d{8}$/.test(ci)) {
-        errores.push("El CI debe tener exactamente 8 dígitos.");
+    function validarCampo(campo) {
+        const input = document.querySelector(campo.selector);
+        const error = document.querySelector(campo.error);
+        const valor = input.value.trim();
+
+        const valido = campo.validador(valor);
+        error.textContent = valido ? "" : campo.mensaje;
+        return valido;
     }
 
-    if (usuario.length < 4) {
-        errores.push("El nombre de usuario debe tener al menos 4 caracteres.");
+    function validarTodo() {
+        let esValido = true;
+        for (let key in campos) {
+            const valido = validarCampo(campos[key]);
+            if (!valido) esValido = false;
+        }
+        btnSubmit.disabled = !esValido;
     }
 
-    if (nombre === "") {
-        errores.push("El nombre completo es obligatorio.");
+    // Asignar eventos en tiempo real
+    for (let key in campos) {
+        const input = document.querySelector(campos[key].selector);
+        input.addEventListener("input", validarTodo);
     }
 
-    if (!/^\S+@\S+\.\S+$/.test(correo)) {
-        errores.push("Ingrese un correo válido.");
-    }
+    document.getElementById("registroForm").addEventListener("submit", function (e) {
+        if (btnSubmit.disabled) {
+            e.preventDefault();
+        }
+    });
 
-    if (!/^\d{8,}$/.test(telefono)) {
-        errores.push("El teléfono debe tener al menos 8 dígitos numéricos.");
-    }
-
-    if (pass.length < 6) {
-        errores.push("La contraseña debe tener al menos 6 caracteres.");
-    }
-
-    if (pass !== confpass) {
-        errores.push("Las contraseñas no coinciden.");
-    }
-
-    // Mostrar errores
-    const errorBox = document.getElementById("errorBox");
-    errorBox.innerHTML = "";
-    if (errores.length > 0) {
-        e.preventDefault(); // cancela envío
-        errores.forEach(err => {
-            const div = document.createElement("div");
-            div.className = "text-danger text-center mb-1";
-            div.textContent = err;
-            errorBox.appendChild(div);
-        });
-    }
+    validarTodo(); // Validar al cargar
 });

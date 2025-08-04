@@ -15,6 +15,7 @@ namespace LogicaNegocio.Interfaces.DTOS
         public string Correo { get; set; }
         public string Pass {  get; set; }
         public string Telefono { get; set; }
+        public bool UsuarioActivo { get; set; }
         public Media Perfil { get; set; }
         public List<Media> Medias { get; set; }
         public List<Especialidad> Especialidades { get; set; } = new List<Especialidad>();

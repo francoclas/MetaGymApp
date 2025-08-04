@@ -87,8 +87,6 @@ namespace MetaGymWebApp.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return View();
                 if (cliente.Password != cliente.ConfPass)
                 {
                     throw new Exception("La confirmacion no coincide.");

@@ -1,52 +1,42 @@
-﻿@model List<PublicacionDTO>
+﻿@model MisPublicacionesProfesional
 @{
     ViewData["Title"] = "Mis Publicaciones";
 }
-
 <h2>Mis Publicaciones</h2>
 
 <div class="mb-3">
     <a asp-action="SolicitarPublicacion" class="btn btn-success">➕ Nueva publicación</a>
 </div>
 
-<ul class="nav nav-tabs mb-3" id="tabFiltro">
-    <li class="nav-item">
-        <a class="nav-link active" data-estado="Pendiente" href="#">Pendientes</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" data-estado="Aprobada" href="#">Aprobadas</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" data-estado="Rechazada" href="#">Rechazadas</a>
-    </li>
-</ul>
+@if (!Model.Pendientes.Any() && !Model.Aprobadas.Any() && !Model.Rechazadas.Any())
+{
+    <div class="bg-dark p-4 rounded border text-center">
+        <h5 class="text-muted">Todavía no realizaste ninguna publicación.</h5>
+        <p>Podés comenzar creando una desde el botón <strong>➕ Nueva publicación</strong>.</p>
+    </div>
+}
+else
+{
+    <ul class="nav nav-tabs mb-3" id="tabFiltro">
+        <li class="nav-item">
+            <a class="nav-link active" data-tab="pendientes" href="#">Pendientes</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-tab="aprobadas" href="#">Aprobadas</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-tab="rechazadas" href="#">Rechazadas</a>
+        </li>
+    </ul>
 
-<table class="table table-dark table-bordered dataTable no-footer" id="tablaPublicaciones">
-    <thead>
-        <tr>
-            <th>Título</th>
-            <th>Estado</th>
-            <th>Fecha creación</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var pub in Model)
-        {
-            <tr data-estado="@pub.Estado">
-                <td>@pub.Titulo</td>
-                <td>@pub.Estado</td>
-                <td>@pub.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>
-                    <a asp-action="DetallePublicacion" asp-route-id="@pub.Id" class="btn btn-sm btn-outline-primary">Ver</a>
-                    @if (pub.Estado == LogicaNegocio.Extra.Enum_EstadoPublicacion.Aprobada)
-                    {
-                        <a asp-action="EditarPublicacion" asp-route-id="@pub.Id" class="btn btn-sm btn-outline-warning">Editar</a>
-                    }
-                </td>
-                
-            </tr>
-        }
-    </tbody>
-</table>
+    <div id="tabla-pendientes" class="tab-publicaciones">
+        @Html.Partial("_TablaPublicaciones", Model.Pendientes)
+    </div>
+    <div id="tabla-aprobadas" class="tab-publicaciones d-none">
+        @Html.Partial("_TablaPublicaciones", Model.Aprobadas)
+    </div>
+    <div id="tabla-rechazadas" class="tab-publicaciones d-none">
+        @Html.Partial("_TablaPublicaciones", Model.Rechazadas)
+    </div>
+}
 <script src="/js/profesional/misPublicacionesProfesional.js"></script>

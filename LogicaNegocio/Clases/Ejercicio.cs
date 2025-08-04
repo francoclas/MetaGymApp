@@ -27,6 +27,5 @@ namespace LogicaNegocio.Clases
         public List<SesionRutina> RutinaEjercicios { get; set; } = new List<SesionRutina> { };
         //Medicion
         public List<Medicion> Mediciones { get; set; } = new();
-
     }
 }

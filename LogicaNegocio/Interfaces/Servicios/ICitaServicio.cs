@@ -27,7 +27,7 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<Cita> SolicitarHistorialProfesional(int profesionalID);
         //Cliente
         List<Cita> SolicitarProximasCliente(int clienteID);
-        List<Cita> SolicitarHistorialCliente(int clienteID);
+        List<CitaDTO> SolicitarHistorialCliente(int clienteID);
         //Buscar
         List<Cita> BuscarPorClienteYEstado(int clienteID,EstadoCita estado);
         List<Cita> BuscarPorEstado(EstadoCita estado);

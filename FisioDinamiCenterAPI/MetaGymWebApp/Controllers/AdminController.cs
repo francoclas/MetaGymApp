@@ -127,6 +127,7 @@ namespace MetaGymWebApp.Controllers
                     Usuario = cliente.NombreUsuario,
                     Correo = cliente.Correo,
                     Telefono = cliente.Telefono,
+                    UsuarioActivo = cliente.UsuarioActivo,
                     Rol = "Cliente"
                 };
                 return View(dto);
@@ -164,6 +165,7 @@ namespace MetaGymWebApp.Controllers
                 {
                     cliente.Pass = HashContrasena.Hashear(dto.Pass);
                 }
+                cliente.UsuarioActivo = dto.UsuarioActivo;
                 //Actualizo en repo
                 _clienteServicio.ActualizarCliente(cliente);
                 TempData["Mensaje"] = "Se actualizo usuario: " + cliente.Correo;
@@ -203,6 +205,7 @@ namespace MetaGymWebApp.Controllers
                     Correo = profesional.Correo,
                     Pass = "", // no se muestra el actual
                     Telefono = profesional.Telefono,
+                    UsuarioActivo = profesional.UsuarioActivo,
                     Especialidades = profesional.Especialidades,
                     TiposAtencionIds = profesional.TiposAtencion?.Select(t => t.Id).ToList() ?? new List<int>(),
                     Rol = "Profesional",
@@ -245,7 +248,7 @@ namespace MetaGymWebApp.Controllers
                 profesional.Pass = HashContrasena.Hashear(dto.Pass);
             if (!string.Equals(profesional.Telefono, dto.Telefono))
                 profesional.Telefono = dto.Telefono;
-
+            profesional.UsuarioActivo = dto.UsuarioActivo;
             if (especialidadId != 0)
             {
                 var especialidad = _extraServicio.ObtenerEspecialidad(especialidadId);
@@ -313,7 +316,9 @@ namespace MetaGymWebApp.Controllers
                     Usuario = admin.NombreUsuario,
                     Correo = admin.Correo,
                     Telefono = admin.Telefono,
+                    UsuarioActivo = admin.UsuarioActivo,
                     Rol = "Admin"
+                    
                 };
                 //Devuelvo vista
                 return View(dto);
@@ -351,6 +356,7 @@ namespace MetaGymWebApp.Controllers
                 {
                     admin.Pass = HashContrasena.Hashear(dto.Pass);
                 }
+                admin.UsuarioActivo = dto.UsuarioActivo;
                 //Actualizo
                 _adminServicio.ActualizarAdmin(admin);
                 TempData["Mensaje"] = "Se actualizo usuario: " + admin.Correo;

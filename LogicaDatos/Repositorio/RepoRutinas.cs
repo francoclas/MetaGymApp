@@ -112,10 +112,11 @@ namespace LogicaDatos.Repositorio
         {
             return _context.SesionesRutina
                .Include(sr => sr.RutinaAsignada)
+                .ThenInclude(ra => ra.Rutina)
                .Include(sr => sr.EjerciciosRealizados)
-                   .ThenInclude(er => er.Series)
+               .ThenInclude(er => er.Series)
                .Include(sr => sr.EjerciciosRealizados)
-                   .ThenInclude(er => er.Ejercicio)
+                .ThenInclude(er => er.Ejercicio)
                .FirstOrDefault(sr => sr.Id == sesionId);
         }
 

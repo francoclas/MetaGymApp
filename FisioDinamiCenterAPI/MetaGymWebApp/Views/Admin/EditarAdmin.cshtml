@@ -36,6 +36,11 @@
             <input asp-for="Telefono" class="form-control" minlength="7" maxlength="12" title="Debe tener entre 8 y 12 dígitos numéricos" />
         </div>
 
+        <div class="form-check mb-3">
+            <input asp-for="UsuarioActivo" class="form-check-input" type="checkbox" id="activoCheck" />
+            <label class="form-check-label" for="activoCheck">Cuenta activa</label>
+        </div>
+
         <button type="submit" class="btn btn-success mt-2">Guardar cambios</button>
     </form>
 </div>

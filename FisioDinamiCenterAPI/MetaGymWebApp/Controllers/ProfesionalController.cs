@@ -48,7 +48,22 @@ namespace MetaGymWebApp.Controllers
             return View(salida);
 
         }
-        
+        //Historiales clinicos
+        [HttpGet]
+        public IActionResult BuscarClientesCita()
+        {
+            var listaClientes = clienteServicio.ObtenerTodosDTO()
+                .Select(c => new ClienteDTO
+                {
+                    Id = c.Id,
+                    NombreCompleto = c.NombreCompleto,
+                    Ci = c.Ci,
+                    Correo = c.Correo,
+                    Telefono = c.Telefono
+                }).ToList();
+
+            return View(listaClientes);
+        }
         //Gestionar cita
         [HttpGet]
         public IActionResult RevisarCita(int id)
@@ -105,61 +120,82 @@ namespace MetaGymWebApp.Controllers
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
 
-            // Obtener las citas correspondientes
-            var citasEnEspera = citaServicio
-                .BuscarSolicitudesSegunTiposAtencion(profesionalServicio.ObtenerTiposAtencionProfesional(profesionalId));
-
-            var citasProximas = citaServicio
-                .SolicitarProximasProfesional(profesionalId);
-
-            var citasFinalizadas = citaServicio
-                .SolicitarHistorialProfesional(profesionalId)
-                .Where(c => c.Estado == EstadoCita.Finalizada)
-                .ToList();
-
-            // Mapeo a DTOs
-            var model = new GestionCitasModelo
+            try
             {
-                CitasEnEspera = citasEnEspera.Select(c => new CitaDTO
+                //Valido si usuariorio tiene especialidades
+                List<int> tiene = profesionalServicio.ObtenerTiposAtencionProfesional(profesionalId);
+                if (!tiene.Any())
                 {
-                    CitaId = c.Id,
-                    Cliente = c.Cliente,
-                    Especialidad = c.Especialidad,
-                    Establecimiento = c.Establecimiento,
-                    Descripcion = c.Descripcion,
-                    FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
-                    FechaCreacion = c.FechaCreacion,
-                    ProfesionalId = c.ProfesionalId,
-                    Conclusion = c.Conclusion
-                }).ToList(),
+                    GestionCitasModelo salida = new GestionCitasModelo { TieneEspecialidades = false };
+                    return View(salida);
 
-                CitasProximasDeProfesional = citasProximas.Select(c => new CitaDTO
+                }
+                else { 
+                    // Obtener las citas correspondientes
+                    var citasEnEspera = citaServicio
+                    .BuscarSolicitudesSegunTiposAtencion(profesionalServicio.ObtenerTiposAtencionProfesional(profesionalId));
+
+                var citasProximas = citaServicio
+                    .SolicitarProximasProfesional(profesionalId);
+
+                var citasFinalizadas = citaServicio
+                    .SolicitarHistorialProfesional(profesionalId)
+                    .Where(c => c.Estado == EstadoCita.Finalizada)
+                    .ToList();
+
+                // Mapeo a DTOs
+                GestionCitasModelo modelo = new GestionCitasModelo
                 {
-                    CitaId = c.Id,
-                    Cliente = c.Cliente,
-                    Especialidad = c.Especialidad,
-                    Establecimiento = c.Establecimiento,
-                    Descripcion = c.Descripcion,
-                    FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
-                    FechaCreacion = c.FechaCreacion,
-                    ProfesionalId = c.ProfesionalId
-                }).ToList(),
+                    CitasEnEspera = citasEnEspera.Select(c => new CitaDTO
+                    {
+                        CitaId = c.Id,
+                        Cliente = c.Cliente,
+                        Especialidad = c.Especialidad,
+                        Establecimiento = c.Establecimiento,
+                        Descripcion = c.Descripcion,
+                        FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
+                        FechaCreacion = c.FechaCreacion,
+                        ProfesionalId = c.ProfesionalId,
+                        Conclusion = c.Conclusion
+                    }).ToList(),
 
-                CitasAtendidasProfesional = citasFinalizadas.Select(c => new CitaDTO
-                {
-                    CitaId = c.Id,
-                    Cliente = c.Cliente,
-                    Especialidad = c.Especialidad,
-                    Establecimiento = c.Establecimiento,
-                    Descripcion = c.Descripcion,
-                    FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
-                    FechaCreacion = c.FechaCreacion,
-                    ProfesionalId = c.ProfesionalId,
-                    Conclusion = c.Conclusion
-                }).ToList(),
-            };
+                    CitasProximasDeProfesional = citasProximas.Select(c => new CitaDTO
+                    {
+                        CitaId = c.Id,
+                        Cliente = c.Cliente,
+                        Especialidad = c.Especialidad,
+                        Establecimiento = c.Establecimiento,
+                        Descripcion = c.Descripcion,
+                        FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
+                        FechaCreacion = c.FechaCreacion,
+                        ProfesionalId = c.ProfesionalId
+                    }).ToList(),
 
-            return View(model);
+                    CitasAtendidasProfesional = citasFinalizadas.Select(c => new CitaDTO
+                    {
+                        CitaId = c.Id,
+                        Cliente = c.Cliente,
+                        Especialidad = c.Especialidad,
+                        Establecimiento = c.Establecimiento,
+                        Descripcion = c.Descripcion,
+                        FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
+                        FechaCreacion = c.FechaCreacion,
+                        ProfesionalId = c.ProfesionalId,
+                        Conclusion = c.Conclusion
+                    }).ToList(),
+                    TieneEspecialidades = true
+                };
+
+                    return View(modelo);
+
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
         [HttpGet]
         public IActionResult EditarCita(int id)
@@ -256,6 +292,16 @@ namespace MetaGymWebApp.Controllers
                 return View(citaDTO);
             }
         }
+        [HttpGet]
+        public IActionResult HistorialClinicoCliente(int id)
+        {
+            List<CitaDTO> historial = citaServicio.SolicitarHistorialCliente(id)
+                .Where(c => c.Estado == EstadoCita.Finalizada)
+                .ToList();
+
+            return View(historial);
+        }
+
 
         [HttpGet]
         public IActionResult GestionRutinas()
@@ -403,7 +449,24 @@ namespace MetaGymWebApp.Controllers
             }
             
         }
-
+        [HttpGet]
+        public IActionResult InformacionEjercicio(int id)
+        {
+            try
+            {
+                //Obtengo el ejercicio a mostrar desde el repo
+                EjercicioDTO ejercicio = rutinaServicio.ObtenerEjercicioDTOId(id);
+                //Verifico que existe
+                if (ejercicio == null) throw new Exception("No se encontro ejercicio o no existe.");
+                return View(ejercicio);
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionEjercicios");
+            }
+        }
         //Alta de ejercicio
         [HttpGet]
         public IActionResult RegistrarEjercicio()
@@ -413,6 +476,20 @@ namespace MetaGymWebApp.Controllers
         [HttpPost]
         public IActionResult RegistrarEjercicio(EjercicioDTO dto, List<IFormFile> archivos)
         {
+            //valido datos
+            try
+            {
+                if (String.IsNullOrEmpty(dto.Nombre)) throw new Exception("El nombre no puede estar vacio.");
+                if (String.IsNullOrEmpty(dto.GrupoMuscular)) throw new Exception("Debe colocar al menos un grupo muscular");
+                if (String.IsNullOrEmpty(dto.Tipo)) throw new Exception("Debe colocar un tipo de ejercicio.");
+                if (String.IsNullOrEmpty(dto.Instrucciones)) throw new Exception("Debe completar las instrucciones.");
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return View(dto);
+            }
             //Instancio el ejercicio a registrar
             Ejercicio ejercicio = new Ejercicio
             {
@@ -683,13 +760,22 @@ namespace MetaGymWebApp.Controllers
         }
         //Mis publicaciones
         [HttpGet]
+        [HttpGet]
         public IActionResult MisPublicaciones()
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
             List<PublicacionDTO> publicaciones = publicacionServicio.ObtenerPorProfesionalId(profesionalId);
 
-            return View(publicaciones);
+            var modelo = new MisPublicacionesProfesional
+            {
+                Pendientes = publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Pendiente).ToList(),
+                Aprobadas = publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Aprobada).ToList(),
+                Rechazadas = publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Rechazada).ToList()
+            };
+
+            return View(modelo);
         }
+
         //Detales
         [HttpGet]
         public IActionResult DetallePublicacion(int id)

@@ -150,9 +150,29 @@ namespace LogicaApp.Servicios
             return true;
         }
         //Solicitud de listas
-        public List<Cita> SolicitarHistorialCliente(int clienteID)
+        public List<CitaDTO> SolicitarHistorialCliente(int clienteID)
         {
-            List<Cita> Salida = repositorioCita.ObtenerPorCliente(clienteID);
+            List<Cita> aux = repositorioCita.ObtenerPorCliente(clienteID);
+            List<CitaDTO> Salida = new List<CitaDTO>();
+            foreach (Cita cita in aux)
+            {
+                Salida.Add(new CitaDTO
+                {
+                    CitaId = cita.Id,
+                    ClienteId = clienteID,
+                    Cliente = cita.Cliente,
+                    Estado = cita.Estado,
+                    EspecialidadId = cita.EspecialidadId,
+                    Especialidad = cita.Especialidad,
+                    TipoAtencion = cita.TipoAtencion,
+                    Establecimiento = cita.Establecimiento,
+                    Descripcion = cita.Descripcion,
+                    FechaAsistencia = (DateTime)cita.FechaAsistencia,
+                    FechaCreacion = cita.FechaCreacion,
+                    FechaFinalizacion = cita.FechaFinalizacion,
+                    Conclusion = cita.Conclusion
+                });
+            }
             return Salida;
         }
         public List<Cita> SolicitarHistorialProfesional(int profesionalID)

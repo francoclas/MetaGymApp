@@ -129,7 +129,7 @@ namespace MetaGymWebApp.Controllers
             //Mapeo a DTO
             var dtoList = citas.Select(c => new CitaDTO
             {
-                CitaId = c.Id,
+                CitaId = c.CitaId,
                 ClienteId = c.ClienteId,
                 Cliente = c.Cliente,
                 EspecialidadId = c.EspecialidadId,
@@ -138,7 +138,7 @@ namespace MetaGymWebApp.Controllers
                 EstablecimientoId = c.EstablecimientoId,
                 Establecimiento = c.Establecimiento,
                 Descripcion = c.Descripcion,
-                FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
+                FechaAsistencia = c.FechaAsistencia,
                 FechaCreacion = c.FechaCreacion,
                 ProfesionalId = c.ProfesionalId,
                 Conclusion = c.Conclusion
@@ -203,25 +203,46 @@ namespace MetaGymWebApp.Controllers
 
             return View(dto);
         }
-        //Sesiones de entrenamiento
         [HttpGet]
         public IActionResult SesionEntrenada(int id)
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
             SesionRutina sesion = rutinaServicio.ObtenerSesionPorId(id);
-
-            // Cargar datos necesarios para vista (Rutina y Ejercicios completos)
-            var rutina = rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignadaId);
+            var rutina = rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignada.RutinaId);
 
             foreach (var er in sesion.EjerciciosRealizados)
             {
-                er.Ejercicio = rutina.Ejercicios
-                    .FirstOrDefault(re => re.Ejercicio.Id== er.EjercicioId)?.Ejercicio;
+                er.Ejercicio = rutina.Ejercicios.FirstOrDefault(re => re.Ejercicio.Id == er.EjercicioId)?.Ejercicio;
             }
 
-            ViewBag.RutinaNombre = rutina.NombreRutina;
-            return View(sesion);
+            var dto = new SesionEntrenadaDTO
+            {
+                NombreRutina = rutina.NombreRutina,
+                FechaRealizada = sesion.FechaRealizada,
+                DuracionMin = sesion.DuracionMin,
+                Ejercicios = sesion.EjerciciosRealizados.Select(er => new EjercicioRealizadoDTO
+                {
+                    Nombre = er.Ejercicio.Nombre,
+                    Tipo = er.Ejercicio.Tipo,
+                    GrupoMuscular = er.Ejercicio.GrupoMuscular,
+                    ImagenURL = er.Ejercicio.Medias.FirstOrDefault()?.Url,
+                    Series = er.Series.Select(s => new SerieDTO
+                    {
+                        Repeticiones = s.Repeticiones,
+                        PesoUtilizado = s.PesoUtilizado
+                    }).ToList(),
+                    Mediciones = er.ValoresMediciones.Select(vm => new MedicionDTO
+                    {
+                        Nombre = vm.Medicion.Nombre,
+                        Unidad = vm.Medicion.Unidad,
+                        Valor = vm.Valor
+                    }).ToList()
+                }).ToList()
+            };
+
+            return View(dto);
         }
+
         [HttpGet]
         public IActionResult HistoricoSesionesEntrenamiento()
         {

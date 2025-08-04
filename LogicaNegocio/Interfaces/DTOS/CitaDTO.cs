@@ -23,8 +23,9 @@ namespace LogicaApp.DTOS
         public Establecimiento Establecimiento { get; set; }
         public string? Descripcion {  get; set; }
         public DateTime FechaAsistencia { get; set; }
-
         public DateTime? FechaCreacion { get; set; }
+        public DateTime? FechaFinalizacion { get; set; }
+
         public int? ProfesionalId { get; set; }
         public string? Conclusion { get; set; }
 

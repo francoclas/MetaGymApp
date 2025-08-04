@@ -8,9 +8,24 @@
 <link rel="stylesheet" href="~/css/profesional/gestionCitas..css" />
 
 <div class="container mt-4 bg-dark border rounded py-4 text-white">
+    @if (!Model.TieneEspecialidades)
+{
+    <div class="alert mt-3" role="alert">
+        <h5 class="alert-heading">¡Atención!</h5>
+        <p>
+            Actualmente no estás habilitado para atender pacientes porque no tenés ninguna especialidad asignada.
+            Si estás capacitado para brindar atención, por favor comunicate con un administrador para solicitar la habilitación de tu perfil.
+        </p>
+    </div>
+}
+else
+{
     <a class="btn btn-outline-light mb-3" asp-controller="Agenda" asp-action="MisAgendas">
         Gestionar mi tiempo de trabajo
     </a>
+        <a class="btn btn-outline-light mb-3" asp-controller="Profesional" asp-action="BuscarClientesCita">
+            Buscar historial clinico de paciente
+        </a>
     <div>
         <a href="@Url.Action("CrearCita", "Profesional")" class="btn btn-success">➕ Agendar una cita</a>
     </div>
@@ -103,6 +118,7 @@
             </div>
         }
     </div>
-</div>
+  
+}
 
 <script src="~/js/profesional/gestionCitas.js"></script>
