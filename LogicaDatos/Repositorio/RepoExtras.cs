@@ -46,7 +46,9 @@ namespace LogicaDatos.Repositorio
 
         public List<Especialidad> ListarEspecialidades()
         {
-            return _context.Especialidades.ToList();
+            return _context.Especialidades
+                .Include(e => e.TiposAtencion)
+                .ToList();
         }
 
         public List<Establecimiento> ListarEstablecimientos()

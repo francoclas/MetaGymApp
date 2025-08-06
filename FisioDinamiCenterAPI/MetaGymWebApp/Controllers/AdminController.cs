@@ -382,18 +382,24 @@ namespace MetaGymWebApp.Controllers
         [HttpPost]
         public IActionResult RegistrarEspecialidad(EspecialidadDTO dto)
         {
-            //Valido que haya datos en el modelo
-            if (!ModelState.IsValid)
+            try
             {
-                TempData["Mensaje"] = "Datos inválidos.";
-                TempData["TipoMensaje"] = "danger";
-                return View(dto);
+                if (string.IsNullOrEmpty(dto.NombreEspecialidad)) throw new Exception("Debe ingresar un nombre.");
+                if (string.IsNullOrEmpty(dto.DescripcionEspecialidad)) throw new Exception("Debe ingresar una descripcion.");
+
+                //Guardo en el repo
+                _extraServicio.RegistrarEspecialidad(dto);
+                TempData["Mensaje"] = "Especialidad registrada correctamente.";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("PanelControl");
             }
-            //Guardo en el repo
-            _extraServicio.RegistrarEspecialidad(dto);
-            TempData["Mensaje"] = "Especialidad registrada correctamente.";
-            TempData["TipoMensaje"] = "success";
-            return RedirectToAction("PanelControl");
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("RegistrarEspecialidad", dto);
+            }
+            
         }
         [HttpGet]
         public IActionResult EditarEspecialidad(int id)

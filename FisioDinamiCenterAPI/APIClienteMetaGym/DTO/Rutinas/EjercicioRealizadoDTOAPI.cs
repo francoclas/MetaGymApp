@@ -1,6 +1,6 @@
 ﻿namespace APIClienteMetaGym.DTO.Rutinas
 {
-    public class EjercicioRealizadoDTO
+    public class EjercicioRealizadoDTOAPI
     {
         public int EjercicioId { get; set; }
         public string NombreEjercicio { get; set; }

@@ -33,5 +33,7 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<TipoAtencion> ObtenerTiposAtencion();
         List<TipoAtencionDTO> ObtenerTiposAtencionPorProfesionalDTO(int profesionalId);
         List<EstablecimientoDTO> ObtenerEstablecimientosDTO();
+        List<EspecialidadDTO> ObtenerEspecialidadesDTO();
+        List<TipoAtencionDTO> ObtenerTiposAtencionDTO();
     }
 }

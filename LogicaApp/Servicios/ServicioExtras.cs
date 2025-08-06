@@ -204,5 +204,53 @@ namespace LogicaApp.Servicios
             }
             return salida;
         }
+
+        public List<EspecialidadDTO> ObtenerEspecialidadesDTO()
+        {
+            List<EspecialidadDTO> salida = new List<EspecialidadDTO>();
+            foreach (var espe in repoExtras.ListarEspecialidades())
+            {
+                EspecialidadDTO ax = new EspecialidadDTO
+                {
+                    Id = espe.Id,
+                    NombreEspecialidad = espe.NombreEspecialidad,
+                    DescripcionEspecialidad = espe.DescripcionEspecialidad,
+                    TipoAtenciones = new List<TipoAtencionDTO>()
+                };
+                if(espe.TiposAtencion != null || espe.TiposAtencion.Any())
+                {
+                    foreach (var tipo in espe.TiposAtencion)
+                    {
+                        ax.TipoAtenciones.Add(new TipoAtencionDTO
+                        {
+                            Id = tipo.Id,
+                            EspecialidadId = tipo.EspecialidadId,
+                            Desc = tipo.Descripcion,
+                            Nombre = tipo.Nombre
+                        });
+                    }
+                    salida.Add(ax);
+                }
+                
+            }
+            return salida;
+        }
+
+        public List<TipoAtencionDTO> ObtenerTiposAtencionDTO()
+        {
+            List<TipoAtencionDTO> salida = new List<TipoAtencionDTO> ();
+            foreach (var tipo in repoExtras.ObtenerTiposAtencionTodos())
+            {
+                salida.Add(
+                    new TipoAtencionDTO
+                    {
+                        Id = tipo.Id,
+                        EspecialidadId = tipo.EspecialidadId,
+                        Desc = tipo.Descripcion,
+                        Nombre = tipo.Nombre
+                    });
+            }
+            return salida;
+        }
     }
 }

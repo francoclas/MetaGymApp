@@ -25,16 +25,16 @@ function initMap() {
 
     marker.addListener("dragend", () => {
         const pos = marker.getPosition();
-        document.getElementById("latitud").value = pos.lat();
-        document.getElementById("longitud").value = pos.lng();
+        document.getElementById("latitud").value = lat.toFixed(6).replace(",", ".");
+        document.getElementById("longitud").value = lon.toFixed(6).replace(",", ".");
         actualizarDireccion(pos);
     });
 
     // cargar el clic en el mapa
     map.addListener("click", (e) => {
         marker.setPosition(e.latLng);
-        document.getElementById("latitud").value = e.latLng.lat();
-        document.getElementById("longitud").value = e.latLng.lng();
+        document.getElementById("latitud").value = e.latLng.lat().toString().replace(",", ".");
+        document.getElementById("longitud").value = e.latLng.lng().toString().replace(",", ".");
         actualizarDireccion(e.latLng);
     });
 }

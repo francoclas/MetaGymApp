@@ -6,6 +6,7 @@ using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
 using MetaGymWebApp.Filtros;
+using MetaGymWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using static LogicaNegocio.Interfaces.DTOS.EstablecimientoDTO;
 
@@ -49,46 +50,40 @@ namespace MetaGymWebApp.Controllers
             return View();
         }
         //Enviar Cita
+        // GET
         [HttpGet]
         public IActionResult GenerarConsultaCita()
         {
-            List<Especialidad> especialidades = extraServicio.ObtenerEspecialidades();
-            List<Establecimiento> establecimientos = extraServicio.ObtenerEstablecimientos();
-            List<TipoAtencion> tiposAtencion = extraServicio.ObtenerTiposAtencion();
+            var especialidades = extraServicio.ObtenerEspecialidadesDTO(); // devuelve List<EspecialidadDTO>
+            var establecimientos = extraServicio.ObtenerEstablecimientosDTO(); // List<EstablecimientoDTO>
+            var tiposAtencion = extraServicio.ObtenerTiposAtencionDTO(); // List<TipoAtencionDTO>
 
-            var establecimientosDTO = establecimientos.Select(e => new EstablecimientoPreviewDTO
+            var modelo = new GenerarCitaModelo
             {
-                Id = e.Id,
-                Nombre = e.Nombre,
-                Direccion = e.Direccion,
-                UrlMedia = e.Media?.FirstOrDefault()?.Url
-            }).ToList();
+                Cita = new CitaDTO(),
+                Especialidades = especialidades,
+                Establecimientos = establecimientos,
+                TiposAtencion = tiposAtencion
+            };
 
-            ViewBag.Especialidades = especialidades;
-            ViewBag.Establecimientos = establecimientos;
-            ViewBag.TiposAtencion = tiposAtencion;
-            ViewBag.EstablecimientosJson = JsonSerializer.Serialize(establecimientosDTO, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
-
-            return View(new CitaDTO());
+            return View(modelo);
         }
 
+        // POST
         [HttpPost]
-        public IActionResult GenerarConsultaCita(CitaDTO dto)
+        public IActionResult GenerarConsultaCita(GenerarCitaModelo vm)
         {
             try
             {
                 int clienteId = GestionSesion.ObtenerUsuarioId(this.HttpContext);
-                dto.ClienteId = clienteId;
+                vm.Cita.ClienteId = clienteId;
 
-                if (dto.ClienteId == 0) throw new Exception("Vuelva a iniciar sesión.");
-                if (string.IsNullOrEmpty(dto.Descripcion)) throw new Exception("La descripción no puede estar vacía.");
-                if (dto.FechaAsistencia < DateTime.Today) throw new Exception("La fecha deseada debe ser posterior a hoy.");
-                if (dto.TipoAtencionId == 0) throw new Exception("Debe seleccionar un tipo de atención.");
+                if (clienteId == 0) throw new Exception("Vuelva a iniciar sesión.");
+                if (string.IsNullOrEmpty(vm.Cita.Descripcion)) throw new Exception("La descripción no puede estar vacía.");
+                if (vm.Cita.FechaAsistencia < DateTime.Today) throw new Exception("La fecha deseada debe ser posterior a hoy.");
+                if (vm.Cita.TipoAtencionId == 0) throw new Exception("Debe seleccionar un tipo de atención.");
 
-                citaServicio.GenerarNuevaCita(dto);
+                citaServicio.GenerarNuevaCita(vm.Cita);
                 return RedirectToAction("MisCitas");
             }
             catch (Exception e)
@@ -96,26 +91,12 @@ namespace MetaGymWebApp.Controllers
                 TempData["Mensaje"] = e.Message;
                 TempData["TipoMensaje"] = "danger";
 
-                List<Especialidad> especialidades = extraServicio.ObtenerEspecialidades();
-                List<Establecimiento> establecimientos = extraServicio.ObtenerEstablecimientos();
-                List<TipoAtencion> tiposAtencion = extraServicio.ObtenerTiposAtencion();
-                ViewBag.Especialidades = especialidades;
-                ViewBag.Establecimientos = establecimientos;
-                ViewBag.TiposAtencion = tiposAtencion;
+                // Recargo el modelo para la vista
+                vm.Especialidades = extraServicio.ObtenerEspecialidadesDTO();
+                vm.Establecimientos = extraServicio.ObtenerEstablecimientosDTO();
+                vm.TiposAtencion = extraServicio.ObtenerTiposAtencionDTO();
 
-                var establecimientosDTO = establecimientos.Select(e => new EstablecimientoPreviewDTO
-                {
-                    Id = e.Id,
-                    Nombre = e.Nombre,
-                    Direccion = e.Direccion,
-                    UrlMedia = e.Media?.FirstOrDefault()?.Url
-                }).ToList();
-                ViewBag.EstablecimientosJson = JsonSerializer.Serialize(establecimientosDTO, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                });
-
-                return View(dto);
+                return View(vm);
             }
         }
         //Seccion de citas del cliente

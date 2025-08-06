@@ -23,10 +23,5 @@
         <div class="text-center mt-3">
             <small>¿No tiene cuenta? <a href="@Url.Action("RegistrarUsuario", "Home")">Regístrese aquí</a></small>
         </div>
-
-        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-        {
-            <div class="text-danger mt-2 text-center">@error.ErrorMessage</div>
-        }
     </form>
 </div>

@@ -8,6 +8,6 @@
         public string NombreRutina { get; set; }
         public DateTime Fecha { get; set; }
         public int? DuracionMin { get; set; }
-        public List<EjercicioRealizadoDTO> Ejercicios { get; set; } = new();
+        public List<EjercicioRealizadoDTOAPI> Ejercicios { get; set; } = new();
     }
 }

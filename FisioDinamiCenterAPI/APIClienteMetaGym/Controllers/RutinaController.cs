@@ -69,9 +69,9 @@ namespace APIClienteMetaGym.Controllers
         }
 
         //Mapeos
-        private EjercicioRealizadoDTO MapearEjercicioRealizado(EjercicioRealizado er)
+        private EjercicioRealizadoDTOAPI MapearEjercicioRealizado(EjercicioRealizado er)
         {
-            return new EjercicioRealizadoDTO
+            return new EjercicioRealizadoDTOAPI
             {
                 NombreEjercicio = er.Ejercicio?.Nombre ?? "Ejercicio desconocido",
                 SeRealizo = er.SeRealizo,
