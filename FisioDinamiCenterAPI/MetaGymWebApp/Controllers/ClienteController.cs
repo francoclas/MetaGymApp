@@ -151,11 +151,22 @@ namespace MetaGymWebApp.Controllers
                 Descripcion = cita.Descripcion,
                 FechaAsistencia = cita.FechaAsistencia ?? DateTime.MinValue,
                 FechaCreacion = cita.FechaCreacion,
-                ProfesionalId = cita.ProfesionalId,
                 Conclusion = cita.Conclusion,
                 Estado = cita.Estado
             };
-
+            if (cita.TipoAtencion != null)
+            {
+                dto.TipoAtencion = cita.TipoAtencion;
+            }
+            else
+            {
+                dto.TipoAtencion = new TipoAtencion { Nombre = "-" };
+            }
+            if (cita.Profesional != null)
+            {
+                dto.NombreProfesional = cita.Profesional.NombreCompleto;
+                dto.ProfesionalId = cita.ProfesionalId;
+            }
             return View("DetalleCita", dto);
         }
         //Rutinas

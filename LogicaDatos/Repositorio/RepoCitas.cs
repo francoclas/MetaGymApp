@@ -111,6 +111,7 @@ namespace LogicaDatos.Repositorio
         {
             return _context.Citas
                 .Include(C=>C.Cliente)
+                .Include(C=>C.Profesional)
                 .Include(C=> C.Especialidad)
                 .Include(C=> C.Establecimiento)
                     .ThenInclude(e => e.Media)

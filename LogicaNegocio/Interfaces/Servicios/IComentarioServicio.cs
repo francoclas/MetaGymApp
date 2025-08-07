@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LogicaNegocio.Clases;
 using LogicaNegocio.Interfaces.DTOS;
 
 namespace LogicaNegocio.Interfaces.Servicios
@@ -18,5 +19,7 @@ namespace LogicaNegocio.Interfaces.Servicios
             void QuitarLikeComentario(int comentarioId, int usuarioId, string rol);
             bool UsuarioYaDioLikeComentario(int comentarioId, int usuarioId, string rol);
             public int ContarLikesComentario(int id);
+        Comentario ObtenerComentarioId(int comentarioId);
+        void Actualizar(Comentario comentario);
     }
 }

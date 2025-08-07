@@ -1,18 +1,20 @@
-﻿/* ===== Publicación general ===== */
+﻿/* ===== Container General ===== */
 .container {
     padding-left: 0;
     padding-right: 0;
 }
+
+/* ===== Publicación ===== */
 .pub-card {
     background: #1f1f1f;
     border-radius: 10px;
     padding: 15px;
     color: #fff;
-    max-width: 100%;
     box-shadow: 0 0 5px #00000066;
+    max-width: 100%;
 }
 
-/* ===== Encabezado ===== */
+/* ===== Encabezado de publicación ===== */
 .pub-header {
     display: flex;
     align-items: center;
@@ -41,7 +43,7 @@
     color: #e50914;
 }
 
-/* ===== Slideshow ===== */
+/* ===== Slideshow multimedia ===== */
 .pub-slideshow {
     position: relative;
     overflow: hidden;
@@ -51,9 +53,15 @@
 .pub-slide-container {
     display: flex;
     transition: transform 0.3s ease;
-    width: 100%;
     scroll-behavior: smooth;
+    width: 100%;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
+
+    .pub-slide-container::-webkit-scrollbar {
+        display: none;
+    }
 
 .pub-slide {
     flex: 0 0 100%;
@@ -70,25 +78,15 @@
     border-radius: 8px;
 }
 
-/* Ocultar scroll horizontal */
-.pub-slide-container::-webkit-scrollbar {
-    display: none;
-}
-
-.pub-slide-container {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-/* ===== Puntos de navegación ===== */
+/* ===== Navegación slideshow ===== */
 .pub-slide-dots {
     position: absolute;
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 10;
     display: flex;
     gap: 8px;
+    z-index: 10;
 }
 
 .pub-slide-dot {
@@ -96,13 +94,35 @@
     height: 10px;
     background-color: #aaa;
     border-radius: 50%;
-    cursor: pointer;
     opacity: 0.6;
+    cursor: pointer;
 }
 
     .pub-slide-dot.active {
         background-color: white;
         opacity: 1;
+    }
+
+.pub-slide-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    z-index: 20;
+}
+
+    .pub-slide-btn.left {
+        left: 10px;
+    }
+
+    .pub-slide-btn.right {
+        right: 10px;
     }
 
 /* ===== Descripción ===== */
@@ -124,8 +144,8 @@
     background: none;
     border: none;
     color: #fff;
-    margin-right: 10px;
     font-size: 1rem;
+    margin-right: 10px;
     cursor: pointer;
 }
 
@@ -134,12 +154,27 @@
     color: #e50914;
 }
 
+.like-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    margin: 0 5px 0 0;
+    transition: color 0.3s;
+}
+
+    .like-button:hover {
+        color: #e50914;
+    }
+
 /* ===== Comentarios ===== */
 .pub-comentario {
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 15px;
     position: relative;
     padding-left: 10px;
 }
@@ -149,41 +184,68 @@
     height: 32px;
     object-fit: cover;
     border-radius: 50%;
+    flex-shrink: 0;
 }
 
+.pub-com-cuerpo {
+    background-color: #222;
+    border-radius: 10px;
+    padding: 10px 14px;
+    max-width: 100%;
+    flex: 1;
+    box-shadow: 0 0 4px rgba(0,0,0,0.4);
+}
+.comentario-oculto {
+    border: 1px solid #a00;
+    background-color: #2a0d0d;
+}
+
+.comentario-oculto-aviso {
+    font-size: 0.75rem;
+    color: #f88;
+    font-style: italic;
+    margin-top: 6px;
+}
 .pub-com-autor {
     font-weight: bold;
     font-size: 0.85rem;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
+    color: #fff;
 }
-
+.pub-com-fecha {
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 4px;
+}
 .pub-com-texto {
     font-size: 0.95rem;
+    color: #ddd;
+    margin-bottom: 6px;
 }
 
-/* Respuestas */
+.pub-btn-responder {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+    .pub-btn-responder:hover {
+        color: #e50914;
+    }
+
+/* Respuestas anidadas */
 .pub-comentario .pub-comentario {
-    margin-left: 30px;
+    margin-left: 36px;
+    padding-left: 12px;
     border-left: 2px solid #444;
-    padding-left: 15px;
 }
 
-/* Línea de conexión */
-.pub-comentario::before {
-    content: "";
-    position: absolute;
-    top: 16px;
-    left: 0;
-    width: 2px;
-    height: 100%;
-    background-color: #444;
-}
 
-/* Oculta línea en comentarios raíz */
-.pub-comentarios > .pub-comentario::before {
-    display: none;
-}
-/* Estilo nuevo de input para comentar */
+/* ===== Formulario de comentar ===== */
 .pub-comentar-form {
     background-color: #121212;
     border: 1px solid #333;
@@ -222,38 +284,15 @@
     background-color: #2a2a2a;
     color: #ccc;
 }
-.pub-slide-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 20;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
+.btn-outline-danger {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: #f55;
+    border-color: #f55;
 }
 
-    .pub-slide-btn.left {
-        left: 10px;
-    }
-
-    .pub-slide-btn.right {
-        right: 10px;
-    }
-.like-button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0;
-    margin: 0 5px 0 0;
-    transition: color 0.3s;
-}
-
-    .like-button:hover {
-        color: #e50914;
+    .btn-outline-danger:hover {
+        background-color: #f55;
+        color: white;
     }

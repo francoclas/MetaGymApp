@@ -18,5 +18,6 @@ namespace LogicaNegocio.Interfaces.Repositorios
         void DarLike(int comentarioId, int usuarioId, string rol);
         void QuitarLike(int comentarioId, int usuarioId, string rol);
         int ContarLikes(int comentarioId);
+        void Actualizar(Comentario comentario);
     }
     }

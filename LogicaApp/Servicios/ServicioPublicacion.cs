@@ -271,7 +271,7 @@ namespace LogicaApp.Servicios
                 Medias = pub.ListaMedia,
                 CantLikes = _repo.ContarLikes(pub.Id),
                 Comentarios = pub.Comentarios?
-                    .Where(c => c.ComentarioPadreId == null && c.EstaActivo)
+                    .Where(c => c.ComentarioPadreId == null)
                     .Select(c => MapearComentario(c))
                     .ToList() ?? new(),
                 MotivoRechazo = pub.MotivoRechazo,
@@ -313,6 +313,7 @@ namespace LogicaApp.Servicios
                 Contenido = c.Contenido,
                 FechaCreacion = c.FechaCreacion,
                 FechaEdicion = c.FechaEdicion,
+                EstaActivo = c.EstaActivo,
                 AutorId = autorId,
                 AutorNombre = c.Profesional?.NombreCompleto ?? c.Cliente?.NombreCompleto ?? c.Admin?.NombreCompleto ?? "Desconocido",
                 RolAutor = tipo.ToString(),
@@ -329,6 +330,21 @@ namespace LogicaApp.Servicios
                 salida.ImagenAutor = new Media { Url = "/MediaWeb/Default/perfil_default.jpg" };
             }
             return salida;
+        }
+
+        public void OcultarComentario(int comentarioId)
+        {
+            //obtengo comentario
+            Comentario comentario = comentarioServicio.ObtenerComentarioId(comentarioId);
+            if (comentario.EstaActivo)
+            {
+                comentario.EstaActivo = false;
+            }
+            else
+            {
+                comentario.EstaActivo = true;
+            }
+            comentarioServicio.Actualizar(comentario);
         }
     }
 }

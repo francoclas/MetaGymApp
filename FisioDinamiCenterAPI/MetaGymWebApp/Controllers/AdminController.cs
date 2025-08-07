@@ -530,6 +530,8 @@ namespace MetaGymWebApp.Controllers
                     Id = entidad.Id,
                     Nombre = entidad.Nombre,
                     Direccion = entidad.Direccion,
+                    Latitud = entidad.Latitud,
+                    Longitud = entidad.Longitud,
                     UrlMedia = mediaUrl
                 };
                 return View(dto);
@@ -555,6 +557,8 @@ namespace MetaGymWebApp.Controllers
                 //Mapeo cambios y guardo
                 establecimiento.Nombre = dto.Nombre;
                 establecimiento.Direccion = dto.Direccion;
+                establecimiento.Longitud = dto.Longitud;
+                establecimiento.Latitud = dto.Latitud;
                 _extraServicio.GuardarCambios();
 
                 //reviso archivos y actualizo

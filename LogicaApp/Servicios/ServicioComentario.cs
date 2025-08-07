@@ -160,5 +160,13 @@ namespace LogicaApp.Servicios
         {
            return _repo.ContarLikes(id);    
         }
+        public Comentario ObtenerComentarioId(int ComentarioId)
+        {
+            return _repo.ObtenerPorId(ComentarioId);
+        }
+        public void Actualizar(Comentario comentario)
+        {
+            _repo.Actualizar(comentario);
+        }
     }
 }

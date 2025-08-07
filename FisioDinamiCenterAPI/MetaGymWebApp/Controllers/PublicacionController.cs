@@ -27,6 +27,7 @@ namespace MetaGymWebApp.Controllers
         public IActionResult Inicio()
         {
             List<PublicacionDTO> publicaciones = publicacionServicio.ObtenerPublicacionesInicio();
+            ViewBag.Rol = GestionSesion.ObtenerRol(HttpContext);
             return View("Inicio", publicaciones);
         }
         [AutorizacionRol("Admin", "Profesional", "Cliente")]
@@ -120,6 +121,15 @@ namespace MetaGymWebApp.Controllers
         {
             List<PublicacionDTO> Publicaciones = publicacionServicio.ObtenerNovedades();
             return View(Publicaciones);
+        }
+        [AutorizacionRol("Admin")]
+        [HttpPost]
+        public IActionResult OcultarComentario(int comentarioId)
+        {
+            publicacionServicio.OcultarComentario(comentarioId);
+            TempData["Mensaje"] = "Se actualizo el comentario.";
+            TempData["TipoMensaje"] = "danger";
+            return RedirectToAction("Inicio");
         }
     }
 }

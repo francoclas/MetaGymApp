@@ -112,5 +112,10 @@ namespace LogicaDatos.Repositorio
         {
             return _context.LikeComentarios.Count(l => l.ComentarioId == comentarioId);
         }
+
+        public void Actualizar(Comentario comentario)
+        {
+            _context.SaveChanges();
+        }
     }
 }
