@@ -33,7 +33,7 @@ namespace LogicaNegocio.Interfaces.Servicios
 
         // Sesiones
         SesionRutina RegistrarSesion(SesionRutina sesion);
-        List<SesionRutina> ObtenerHistorialCliente(int clienteId);
+        List<SesionEntrenadaDTO> ObtenerHistorialClienteDTO(int clienteId);
         SesionRutina? ObtenerSesionPorId(int sesionId);
        
         List<Rutina> ObtenerTodasRutinas();

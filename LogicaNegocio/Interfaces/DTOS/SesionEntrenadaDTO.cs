@@ -8,6 +8,8 @@ namespace LogicaNegocio.Interfaces.DTOS
 {
     public class SesionEntrenadaDTO
     {
+        public int SesionRutinaId { get; set; }
+        public string NombreCliente { get; set; }
         public string NombreRutina { get; set; }
         public DateTime FechaRealizada { get; set; }
         public int? DuracionMin { get; set; }

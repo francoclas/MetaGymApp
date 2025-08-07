@@ -239,7 +239,7 @@ namespace MetaGymWebApp.Controllers
         public IActionResult HistoricoSesionesEntrenamiento()
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var sesiones = rutinaServicio.ObtenerHistorialCliente(clienteId);
+            var sesiones = rutinaServicio.ObtenerHistorialClienteDTO(clienteId);
             return View(sesiones);
         }
 

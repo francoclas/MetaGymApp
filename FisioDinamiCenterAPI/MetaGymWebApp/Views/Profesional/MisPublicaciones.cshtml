@@ -30,13 +30,43 @@ else
     </ul>
 
     <div id="tabla-pendientes" class="tab-publicaciones">
-        @Html.Partial("_TablaPublicaciones", Model.Pendientes)
+        @if (!Model.Pendientes.Any())
+        {
+            <div class="alert alert-info mt-3" role="alert">
+                No tenés publicaciones pendientes de aprobación. Podés generar una nueva solicitud arriba.
+            </div>
+        }
+        else
+        {
+            @Html.Partial("_TablaPublicaciones", Model.Pendientes)
+        }
     </div>
+
     <div id="tabla-aprobadas" class="tab-publicaciones d-none">
-        @Html.Partial("_TablaPublicaciones", Model.Aprobadas)
+        @if (!Model.Aprobadas.Any())
+        {
+            <div class="alert alert-info mt-3" role="alert">
+                No tenés publicaciones aprobadas todavía.
+            </div>
+        }
+        else
+        {
+            @Html.Partial("_TablaPublicaciones", Model.Aprobadas)
+        }
     </div>
+
     <div id="tabla-rechazadas" class="tab-publicaciones d-none">
-        @Html.Partial("_TablaPublicaciones", Model.Rechazadas)
+        @if (!Model.Rechazadas.Any())
+        {
+            <div class="alert alert-info mt-3" role="alert">
+                No tenés publicaciones rechazadas por ahora.
+            </div>
+        }
+        else
+        {
+            @Html.Partial("_TablaPublicaciones", Model.Rechazadas)
+        }
     </div>
 }
+
 <script src="/js/profesional/misPublicacionesProfesional.js"></script>

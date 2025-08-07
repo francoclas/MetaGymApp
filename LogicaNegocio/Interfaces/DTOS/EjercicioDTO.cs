@@ -18,7 +18,6 @@ namespace LogicaNegocio.Interfaces.DTOS
         public string Instrucciones { get; set; }
         public Media? Media { get; set; }
         public List<Media>? Medias { get; set; } = new List<Media>();
-
         public List<Medicion> Mediciones { get; set;} = new List<Medicion>();
     }
 }

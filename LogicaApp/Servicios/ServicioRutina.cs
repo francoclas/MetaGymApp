@@ -130,7 +130,7 @@ namespace LogicaApp.Servicios
             return MapeoEjercicioDTO(repositorioEjercicio.ObtenerPorProfesional(Id));
         }
 
-        public List<SesionRutina> ObtenerHistorialCliente(int clienteId)
+        public List<SesionRutina> ObtenerHistorialClienteDTO(int clienteId)
         {
             return repositorioRutina.ObtenerSesionesPorCliente(clienteId);
         }

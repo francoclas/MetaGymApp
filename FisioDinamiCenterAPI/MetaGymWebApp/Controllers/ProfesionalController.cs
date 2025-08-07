@@ -1,11 +1,7 @@
-﻿using Humanizer;
-using LogicaApp.DTOS;
-using LogicaApp.Servicios;
-using LogicaDatos.Repositorio;
+﻿using LogicaApp.DTOS;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
-using LogicaNegocio.Interfaces.Repositorios;
 using LogicaNegocio.Interfaces.Servicios;
 using MetaGymWebApp.Filtros;
 using MetaGymWebApp.Models;
@@ -302,7 +298,12 @@ namespace MetaGymWebApp.Controllers
             return View(historial);
         }
 
-
+        [HttpGet] 
+        IActionResult HistorialSesionesCliente(int id)
+        {
+            List<SesionEntrenadaDTO> sesiones = rutinaServicio.ObtenerHistorialClienteDTO(id);
+            return View(sesiones);
+        }
         [HttpGet]
         public IActionResult GestionRutinas()
         {
@@ -428,7 +429,21 @@ namespace MetaGymWebApp.Controllers
 
             return View(modelo);
         }
-        
+        [HttpGet]
+        public IActionResult BuscarHistorialClientes()
+        {
+            var listaClientes = clienteServicio.ObtenerTodosDTO()
+                 .Select(c => new ClienteDTO
+                 {
+                     Id = c.Id,
+                     NombreCompleto = c.NombreCompleto,
+                     Ci = c.Ci,
+                     Correo = c.Correo,
+                     Telefono = c.Telefono
+                 }).ToList();
+
+            return View(listaClientes);
+        }
         [HttpGet]
         public IActionResult DetalleEjercicio(int id)
         {

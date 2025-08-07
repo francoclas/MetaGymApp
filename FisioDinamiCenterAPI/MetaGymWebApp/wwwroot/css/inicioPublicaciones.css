@@ -176,7 +176,6 @@
     gap: 10px;
     margin-top: 15px;
     position: relative;
-    padding-left: 10px;
 }
 
 .pub-com-img {
@@ -236,14 +235,6 @@
     .pub-btn-responder:hover {
         color: #e50914;
     }
-
-/* Respuestas anidadas */
-.pub-comentario .pub-comentario {
-    margin-left: 36px;
-    padding-left: 12px;
-    border-left: 2px solid #444;
-}
-
 
 /* ===== Formulario de comentar ===== */
 .pub-comentar-form {

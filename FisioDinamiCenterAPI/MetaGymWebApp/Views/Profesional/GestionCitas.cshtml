@@ -23,12 +23,12 @@ else
     <a class="btn btn-outline-light mb-3" asp-controller="Agenda" asp-action="MisAgendas">
         Gestionar mi tiempo de trabajo
     </a>
-        <a class="btn btn-outline-light mb-3" asp-controller="Profesional" asp-action="BuscarClientesCita">
+    <a class="btn btn-outline-light mb-3" asp-controller="Profesional" asp-action="BuscarClientesCita">
             Buscar historial clinico de paciente
-        </a>
-    <div>
-        <a href="@Url.Action("CrearCita", "Profesional")" class="btn btn-success">➕ Agendar una cita</a>
-    </div>
+    </a>
+    <a class="btn btn-outline-light mb-3" asp-controller="Profesional" asp-action="CrearCita">
+            ➕ Agendar una cita
+    </a>
     <ul class="nav nav-tabs mb-4" id="tabsCitas">
         <li class="nav-item">
             <a class="nav-link active" data-tab="espera">Solicitudes</a>
@@ -50,8 +50,15 @@ else
         <button class="btn btn-outline-light btn-sm" onclick="ordenarCitas('desc')">Más nuevas</button>
     </div>
 
-    <!-- Sección Solicitudes -->
     <div class="tab-content" id="tab-espera">
+    @if (!Model.CitasEnEspera.Any())
+    {
+        <div class="alert alert-info text-center mt-3">
+            No hay citas pendientes de recepción por el momento.
+        </div>
+    }
+    else
+    {
         @foreach (var cita in Model.CitasEnEspera)
         {
             <div class="card mb-3 cita-card" data-fecha="@cita.FechaAsistencia.ToString("yyyy-MM-ddTHH:mm")">
@@ -68,10 +75,18 @@ else
                 </div>
             </div>
         }
-    </div>
+    }
+</div>
 
-    <!-- Sección Próximas -->
-    <div class="tab-content d-none" id="tab-proximas">
+<div class="tab-content d-none" id="tab-proximas">
+    @if (!Model.CitasProximasDeProfesional.Any())
+    {
+        <div class="alert alert-info text-center mt-3">
+            No hay citas próximas agendadas.
+        </div>
+    }
+    else
+    {
         @foreach (var cita in Model.CitasProximasDeProfesional)
         {
             <div class="card mb-3 cita-card" data-fecha="@cita.FechaAsistencia.ToString("yyyy-MM-ddTHH:mm")">
@@ -84,20 +99,24 @@ else
                     </div>
                     <div>
                         <span class="badge bg-success">Confirmada</span>
-                        <a href="@Url.Action("VerCita", "Profesional", new { id = cita.CitaId })" class="btn btn-outline-primary btn-sm">
-                            Ver
-                        </a>
-                        <a href="@Url.Action("EditarCita", "Profesional", new { id = cita.CitaId })" class="btn btn-outline-primary btn-sm">
-                            Editar
-                        </a>
+                        <a href="@Url.Action("VerCita", "Profesional", new { id = cita.CitaId })" class="btn btn-outline-primary btn-sm">Ver</a>
+                        <a href="@Url.Action("EditarCita", "Profesional", new { id = cita.CitaId })" class="btn btn-outline-primary btn-sm">Editar</a>
                     </div>
                 </div>
             </div>
         }
-    </div>
+    }
+</div>
 
-    <!-- Sección Finalizadas -->
-    <div class="tab-content d-none" id="tab-finalizadas">
+<div class="tab-content d-none" id="tab-finalizadas">
+    @if (!Model.CitasAtendidasProfesional.Any())
+    {
+        <div class="alert alert-info text-center mt-3">
+            Todavía no tenés citas finalizadas.
+        </div>
+    }
+    else
+    {
         @foreach (var cita in Model.CitasAtendidasProfesional)
         {
             <div class="card mb-3 cita-card" data-fecha="@cita.FechaAsistencia.ToString("yyyy-MM-ddTHH:mm")">
@@ -110,15 +129,12 @@ else
                 </div>
                 <div>
                     <span class="badge bg-success">Finalizada</span>
-                    <a href="@Url.Action("VerCita", "Profesional", new { id = cita.CitaId })" class="btn btn-outline-primary btn-sm">
-                        Ver
-                    </a>
+                    <a href="@Url.Action("VerCita", "Profesional", new { id = cita.CitaId })" class="btn btn-outline-primary btn-sm">Ver</a>
                 </div>
-
             </div>
         }
-    </div>
-  
+    }
+</div>
 }
 
 <script src="~/js/profesional/gestionCitas.js"></script>

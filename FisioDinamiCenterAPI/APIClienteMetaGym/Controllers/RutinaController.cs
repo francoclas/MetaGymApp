@@ -63,7 +63,7 @@ namespace APIClienteMetaGym.Controllers
         [HttpGet("historial")]
         public IActionResult HistorialCliente([FromQuery] int clienteId)
         {
-            var sesiones = rutinaServicio.ObtenerHistorialCliente(clienteId);
+            var sesiones = rutinaServicio.ObtenerHistorialClienteDTO(clienteId);
             var salida = sesiones.Select(MapearSesionRutina).ToList();
             return Ok(RespuestaApi<List<SesionRutinaDTO>>.Ok(salida));
         }

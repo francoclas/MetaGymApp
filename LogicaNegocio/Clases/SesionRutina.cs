@@ -18,7 +18,6 @@ namespace LogicaNegocio.Clases
         //Cliente
         public int ClienteId { get; set; }
         public Cliente Cliente { get; set; }
-
         //Ejercicios
         public List<EjercicioRealizado> EjerciciosRealizados { get; set; }
     }
