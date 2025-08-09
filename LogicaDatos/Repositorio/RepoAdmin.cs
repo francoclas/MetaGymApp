@@ -34,6 +34,16 @@ namespace LogicaDatos.Repositorio
             throw new NotImplementedException();
         }
 
+        public bool ExisteCI(string cI)
+        {
+            return _context.Administradores.Any(a => a.CI == cI);
+        }
+
+        public bool ExisteCorreo(string correo)
+        {
+            return _context.Administradores.Any(a => a.Correo == correo);   
+        }
+
         public bool ExisteUsuario(string usuario)
         {
             return _context.Administradores.Any(a => a.NombreUsuario.ToLower() == usuario.ToLower());

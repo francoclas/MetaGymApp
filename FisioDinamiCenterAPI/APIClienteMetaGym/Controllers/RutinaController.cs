@@ -64,8 +64,7 @@ namespace APIClienteMetaGym.Controllers
         public IActionResult HistorialCliente([FromQuery] int clienteId)
         {
             var sesiones = rutinaServicio.ObtenerHistorialClienteDTO(clienteId);
-            var salida = sesiones.Select(MapearSesionRutina).ToList();
-            return Ok(RespuestaApi<List<SesionRutinaDTO>>.Ok(salida));
+            return Ok(RespuestaApi<List<SesionEntrenadaDTO>>.Ok(sesiones));
         }
 
         //Mapeos

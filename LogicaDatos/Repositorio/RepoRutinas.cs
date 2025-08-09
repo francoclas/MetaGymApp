@@ -104,6 +104,9 @@ namespace LogicaDatos.Repositorio
             return _context.SesionesRutina
                 .Include(sr => sr.RutinaAsignada)
                     .ThenInclude(ra => ra.Rutina)
+                    .Include(sr => sr.EjerciciosRealizados)
+                    .ThenInclude(er => er.Ejercicio)
+                    .Include(sr => sr.Cliente)
                 .Where(sr => sr.RutinaAsignada.ClienteId == clienteId)
                 .ToList();
         }

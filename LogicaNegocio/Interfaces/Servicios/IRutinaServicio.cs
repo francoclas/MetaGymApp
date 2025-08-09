@@ -43,5 +43,6 @@ namespace LogicaNegocio.Interfaces.Servicios
         //DTOs
         RutinaAsignadaDTO ObtenerDetalleRutinaAsignadaDTO(int rutinaAsignadaId, int clienteId);
         string ObtenerNombreRutina(int idRutina);
+        List<SesionRutina> ObtenerSesionesCliente(int clienteId);
     }
 }

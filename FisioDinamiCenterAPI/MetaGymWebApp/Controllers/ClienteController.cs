@@ -12,7 +12,7 @@ using static LogicaNegocio.Interfaces.DTOS.EstablecimientoDTO;
 
 namespace MetaGymWebApp.Controllers
 {
-    [AutorizacionRol("Admin", "Cliente")]
+    [AutorizacionRol("Admin", "Cliente","Profesional")]
     public class ClienteController : Controller
     {
         private readonly IUsuarioServicio usuarioServicio;
@@ -198,7 +198,6 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult SesionEntrenada(int id)
         {
-            int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
             SesionRutina sesion = rutinaServicio.ObtenerSesionPorId(id);
             var rutina = rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignada.RutinaId);
 
@@ -239,7 +238,7 @@ namespace MetaGymWebApp.Controllers
         public IActionResult HistoricoSesionesEntrenamiento()
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var sesiones = rutinaServicio.ObtenerHistorialClienteDTO(clienteId);
+            List<SesionRutina> sesiones = rutinaServicio.ObtenerSesionesCliente(clienteId);
             return View(sesiones);
         }
 

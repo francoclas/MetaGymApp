@@ -97,5 +97,15 @@ namespace LogicaDatos.Repositorio
         {
            return _context.Clientes.SingleOrDefault(u => u.NombreUsuario == usuario && u.Pass == pass);
         }
+
+        public bool ExisteCorreo(string correo)
+        {
+            return _context.Clientes.Any(c => c.Correo == correo);
+        }
+
+        public bool ExisteCI(string cI)
+        {
+            return _context.Clientes.Any(c => (c.CI == cI));
+        }
     }
 }

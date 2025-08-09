@@ -14,5 +14,11 @@ namespace LogicaNegocio.Interfaces.DTOS
         public DateTime FechaRealizada { get; set; }
         public int? DuracionMin { get; set; }
         public List<EjercicioRealizadoDTO> Ejercicios { get; set; }
+        public override bool Equals(object obj)
+        {
+            return obj is SesionEntrenadaDTO otro &&
+                   this.SesionRutinaId == otro.SesionRutinaId;
+        }
     }
-}
+
+    }

@@ -299,7 +299,7 @@ namespace MetaGymWebApp.Controllers
         }
 
         [HttpGet] 
-        IActionResult HistorialSesionesCliente(int id)
+        public IActionResult HistorialSesionesCliente(int id)
         {
             List<SesionEntrenadaDTO> sesiones = rutinaServicio.ObtenerHistorialClienteDTO(id);
             return View(sesiones);

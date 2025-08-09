@@ -16,5 +16,7 @@ namespace LogicaDatos.Interfaces.Repos
         List<Profesional> BuscarPorNombre(string Nombre);
         Profesional ObtenerPorUsuario(string usuario);
         void GuardarCambios();
+        bool ExisteCorreo(string correo);
+        bool ExisteCI(string cI);
     }
 }

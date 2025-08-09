@@ -38,7 +38,7 @@
                     <td>@c.Correo</td>
                     <td>@c.Telefono</td>
                     <td>
-                        <a class="btn btn-sm btn-outline-primary" asp-action="HistorialClinicoCliente" asp-route-id="@c.Id" target="_blank">Ver historial clínico</a>
+                        <a class="btn btn-sm btn-outline-primary" asp-action="HistorialSesionesCliente" asp-controller="Profesional" asp-route-id="@c.Id" target="_blank">Ver sesiones de entrenamiento</a>
                     </td>
                 </tr>
             }

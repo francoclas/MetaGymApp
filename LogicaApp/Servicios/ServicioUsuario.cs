@@ -52,10 +52,8 @@ namespace LogicaNegocio.Servicios
             //Valido datos
             NuevoAdmin.Validar();
             //Verifico que no exista usuario
-            if (repoAdmin.ExisteUsuario(Usuario))
-            {
-                throw new UsuarioException("Ya existe un usuario con ese nombre de usuario.");
-            }
+            VerificarUsuarioRepetido(Usuario, Correo);
+            ExisteCI(Ci);
             //Cargo a repo
             repoAdmin.Agregar(NuevoAdmin);
         }
@@ -72,10 +70,8 @@ namespace LogicaNegocio.Servicios
             //Valido datos
             NuevoCliente.Validar();
             //Verificar que no existe
-            if (repoCliente.ExisteUsuario(NombreUsuario))
-            {
-                throw new UsuarioException("Ya existe usuario con ese nombre de usuario");
-            }
+            VerificarUsuarioRepetido(NombreUsuario, Correo);
+            ExisteCI(Ci);
             //Cargo en el sistema
             repoCliente.Agregar(NuevoCliente);
         }
@@ -92,10 +88,8 @@ namespace LogicaNegocio.Servicios
             //Valido datos
             NuevoProfesional.Validar();
             //Verifico que no exista el usuari
-            if (repoProfesional.ExisteUsuario(Usuario))
-            {
-                throw new UsuarioException("Ya existe usuario con ese nombre de usuario");
-            }
+            VerificarUsuarioRepetido(Usuario, Correo);
+            ExisteCI(Ci);
             //Lo cargo al sistema
             repoProfesional.Agregar(NuevoProfesional);
         }
@@ -198,10 +192,9 @@ namespace LogicaNegocio.Servicios
         public void RegistrarCliente(ClienteDTO cliente)
         {
             //Verifico que no exista uno con ese nombre de usuario
-            if (repoCliente.ExisteUsuario(cliente.NombreUsuario))
-            {
-                throw new UsuarioException("Ya existe usuario con ese nombre de usuario");
-            }
+            VerificarUsuarioRepetido(cliente.NombreUsuario, cliente.Correo);
+            //verifico ci
+            ExisteCI(cliente.Ci);
             //Instancio nuevo cliente
             Cliente Nuevo = new Cliente(cliente.Ci,
                 cliente.NombreUsuario,
@@ -213,6 +206,30 @@ namespace LogicaNegocio.Servicios
             Nuevo.Validar();
             //Agrego desde repositorio
             repoCliente.Agregar(Nuevo);
+        }
+        private void VerificarUsuarioRepetido(string NombreUsuario,string Correo)
+        {
+            if (repoCliente.ExisteUsuario(NombreUsuario))
+                throw new UsuarioException("Intente con otro usuario");
+            if (repoAdmin.ExisteUsuario(NombreUsuario))
+                throw new UsuarioException("Intente con otro usuario");
+            if (repoProfesional.ExisteUsuario(NombreUsuario))
+                throw new UsuarioException("Intente con otro usuario");
+            if (repoCliente.ExisteCorreo(Correo)) 
+                throw new UsuarioException("Intente con otro correo");
+            if (repoAdmin.ExisteCorreo(Correo))
+                throw new UsuarioException("Intente con otro correo");
+            if (repoProfesional.ExisteCorreo(Correo))
+                throw new UsuarioException("Intente con otro correo");
+        }
+        private void ExisteCI(string CI)
+        {
+            if(repoCliente.ExisteCI(CI))
+                throw new UsuarioException("Ya existe usuario con esa CI");
+            if (repoAdmin.ExisteCI(CI))
+                throw new UsuarioException("Ya existe usuario con esa CI");
+            if (repoProfesional.ExisteCI(CI))
+                throw new UsuarioException("Ya existe usuario con esa CI");
         }
         private UsuarioGenericoDTO MapeoClienteUsuarioDTO(Cliente cliente)
         {

@@ -13,5 +13,7 @@ namespace LogicaDatos.Interfaces.Repos
         Admin VerificarCredenciales(string usuario, string pass);
         Admin ObtenerPorUsuario(string usuario);
         void GuardarCambios();
+        bool ExisteCorreo(string correo);
+        bool ExisteCI(string cI);
     }
 }

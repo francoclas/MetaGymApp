@@ -14,7 +14,7 @@ using LogicaNegocio.Interfaces.Servicios;
 
 namespace LogicaApp.Servicios
 {
-    public class ServicioRutina : IRutinaServicio
+    public class ServicioRutina : IRutinaServicio 
     {
         private readonly IRepositorioRutina repositorioRutina;
         private readonly IRepositorioEjercicio repositorioEjercicio;
@@ -128,11 +128,6 @@ namespace LogicaApp.Servicios
         public List<EjercicioDTO> ObtenerEjerciciosProfesional(int Id)
         {
             return MapeoEjercicioDTO(repositorioEjercicio.ObtenerPorProfesional(Id));
-        }
-
-        public List<SesionRutina> ObtenerHistorialClienteDTO(int clienteId)
-        {
-            return repositorioRutina.ObtenerSesionesPorCliente(clienteId);
         }
 
         public List<RutinaAsignada> ObtenerRutinasAsignadasCliente(int clienteId)
@@ -269,12 +264,37 @@ namespace LogicaApp.Servicios
 
             return dto;
         }
+        public List<SesionEntrenadaDTO> ObtenerHistorialClienteDTO(int clienteId)
+        {
+            List<SesionEntrenadaDTO> salida = new List<SesionEntrenadaDTO>();
+            foreach (var sesion in repositorioRutina.ObtenerSesionesPorCliente(clienteId))
+            {
+                SesionEntrenadaDTO aux = new SesionEntrenadaDTO
+                {
+                    SesionRutinaId = sesion.Id,
+                    NombreCliente = sesion.Cliente.NombreCompleto,
+                    NombreRutina = sesion.RutinaAsignada.Rutina.NombreRutina,
+                    FechaRealizada = sesion.FechaRealizada,
+                    DuracionMin = sesion.DuracionMin,
+                };
+                if (!salida.Contains(aux))
+                {
+                    salida.Add(aux);
+                }
+            }
 
+            return salida;
+        }
         public string ObtenerNombreRutina(int idRutina)
         {
             Rutina salida = repositorioRutina.ObtenerPorId(idRutina);
 
             return salida.NombreRutina;
+        }
+
+        public List<SesionRutina> ObtenerSesionesCliente(int clienteId)
+        {
+            return repositorioRutina.ObtenerSesionesPorCliente(clienteId);
         }
     }
 }

@@ -99,5 +99,15 @@ namespace LogicaDatos.Repositorio
         {
             return _context.Profesionales.SingleOrDefault(P => P.NombreUsuario == usuario && P.Pass == pass);
         }
+
+        public bool ExisteCorreo(string correo)
+        {
+            return _context.Profesionales.Any(p => p.Correo == correo);    
+        }
+
+        public bool ExisteCI(string cI)
+        {
+            return _context.Profesionales.Any(p => p.CI == cI);
+        }
     }
 }
