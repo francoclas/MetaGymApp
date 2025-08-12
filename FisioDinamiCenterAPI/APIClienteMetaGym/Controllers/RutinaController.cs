@@ -1,5 +1,6 @@
 ﻿using APIClienteMetaGym.DTO;
 using APIClienteMetaGym.DTO.Rutinas;
+using APIClienteMetaGym.Extra;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
@@ -29,7 +30,16 @@ namespace APIClienteMetaGym.Controllers
             List<RutinaAsignada> rutinas = rutinaServicio.ObtenerRutinasAsignadasCliente(clienteId);
             return Ok(RespuestaApi<List<RutinaAsignada>>.Ok(rutinas));
         }
-
+        /// <summary>
+        /// Obtiene la informacion de los ejercicios de una rutina en particular.
+        /// </summary>
+        [HttpGet("informacionRutina")]
+        public IActionResult ObtenerInformacionRutina([FromQuery] int rutinaId)
+        {
+            Rutina rutina = rutinaServicio.ObtenerRutinaPorId(rutinaId);
+            return Ok(RespuestaApi<RutinaDTO>.Ok(new MapeadorRutinas().MapearRutinaDTO(rutina)));
+        }
+        
         /// <summary>
         /// Obtiene la información de un ejercicio por ID.
         /// </summary>
@@ -66,7 +76,15 @@ namespace APIClienteMetaGym.Controllers
             var sesiones = rutinaServicio.ObtenerHistorialClienteDTO(clienteId);
             return Ok(RespuestaApi<List<SesionEntrenadaDTO>>.Ok(sesiones));
         }
-
+        /// <summary>
+        /// Obtiene el historial de sesiones del cliente.
+        /// </summary>
+        [HttpGet("sesionEntrenamiento")]
+        public IActionResult sesionEntrenamiento([FromQuery] int sesionId)
+        {
+            SesionEntrenadaDTO sesiones = rutinaServicio.ObtenerSesionEntrenamiento(sesionId);
+            return Ok(RespuestaApi<SesionEntrenadaDTO>.Ok(sesiones));
+        }
         //Mapeos
         private EjercicioRealizadoDTOAPI MapearEjercicioRealizado(EjercicioRealizado er)
         {
@@ -120,7 +138,7 @@ namespace APIClienteMetaGym.Controllers
             return new SesionRutinaDTO
             {
                 SesionRutinaId = sesion.Id,
-                NombreRutina = rutinaServicio.ObtenerNombreRutina(sesion.RutinaAsignadaId),
+                NombreRutina = sesion.NombreRutinaHistorial,
                 Fecha = sesion.FechaRealizada,
                 DuracionMin = sesion.DuracionMin,
                 Ejercicios = sesion.EjerciciosRealizados?.Select(MapearEjercicioRealizado).ToList() ?? new()

@@ -35,7 +35,7 @@ namespace LogicaNegocio.Interfaces.Servicios
         SesionRutina RegistrarSesion(SesionRutina sesion);
         List<SesionEntrenadaDTO> ObtenerHistorialClienteDTO(int clienteId);
         SesionRutina? ObtenerSesionPorId(int sesionId);
-       
+        SesionEntrenadaDTO ObtenerSesionEntrenamiento(int sesionId);
         List<Rutina> ObtenerTodasRutinas();
         void AsignarRutina(Rutina rutina, Cliente cliente);
         void DesasignarRutina(Rutina rutina, Cliente cliente);
@@ -44,5 +44,6 @@ namespace LogicaNegocio.Interfaces.Servicios
         RutinaAsignadaDTO ObtenerDetalleRutinaAsignadaDTO(int rutinaAsignadaId, int clienteId);
         string ObtenerNombreRutina(int idRutina);
         List<SesionRutina> ObtenerSesionesCliente(int clienteId);
+        void ActualizarEjerciciosRutina(Rutina rutina, List<int> idsEjerciciosSeleccionados);
     }
 }

@@ -614,65 +614,108 @@ namespace MetaGymWebApp.Controllers
             };
             return View(modelo);
         }
-            [HttpPost]
-            public IActionResult RegistrarRutina(RutinaRegistroDTO dto)
+        [HttpPost]
+        public IActionResult RegistrarRutina(RutinaRegistroDTO dto)
         {
-            //instancio la nueva rutina
-            Rutina rutina = new Rutina
-            {
-                NombreRutina = dto.NombreRutina,
-                Tipo = dto.Tipo,
-                ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext),
-                FechaCreacion = DateTime.Now,
-                FechaModificacion = DateTime.Now,
-                Ejercicios = dto.IdsEjerciciosSeleccionados.Select((id, index) => new RutinaEjercicio
-                {
-                    EjercicioId = id,
-                    Orden = index + 1
-                }).ToList()
-            };
             try
             {
-                // Guardar la rutina primero
+                // Crear la rutina vacía
+                var rutina = new Rutina
+                {
+                    NombreRutina = dto.NombreRutina,
+                    Tipo = dto.Tipo,
+                    ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext),
+                    FechaCreacion = DateTime.Now,
+                    FechaModificacion = DateTime.Now,
+                    Ejercicios = new List<RutinaEjercicio>() // empezamos vacío
+                };
+
+                // Guardar la rutina primero para obtener Id
                 rutinaServicio.GenerarNuevaRutina(rutina);
+
+                // Agregar ejercicios usando el mismo patrón de merge
+                rutinaServicio.ActualizarEjerciciosRutina(rutina, dto.IdsEjerciciosSeleccionados);
+
                 // Asignar a cada cliente
                 foreach (var clienteId in dto.IdsClientesAsignados)
                 {
                     rutinaServicio.AsignarRutinaACliente(clienteId, rutina.Id);
                 }
-                TempData["Mensaje"] = "Se registro la rutina correctamente, se asigno a los usuarios seleccionados.";
-                TempData["TipoMensaje"] = "Success";
+
+                TempData["Mensaje"] = "Se registró la rutina correctamente y se asignó a los usuarios seleccionados.";
+                TempData["TipoMensaje"] = "success";
                 return RedirectToAction("GestionRutinas");
             }
             catch (Exception)
             {
-                TempData["Mensaje"] = "No se logro registrar la rutina, favor de intentar nuevamente mas tarde.";
+                TempData["Mensaje"] = "No se logró registrar la rutina, favor de intentar nuevamente más tarde.";
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("GestionRutinas");
             }
-
         }
         [HttpGet]
         public IActionResult EditarRutina(int id)
         {
             try
             {
-                //Obtengo la rutina a modificar
+                int profesionalId = GestionSesion.ObtenerUsuarioId(this.HttpContext);
+
+                // Obtener la rutina
                 Rutina rutina = rutinaServicio.ObtenerRutinaPorId(id);
-                //valido info
-                if (rutina == null) throw new Exception("No se encontro rutina o no existe.");
-                if (rutina.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext)) throw new Exception("No tiene permisos para editar esta rutina.");
-                //Mapeo a dto
-                RutinaRegistroDTO dto = new RutinaRegistroDTO
+                if (rutina == null)
+                    throw new Exception("No se encontró rutina o no existe.");
+                if (rutina.ProfesionalId != profesionalId)
+                    throw new Exception("No tiene permisos para editar esta rutina.");
+
+                // Ejercicios de la rutina
+                var idsSeleccionados = rutina.Ejercicios.Select(e => e.EjercicioId).ToList();
+
+                // Todos los ejercicios
+                List<EjercicioDTO> todosEjercicios = rutinaServicio.ObtenerTodosEjercicios();
+
+                // Clientes asignados a la rutina
+                var idsClientesAsignados = rutinaServicio.ObtenerAsignacionesPorRutina(id)
+                                                         .Select(a => a.ClienteId)
+                                                         .ToList();
+
+                // Todos los clientes
+                List<ClienteDTO> todosClientes = clienteServicio.ObtenerTodosDTO();
+
+                // Armar DTO para la vista
+                var dto = new RutinaRegistroDTO
                 {
                     Id = rutina.Id,
                     NombreRutina = rutina.NombreRutina,
                     Tipo = rutina.Tipo,
-                    IdsEjerciciosSeleccionados = rutina.Ejercicios.Select(e => e.EjercicioId).ToList(),
-                    IdsClientesAsignados = rutinaServicio.ObtenerAsignacionesPorRutina(id).Select(a => a.ClienteId).ToList(),
-                    MisEjerciciosDisponibles = rutinaServicio.ObtenerTodosEjercicios(),
-                    ClientesDisponibles = clienteServicio.ObtenerTodosDTO()
+
+                    IdsEjerciciosSeleccionados = idsSeleccionados,
+                    IdsClientesAsignados = idsClientesAsignados,
+
+                    // Ejercicios disponibles (se excluyen los ya seleccionados)
+                    MisEjerciciosDisponibles = todosEjercicios
+                        .Where(e => e.ProfesionalId == profesionalId && !idsSeleccionados.Contains(e.Id))
+                        .ToList(),
+
+                    EjerciciosDisponiblesSistema = todosEjercicios
+                        .Where(e => e.ProfesionalId != profesionalId && !idsSeleccionados.Contains(e.Id))
+                        .ToList(),
+
+                    // Ejercicios seleccionados (solo los de la rutina)
+                    EjerciciosSeleccionados = todosEjercicios
+                        .Where(e => idsSeleccionados.Contains(e.Id))
+                        .ToList(),
+
+                    // Clientes disponibles (sin los ya asignados)
+                    ClientesDisponibles = todosClientes
+                        .Where(c => !idsClientesAsignados.Contains(c.Id))
+                        .ToList(),
+
+                    // Clientes seleccionados
+                    ClientesSeleccionados = todosClientes
+                        .Where(c => idsClientesAsignados.Contains(c.Id))
+                        .ToList()
                 };
+
                 return View(dto);
             }
             catch (Exception e)
@@ -681,36 +724,47 @@ namespace MetaGymWebApp.Controllers
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("GestionRutinas");
             }
-            
         }
+
+
+
         [HttpPost]
         public IActionResult EditarRutina(RutinaRegistroDTO dto)
         {
             try
             {
-                //Obtengo la rutina a modificar
-                Rutina rutina = rutinaServicio.ObtenerRutinaPorId(dto.Id);
-                //Valido info
-                if (rutina == null) throw new Exception("No se encontro rutina o no existe.");
-                //Verifico que quien la edita sea el dueño
-                if (rutina.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext)) throw new Exception("No tiene permisos para editar esta rutina.");
+                int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
 
-                //mapeo cambios
+                // Buscar la rutina
+                Rutina rutina = rutinaServicio.ObtenerRutinaPorId(dto.Id);
+                if (rutina == null)
+                    throw new Exception("No se encontró rutina o no existe.");
+                if (rutina.ProfesionalId != profesionalId)
+                    throw new Exception("No tiene permisos para editar esta rutina.");
+
+                // Actualizar datos principales
                 rutina.NombreRutina = dto.NombreRutina;
                 rutina.Tipo = dto.Tipo;
                 rutina.FechaModificacion = DateTime.Now;
-                rutina.Ejercicios = dto.IdsEjerciciosSeleccionados.Select((id, index) => new RutinaEjercicio
-                {
-                    EjercicioId = id,
-                    Orden = index + 1
-                }).ToList();
-                //mando al repo
-                rutinaServicio.ModificarRutina(rutina);
 
-                // Reemplazar asignaciones
+                // === Actualizar ejercicios ===
+                rutina.Ejercicios.Clear();
+                foreach (var ejercicioId in dto.IdsEjerciciosSeleccionados)
+                {
+                    rutina.Ejercicios.Add(new RutinaEjercicio
+                    {
+                        EjercicioId = ejercicioId,
+                        Orden = dto.IdsEjerciciosSeleccionados.IndexOf(ejercicioId) + 1
+                    });
+                }
+
+                // === Actualizar clientes asignados ===
                 rutinaServicio.ReemplazarAsignaciones(rutina.Id, dto.IdsClientesAsignados);
 
-                TempData["Mensaje"] = "Se modifico la rutina correctamente.";
+                // Guardar cambios
+                rutinaServicio.ModificarRutina(rutina);
+
+                TempData["Mensaje"] = "Rutina actualizada correctamente.";
                 TempData["TipoMensaje"] = "success";
                 return RedirectToAction("GestionRutinas");
             }
@@ -719,10 +773,9 @@ namespace MetaGymWebApp.Controllers
                 TempData["Mensaje"] = e.Message;
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("GestionRutinas");
-
             }
-
         }
+
         //Publicaciones
 
         //Solicitar publicacion

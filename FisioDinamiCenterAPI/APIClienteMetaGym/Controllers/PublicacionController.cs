@@ -36,9 +36,9 @@ public class PublicacionController : ControllerBase
     [ProducesResponseType(typeof(RespuestaApi<List<PublicacionVistaDTO>>), StatusCodes.Status200OK)]
     public IActionResult ObtenerPublicacionesInicio()
     {
-        var publicaciones = _publicacionServicio.ObtenerPublicacionesInicio();
+        var publicaciones = _publicacionServicio.ObtenerPublicacionesInicioAPI();
         var baseUrl = _configuration["BaseUrl"];
-        var salida = new MapeadorPublicaciones(baseUrl).MapearLista(publicaciones);
+        var salida = new MapeadorPublicaciones().MapearLista(publicaciones);
 
         return Ok(RespuestaApi<List<PublicacionVistaDTO>>.Ok(salida));
     }
@@ -52,7 +52,7 @@ public class PublicacionController : ControllerBase
     {
         var publicaciones = _publicacionServicio.ObtenerNovedades();
         var baseUrl = _configuration["BaseUrl"];
-        var salida = new MapeadorPublicaciones(baseUrl).MapearLista(publicaciones);
+        var salida = new MapeadorPublicaciones().MapearLista(publicaciones);
 
         return Ok(RespuestaApi<List<PublicacionVistaDTO>>.Ok(salida));
     }

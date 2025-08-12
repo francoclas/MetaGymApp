@@ -18,11 +18,55 @@ namespace LogicaDatos.Repositorio
             _context = context;
         }
 
-        public void Actualizar(Rutina entidad)
+        public void Actualizar(Rutina dto)
         {
-            _context.Update(entidad);
             _context.SaveChanges();
         }
+        public void ActualizarRutina(Rutina rutina, List<int> nuevosEjercicios)
+        {
+            // Cargar desde BD la rutina con sus ejercicios
+            var rutinaDb = _context.Rutinas
+                .Include(r => r.Ejercicios)
+                .FirstOrDefault(r => r.Id == rutina.Id);
+
+            if (rutinaDb == null)
+                throw new Exception("Rutina no encontrada");
+
+            // Actualizar campos básicos
+            rutinaDb.NombreRutina = rutina.NombreRutina;
+            rutinaDb.Tipo = rutina.Tipo;
+            rutinaDb.FechaModificacion = rutina.FechaModificacion;
+
+            // Eliminar los que ya no estén
+            var ejerciciosActuales = rutinaDb.Ejercicios.ToList();
+            foreach (var ejercicio in ejerciciosActuales)
+            {
+                if (!nuevosEjercicios.Contains(ejercicio.EjercicioId))
+                    _context.RutinaEjercicios.Remove(ejercicio);
+            }
+
+            // Agregar nuevos o actualizar orden
+            foreach (var id in nuevosEjercicios)
+            {
+                var existente = rutinaDb.Ejercicios.FirstOrDefault(e => e.EjercicioId == id);
+                if (existente == null)
+                {
+                    rutinaDb.Ejercicios.Add(new RutinaEjercicio
+                    {
+                        EjercicioId = id,
+                        Orden = nuevosEjercicios.IndexOf(id) + 1,
+                        RutinaId = rutinaDb.Id
+                    });
+                }
+                else
+                {
+                    existente.Orden = nuevosEjercicios.IndexOf(id) + 1;
+                }
+            }
+
+            _context.SaveChanges();
+        }
+
 
         public void Agregar(Rutina entidad)
         {
@@ -71,9 +115,13 @@ namespace LogicaDatos.Repositorio
         public Rutina ObtenerPorId(int id)
         {
             return _context.Rutinas
+         .Include(r => r.Ejercicios)
+             .ThenInclude(re => re.Ejercicio)
+            .ThenInclude(e => e.Mediciones)
         .Include(r => r.Ejercicios)
             .ThenInclude(re => re.Ejercicio)
-            .ThenInclude(ej => ej.Medias)
+            .ThenInclude(e => e.Medias)
+
         .FirstOrDefault(r => r.Id == id);
 
         }
@@ -102,12 +150,16 @@ namespace LogicaDatos.Repositorio
         public List<SesionRutina> ObtenerSesionesPorCliente(int clienteId)
         {
             return _context.SesionesRutina
+                .Include(sr => sr.Cliente)
                 .Include(sr => sr.RutinaAsignada)
                     .ThenInclude(ra => ra.Rutina)
-                    .Include(sr => sr.EjerciciosRealizados)
-                    .ThenInclude(er => er.Ejercicio)
-                    .Include(sr => sr.Cliente)
-                .Where(sr => sr.RutinaAsignada.ClienteId == clienteId)
+                .Include(sr => sr.EjerciciosRealizados)
+                    .ThenInclude(er => er.Series)
+                .Include(sr => sr.EjerciciosRealizados)
+                    .ThenInclude(er => er.ValoresMediciones)
+                        .ThenInclude(vm => vm.Medicion)
+                .Where(sr => sr.ClienteId == clienteId)
+                .OrderByDescending(sr => sr.FechaRealizada)
                 .ToList();
         }
 
@@ -152,6 +204,11 @@ namespace LogicaDatos.Repositorio
                 _context.RutinasAsignadas.Remove(asignacion);
                 _context.SaveChanges();
             }
+        }
+
+        public void GuardarCambios()
+        {
+            _context.SaveChanges();
         }
     }
     }

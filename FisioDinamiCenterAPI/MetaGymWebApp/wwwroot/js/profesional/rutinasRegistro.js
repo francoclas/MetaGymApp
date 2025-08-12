@@ -1,143 +1,110 @@
-﻿let ejerciciosSeleccionados = [];
-let clientesSeleccionados = [];
-const listaEjercicios = new Set();
-function agregarEjercicio(id, nombre) {
-    if (listaEjercicios.has(id)) return;
+﻿window.ejerciciosSeleccionados = [];
+window.clientesSeleccionados = [];
 
-    listaEjercicios.add(id);
+window.initDatosIniciales = function () {
+    document.querySelectorAll("#listaEjerciciosSeleccionados li").forEach(li => {
+        window.ejerciciosSeleccionados.push({
+            id: parseInt(li.dataset.id),
+            nombre: li.dataset.nombre
+        });
+    });
 
-    const ul = document.getElementById("listaEjerciciosSeleccionados");
-    const li = document.createElement("li");
-    li.innerText = nombre;
-    li.dataset.id = id;
+    document.querySelectorAll("#listaClientesSeleccionados li").forEach(li => {
+        window.clientesSeleccionados.push({
+            id: parseInt(li.dataset.id),
+            nombre: li.dataset.nombre
+        });
+    });
+};
 
-    const btnQuitar = document.createElement("button");
-    btnQuitar.innerText = "Quitar";
-    btnQuitar.type = "button";
-    btnQuitar.className = "btn btn-sm btn-danger ms-2";
-    btnQuitar.onclick = function () {
-        listaEjercicios.delete(id);
-        li.remove();
-        document.getElementById(`input-ej-${id}`)?.remove();
-    };
-
-    li.appendChild(btnQuitar);
-    ul.appendChild(li);
-
-    // Crear input oculto
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = "IdsEjerciciosSeleccionados";
-    input.value = id;
-    input.id = `input-ej-${id}`;
-    document.getElementById("contenedorEjerciciosInputs").appendChild(input);
-}
-function quitarEjercicio(id) {
-    ejerciciosSeleccionados = ejerciciosSeleccionados.filter(e => e !== id);
+window.agregarEjercicio = function (id, nombre) {
+    if (window.ejerciciosSeleccionados.some(e => e.id === id)) return;
+    window.ejerciciosSeleccionados.push({ id, nombre });
     actualizarListaEjercicios();
-    document.querySelector(`.card-ejercicio[data-id="${id}"]`).style.display = "block";
-}
+    document.querySelectorAll(`.card-ejercicio[data-id="${id}"]`).forEach(c => c.style.display = "none");
+};
+
+window.quitarEjercicio = function (id) {
+    window.ejerciciosSeleccionados = window.ejerciciosSeleccionados.filter(e => e.id !== id);
+    actualizarListaEjercicios();
+    document.querySelectorAll(`.card-ejercicio[data-id="${id}"]`).forEach(c => c.style.display = "block");
+};
+
 function actualizarListaEjercicios() {
     const lista = document.getElementById("listaEjerciciosSeleccionados");
-    lista.innerHTML = "";
-
     const contenedorInputs = document.getElementById("contenedorEjerciciosInputs");
+
+    lista.innerHTML = "";
     contenedorInputs.innerHTML = "";
 
-    ejerciciosSeleccionados.forEach(id => {
-        const nombre = document.querySelector(`.card-ejercicio[data-id="${id}"] strong`).textContent;
+    window.ejerciciosSeleccionados.forEach(e => {
+        const li = document.createElement("li");
+        li.dataset.id = e.id;
+        li.dataset.nombre = e.nombre;
+        li.className = "list-group-item bg-dark text-light";
+        li.textContent = e.nombre + " ";
 
-        // Mostrar en lista
-        lista.innerHTML += `
-            <li data-id="${id}">
-                ${nombre} 
-                <button type="button" onclick="quitarEjercicio(${id})">X</button>
-            </li>`;
+        const btnQuitar = document.createElement("button");
+        btnQuitar.type = "button";
+        btnQuitar.className = "btn btn-sm btn-danger ms-2";
+        btnQuitar.textContent = "X";
+        btnQuitar.onclick = () => window.quitarEjercicio(e.id);
 
-        // Agregar input oculto
+        li.appendChild(btnQuitar);
+        lista.appendChild(li);
+
         const input = document.createElement("input");
         input.type = "hidden";
         input.name = "IdsEjerciciosSeleccionados";
-        input.value = id;
+        input.value = e.id;
         contenedorInputs.appendChild(input);
     });
 }
 
-function agregarCliente(id, nombre) {
-    if (!clientesSeleccionados.includes(id)) {
-        clientesSeleccionados.push(id);
-        actualizarListaClientes();
-        document.querySelector(`tr[data-id="${id}"]`).style.display = "none";
-    }
-}
+window.agregarCliente = function (id, nombre) {
+    if (window.clientesSeleccionados.some(c => c.id === id)) return;
+    window.clientesSeleccionados.push({ id, nombre });
+    actualizarListaClientes();
+    document.querySelector(`tr[data-id="${id}"]`).style.display = "none";
+};
 
-function quitarCliente(id) {
-    clientesSeleccionados = clientesSeleccionados.filter(c => c !== id);
+window.quitarCliente = function (id) {
+    window.clientesSeleccionados = window.clientesSeleccionados.filter(c => c.id !== id);
     actualizarListaClientes();
     document.querySelector(`tr[data-id="${id}"]`).style.display = "";
-}
+};
 
 function actualizarListaClientes() {
     const lista = document.getElementById("listaClientesSeleccionados");
-    lista.innerHTML = "";
-
     const contenedorInputs = document.getElementById("contenedorClientesInputs");
+
+    lista.innerHTML = "";
     contenedorInputs.innerHTML = "";
 
-    clientesSeleccionados.forEach(id => {
-        const nombre = document.querySelector(`tr[data-id="${id}"] td:first-child`).textContent;
+    window.clientesSeleccionados.forEach(c => {
+        const li = document.createElement("li");
+        li.dataset.id = c.id;
+        li.dataset.nombre = c.nombre;
+        li.className = "list-group-item bg-dark text-light";
+        li.textContent = c.nombre + " ";
 
-        lista.innerHTML += `
-            <li data-id="${id}">
-                ${nombre}
-                <button type="button" onclick="quitarCliente(${id})">X</button>
-            </li>`;
+        const btnQuitar = document.createElement("button");
+        btnQuitar.type = "button";
+        btnQuitar.className = "btn btn-sm btn-danger ms-2";
+        btnQuitar.textContent = "X";
+        btnQuitar.onclick = () => window.quitarCliente(c.id);
+
+        li.appendChild(btnQuitar);
+        lista.appendChild(li);
 
         const input = document.createElement("input");
         input.type = "hidden";
         input.name = "IdsClientesAsignados";
-        input.value = id;
+        input.value = c.id;
         contenedorInputs.appendChild(input);
     });
 }
 
-// Buscador de ejercicios
-document.getElementById("buscadorEjercicios").addEventListener("input", function () {
-    const valor = this.value.toLowerCase();
-    document.querySelectorAll("#ejerciciosDisponibles .card-ejercicio").forEach(card => {
-        const nombre = card.dataset.nombre.toLowerCase();
-        const tipo = card.dataset.tipo.toLowerCase();
-        card.style.display = (nombre.includes(valor) || tipo.includes(valor)) ? "block" : "none";
-    });
-});
-
-// Buscador de clientes
-document.getElementById("buscadorClientes").addEventListener("input", function () {
-    const valor = this.value.toLowerCase();
-    document.querySelectorAll(".tabla-clientes tbody tr").forEach(row => {
-        const nombre = row.dataset.nombre.toLowerCase();
-        const usuario = row.dataset.usuario.toLowerCase();
-        const ci = row.dataset.ci.toLowerCase();
-        row.style.display = (nombre.includes(valor) || usuario.includes(valor) || ci.includes(valor)) ? "" : "none";
-    });
-});
-function aplicarFiltro(inputId, contenedorId) {
-    const input = document.getElementById(inputId);
-    const contenedor = document.getElementById(contenedorId);
-    const cards = contenedor.querySelectorAll(".card-ejercicio");
-
-    input.addEventListener("input", () => {
-        const texto = input.value.toLowerCase();
-        cards.forEach(card => {
-            const nombre = card.dataset.nombre;
-            const tipo = card.dataset.tipo;
-            const visible = nombre.includes(texto) || tipo.includes(texto);
-            card.style.display = visible ? "block" : "none";
-        });
-    });
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-    aplicarFiltro("buscadorMisEjercicios", "misEjerciciosDisponibles");
-    aplicarFiltro("buscadorEjerciciosSistema", "ejerciciosSistemaDisponibles");
+    window.initDatosIniciales();
 });

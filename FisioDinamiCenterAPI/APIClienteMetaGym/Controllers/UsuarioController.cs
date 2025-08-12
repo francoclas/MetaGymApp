@@ -1,7 +1,9 @@
 ﻿using APIClienteMetaGym.DTO;
+using APIClienteMetaGym.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.DTOS.API;
 using LogicaNegocio.Interfaces.Servicios;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIClienteMetaGym.Controllers;
@@ -34,59 +36,136 @@ public class UsuarioController : ControllerBase
     [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status401Unauthorized)]
     public IActionResult Login([FromBody] LoginDTO loginDto)
     {
-        var usuario = _usuarioServicio.IniciarSesionCliente(loginDto);
+        try
+        {
+            var usuario = _usuarioServicio.IniciarSesionCliente(loginDto);
 
-        if (usuario == null)
-            return Unauthorized(RespuestaApi<string>.Unauthorized("Credenciales inválidas."));
+            if (usuario == null)
+                return Unauthorized(RespuestaApi<string>.Unauthorized("Credenciales inválidas."));
 
-        var clave = _configuration["Jwt:Key"];
-        var token = GestionJWT.GenerarToken(usuario, clave);
-        usuario.Token = token;
+            var clave = _configuration["Jwt:Key"];
+            var token = GestionJWT.GenerarToken(usuario, clave);
+            usuario.Token = token;
 
-        return Ok(RespuestaApi<SesionDTO>.Ok(usuario));
+            return Ok(RespuestaApi<SesionDTO>.Ok(usuario));
+        }
+        catch (Exception e)
+        {
+            return Unauthorized(RespuestaApi<string>.Unauthorized(e.Message));
+        }
+        
+    }
+
+
+    private bool EsCliente(string rol) =>
+        string.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Obtiene la información básica del cliente autenticado.
+    /// </summary>
+    [Authorize]
+    [HttpGet("perfil")]
+    [ProducesResponseType(typeof(RespuestaApi<UsuarioGenericoDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]
+    public IActionResult ObtenerPerfil(int usuarioId, string rol)
+    {
+        if (!EsCliente(rol))
+            return StatusCode(403, RespuestaApi<string>.Forbidden());
+
+        try
+        {
+            var dto = _usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId,"Cliente");
+            return Ok(RespuestaApi<ClienteDTOAPI>.Ok(new MapeadorUsuario().MapearCiente(dto)));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(RespuestaApi<string>.BadRequest(ex.Message));
+        }
     }
 
     /// <summary>
-    /// Registra un nuevo cliente y devuelve su sesión con token.
+    /// Cambia el teléfono del cliente.
     /// </summary>
-    /// <param name="registro">Datos del nuevo cliente.</param>
-    /// <returns>Sesión con token si el registro fue exitoso.</returns>
-    /// <response code="200">Registro exitoso.</response>
-    /// <response code="400">Datos inválidos.</response>
-    /// <response code="409">Usuario o correo ya registrado.</response>
-    [HttpPost("registro")]
-    [ProducesResponseType(typeof(RespuestaApi<SesionDTO>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status409Conflict)]
-    public IActionResult Registro([FromBody] RegistroUsuarioDTO registro)
+    [Authorize]
+    [HttpPatch("{id}/telefono")]
+    [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]
+    public IActionResult CambiarTelefono(int id, string usuario, string telefonoNuevo, string rol)
     {
-        // Validaciones básicas
-        if (string.IsNullOrWhiteSpace(registro.Correo) ||
-            string.IsNullOrWhiteSpace(registro.Usuario) ||
-            string.IsNullOrWhiteSpace(registro.Pass) ||
-            string.IsNullOrWhiteSpace(registro.Confirmacion))
+        if (!EsCliente(rol))
+            return StatusCode(403, RespuestaApi<string>.Forbidden());
+
+        try
         {
-            return BadRequest(RespuestaApi<string>.BadRequest("Faltan campos obligatorios."));
+            _usuarioServicio.CambiarTelefono(id, usuario, telefonoNuevo);
+            return Ok(RespuestaApi<string>.Ok("Teléfono actualizado correctamente."));
         }
-
-        if (registro.Pass != registro.Confirmacion)
+        catch (Exception ex)
         {
-            return BadRequest(RespuestaApi<string>.BadRequest("Las contraseñas no coinciden."));
+            return BadRequest(RespuestaApi<string>.BadRequest(ex.Message));
         }
+    }
 
-        // Llamar al servicio
-        SesionDTO sesion = null; // _usuarioServicio.RegistrarCliente(registro);
+    /// <summary>
+    /// Cambia el correo del cliente.
+    /// </summary>
+    [Authorize]
+    [HttpPatch("{id}/correo")]
+    public IActionResult CambiarCorreo(int id, string usuario, string correoNuevo, string rol)
+    {
+        if (!EsCliente(rol))
+            return StatusCode(403, RespuestaApi<string>.Forbidden());
 
-        //falta implementar
-
-        if (sesion == null)
+        try
         {
-            return BadRequest(RespuestaApi<string>.BadRequest("El correo o nombre de usuario ya está en uso."));
+            _usuarioServicio.CambiarCorreo(id, usuario, correoNuevo);
+            return Ok(RespuestaApi<string>.Ok("Correo actualizado correctamente."));
         }
+        catch (Exception ex)
+        {
+            return BadRequest(RespuestaApi<string>.BadRequest(ex.Message));
+        }
+    }
 
-        var token = GestionJWT.GenerarToken(sesion, _configuration["Jwt:Key"]);
-        sesion.Token = token;
+    /// <summary>
+    /// Cambia el nombre del cliente.
+    /// </summary>
+    [Authorize]
+    [HttpPatch("{id}/nombre")]
+    public IActionResult CambiarNombre(int id, string usuario, string nombreNuevo, string rol)
+    {
+        if (!EsCliente(rol))
+            return StatusCode(403, RespuestaApi<string>.Forbidden());
 
-        return Ok(RespuestaApi<SesionDTO>.Ok(sesion, "Registro exitoso."));
+        try
+        {
+            _usuarioServicio.CambiarNombre(id, usuario, nombreNuevo);
+            return Ok(RespuestaApi<string>.Ok("Nombre actualizado correctamente."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(RespuestaApi<string>.BadRequest(ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Cambia la contraseña del cliente.
+    /// </summary>
+    [Authorize]
+    [HttpPatch("{id}/password")]
+    public IActionResult CambiarPass(int id, string usuario, string nuevaPassword, string confPassword, string rol)
+    {
+        if (!EsCliente(rol))
+            return StatusCode(403, RespuestaApi<string>.Forbidden());
+
+        try
+        {
+            _usuarioServicio.CambiarPass(id, usuario, nuevaPassword, confPassword);
+            return Ok(RespuestaApi<string>.Ok("Contraseña actualizada correctamente."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(RespuestaApi<string>.BadRequest(ex.Message));
+        }
     }
 }

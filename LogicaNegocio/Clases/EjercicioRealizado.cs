@@ -13,8 +13,14 @@ namespace LogicaNegocio.Clases
         public int Id { get; set; }
         public int SesionRutinaId { get; set; }
         public SesionRutina SesionRutina { get; set; }
-        public int EjercicioId { get; set; }
+        public int? EjercicioId { get; set; }
         public Ejercicio Ejercicio { get; set; }
+        // Datos históricos del ejercicio
+        public string NombreHistorial { get; set; }
+        public string TipoHistorial { get; set; }
+        public string GrupoMuscularHistorial { get; set; }
+        public string ImagenUrlHistorial { get; set; }
+        public string? InstruccionesHistorial { get; set; }
         public int? Orden { get; set; } 
         public bool SeRealizo { get; set; }
         public string? Observaciones { get; set; }

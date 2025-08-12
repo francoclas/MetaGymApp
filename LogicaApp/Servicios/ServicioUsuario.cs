@@ -25,24 +25,58 @@ namespace LogicaNegocio.Servicios
             repoProfesional = rPro;
             this.mediaServicio = mediaServicio;
         }
-        public void AgregarTelefono(string Usuario, string NumeroNuevo)
+        public void CambiarTelefono(int IdCliente, string Usuario, string NumeroNuevo)
         {
-            throw new NotImplementedException();
+            Cliente cliente = repoCliente.ObtenerPorId(IdCliente);
+
+            if (cliente == null || cliente.NombreUsuario != Usuario)
+                throw new Exception("Cliente no encontrado o usuario inválido.");
+
+            cliente.Telefono = NumeroNuevo;
+            repoCliente.Actualizar(cliente);
+            repoCliente.GuardarCambios();
         }
 
-        public void CambiarCorreo(string Usuario, string Correo)
+        public void CambiarCorreo(int IdCliente, string Usuario, string Correo)
         {
-            throw new NotImplementedException();
+            Cliente cliente = repoCliente.ObtenerPorId(IdCliente);
+
+            if (cliente == null || cliente.NombreUsuario != Usuario)
+                throw new Exception("Cliente no encontrado o usuario inválido.");
+            if(FuncionesAuxiliares.EsCorreoValido(Correo))
+                throw new Exception("Verifique el correo ingresado.");
+
+            cliente.Correo = Correo;
+            repoCliente.Actualizar(cliente);
+            repoCliente.GuardarCambios();
         }
 
-        public void CambiarNombre(string Usuario, string Nombre)
+        public void CambiarNombre(int IdCliente, string Usuario, string Nombre)
         {
-            throw new NotImplementedException();
+            Cliente cliente = repoCliente.ObtenerPorId(IdCliente);
+
+            if (cliente == null || cliente.NombreUsuario != Usuario)
+                throw new Exception("Cliente no encontrado o usuario inválido.");
+
+            cliente.NombreCompleto = Nombre;
+            repoCliente.Actualizar(cliente);
+            repoCliente.GuardarCambios();
         }
 
-        public void CambiarPass(string Usuario, string NuevaPassword, string ConfPassword)
+        public void CambiarPass(int IdCliente, string Usuario, string NuevaPassword, string ConfPassword)
         {
-            throw new NotImplementedException();
+            if (NuevaPassword != ConfPassword)
+                throw new Exception("Las contraseñas no coinciden.");
+            if (FuncionesAuxiliares.EsContrasenaValida(NuevaPassword))
+                throw new Exception("Pruebe con otra contraseña");
+
+            Cliente cliente = repoCliente.ObtenerPorId(IdCliente);
+            if (cliente == null || cliente.NombreUsuario != Usuario)
+                throw new Exception("Cliente no encontrado o usuario inválido.");
+
+            cliente.Pass = HashContrasena.Hashear(NuevaPassword);
+            repoCliente.Actualizar(cliente);
+            repoCliente.GuardarCambios();
         }
 
         public void CrearAdmin(string Ci, string Usuario,string NombreCompleto, string Correo,string Password, string Telefono)
@@ -237,6 +271,7 @@ namespace LogicaNegocio.Servicios
             {
                 Rol = "Cliente",
                 Id = cliente.Id,
+                Ci = cliente.CI,
                 Nombre = cliente.NombreCompleto,
                 Correo = cliente.Correo,
                 Medias = mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Cliente, cliente.Id),
