@@ -18,12 +18,11 @@ namespace LogicaNegocio.Interfaces.Servicios
         //Registro usuario
         void RegistrarCliente(ClienteDTO cliente);
         //Cambio de contraseña
-        void CambiarPass(string NombreUsuario, string NuevaPassword,string ConfPassword);
-
+        void CambiarPass(int IdCliente, string NombreUsuario, string NuevaPassword,string ConfPassword);
         //Modificar datos
-        void AgregarTelefono(string NombreUsuario, string NumeroNuevo);
-        void CambiarNombre(string NombreUsuario, string Nombre);
-        void CambiarCorreo(string NombreUsuario, string Correo);
+        void CambiarTelefono(int IdCliente,string NombreUsuario, string NumeroNuevo);
+        void CambiarNombre(int IdCliente, string NombreUsuario, string Nombre);
+        void CambiarCorreo(int IdCliente, string NombreUsuario, string Correo);
         void AsignarFotoFavorita(int mediaId, Extra.Enum_TipoEntidad tipo, int entidadId);
         //Acceso administrador
         void CrearAdmin(string Ci, string NombreUsuario,string NombreCompleto, string Correo, string Password,string Telefono);

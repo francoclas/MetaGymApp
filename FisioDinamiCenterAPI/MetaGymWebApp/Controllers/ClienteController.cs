@@ -12,7 +12,7 @@ using static LogicaNegocio.Interfaces.DTOS.EstablecimientoDTO;
 
 namespace MetaGymWebApp.Controllers
 {
-    [AutorizacionRol("Admin", "Cliente")]
+    [AutorizacionRol("Admin", "Cliente","Profesional")]
     public class ClienteController : Controller
     {
         private readonly IUsuarioServicio usuarioServicio;
@@ -200,33 +200,49 @@ namespace MetaGymWebApp.Controllers
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
             SesionRutina sesion = rutinaServicio.ObtenerSesionPorId(id);
-            var rutina = rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignada.RutinaId);
 
-            foreach (var er in sesion.EjerciciosRealizados)
+            // Si la rutina asignada existe, la traemos; si no, es snapshot
+            Rutina rutina = sesion.RutinaAsignada != null
+                ? rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignada.RutinaId)
+                : null;
+
+            if (rutina != null)
             {
-                er.Ejercicio = rutina.Ejercicios.FirstOrDefault(re => re.Ejercicio.Id == er.EjercicioId)?.Ejercicio;
+                // Vincular ejercicios reales solo si la rutina original existe
+                foreach (var er in sesion.EjerciciosRealizados)
+                {
+                    er.Ejercicio = rutina.Ejercicios
+                        .FirstOrDefault(re => re.Ejercicio.Id == er.EjercicioId)?.Ejercicio;
+                }
             }
 
             var dto = new SesionEntrenadaDTO
             {
-                NombreRutina = rutina.NombreRutina,
+                NombreRutina = rutina != null
+                    ? rutina.NombreRutina
+                    : sesion.NombreRutinaHistorial, // snapshot
                 FechaRealizada = sesion.FechaRealizada,
                 DuracionMin = sesion.DuracionMin,
                 Ejercicios = sesion.EjerciciosRealizados.Select(er => new EjercicioRealizadoDTO
                 {
-                    Nombre = er.Ejercicio.Nombre,
-                    Tipo = er.Ejercicio.Tipo,
-                    GrupoMuscular = er.Ejercicio.GrupoMuscular,
-                    ImagenURL = er.Ejercicio.Medias.FirstOrDefault()?.Url,
+                    Nombre = er.NombreHistorial,
+                    Tipo = er.TipoHistorial,
+                    GrupoMuscular = er.GrupoMuscularHistorial,
+
+                    ImagenURL = rutina != null
+                        ? er.Ejercicio?.Medias.FirstOrDefault()?.Url
+                        : er.ImagenUrlHistorial, // snapshot
+
                     Series = er.Series.Select(s => new SerieDTO
                     {
                         Repeticiones = s.Repeticiones,
                         PesoUtilizado = s.PesoUtilizado
                     }).ToList(),
+
                     Mediciones = er.ValoresMediciones.Select(vm => new MedicionDTO
                     {
-                        Nombre = vm.Medicion.Nombre,
-                        Unidad = vm.Medicion.Unidad,
+                        Nombre = vm.Medicion?.Nombre,  // si es snapshot, puede ser null
+                        Unidad = vm.Medicion?.Unidad,
                         Valor = vm.Valor
                     }).ToList()
                 }).ToList()
@@ -235,14 +251,27 @@ namespace MetaGymWebApp.Controllers
             return View(dto);
         }
 
+
         [HttpGet]
         public IActionResult HistoricoSesionesEntrenamiento()
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var sesiones = rutinaServicio.ObtenerHistorialClienteDTO(clienteId);
-            return View(sesiones);
-        }
 
+            var sesiones = rutinaServicio.ObtenerHistorialClienteDTO(clienteId);
+
+            var modeloOrdenado = sesiones
+                .OrderByDescending(s => s.FechaRealizada)
+                .ToList();
+
+            ViewBag.UltimaSesion = modeloOrdenado.FirstOrDefault();
+            ViewBag.PromedioDuracion = modeloOrdenado
+                .Where(s => s.DuracionMin.HasValue)
+                .Select(s => s.DuracionMin.Value)
+                .DefaultIfEmpty(0)
+                .Average();
+
+            return View(modeloOrdenado);
+        }
         //Ver detalles de ejercicio
         [HttpGet]
         public IActionResult InformacionEjercicio(int id)

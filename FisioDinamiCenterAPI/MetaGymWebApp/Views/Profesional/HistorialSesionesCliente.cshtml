@@ -43,7 +43,7 @@
                         <td>@sesion.FechaRealizada.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>@(sesion.DuracionMin?.ToString() ?? "-")</td>
                         <td>
-                            <a class="btn btn-sm btn-outline-info" asp-action="VerSesion" asp-route-id="@sesion.SesionRutinaId" target="_blank">Ver detalles</a>
+                            <a class="btn btn-sm btn-outline-info" asp-action="SesionEntrenada" asp-controller="Cliente" asp-route-id="@sesion.SesionRutinaId" target="_blank">Ver detalles</a>
                         </td>
                     </tr>
                 }

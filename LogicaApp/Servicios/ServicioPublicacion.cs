@@ -228,6 +228,17 @@ namespace LogicaApp.Servicios
             }
             return salida;
         }
+        public List<PublicacionDTO> ObtenerPublicacionesInicioAPI()
+        {
+            List<PublicacionDTO> salida = new List<PublicacionDTO>();
+            List<Publicacion> list = _repo.ObtenerAprobadasPublicas().OrderByDescending(p => p.FechaCreacion).ToList();
+
+            foreach (var item in list)
+            {
+                salida.Add(ConvertirAPublicacionDTOFiltroComentario(item));
+            }
+            return salida;
+        }
         public void DarLikePublicacion(int publicacionId, int usuarioId, string rol)
         {
             _repo.DarLike(publicacionId, usuarioId, rol);
@@ -272,6 +283,37 @@ namespace LogicaApp.Servicios
                 CantLikes = _repo.ContarLikes(pub.Id),
                 Comentarios = pub.Comentarios?
                     .Where(c => c.ComentarioPadreId == null)
+                    .Select(c => MapearComentario(c))
+                    .ToList() ?? new(),
+                MotivoRechazo = pub.MotivoRechazo,
+                NombreAprobador = pub.AdminAprobador?.NombreCompleto,
+                NombreCreadorAdmin = pub.AdminCreador?.NombreCompleto
+            };
+        }
+        private PublicacionDTO ConvertirAPublicacionDTOFiltroComentario(Publicacion pub)
+        {
+            var autorId = pub.ProfesionalId ?? pub.AdminCreadorId ?? 0;
+            var rolAutor = pub.Profesional != null ? Enum_TipoEntidad.Profesional : Enum_TipoEntidad.Admin;
+
+            return new PublicacionDTO
+            {
+                Id = pub.Id,
+                Titulo = pub.Titulo,
+                Descripcion = pub.Descripcion,
+                FechaCreacion = pub.FechaCreacion,
+                FechaProgramada = pub.FechaProgramada,
+                Estado = pub.Estado,
+                EsPrivada = pub.EsPrivada,
+                Vistas = pub.Vistas,
+                AutorId = autorId,
+                RolAutor = rolAutor.ToString(),
+                NombreAutor = pub.Profesional?.NombreCompleto ?? pub.AdminCreador?.NombreCompleto ?? "Desconocido",
+                ImagenAutorURL = mediaServicio.ObtenerFotoFavorita(rolAutor, autorId)?.Url,
+                UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new(),
+                Medias = pub.ListaMedia,
+                CantLikes = _repo.ContarLikes(pub.Id),
+                Comentarios = pub.Comentarios?
+                    .Where(c => c.ComentarioPadreId == null && c.EstaActivo)
                     .Select(c => MapearComentario(c))
                     .ToList() ?? new(),
                 MotivoRechazo = pub.MotivoRechazo,
@@ -346,5 +388,7 @@ namespace LogicaApp.Servicios
             }
             comentarioServicio.Actualizar(comentario);
         }
+
+       
     }
 }

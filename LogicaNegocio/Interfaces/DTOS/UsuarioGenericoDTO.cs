@@ -10,6 +10,7 @@ namespace LogicaNegocio.Interfaces.DTOS
     public class UsuarioGenericoDTO
     {
         public int Id { get; set; }
+        public string Ci { get; set; }
         public string Nombre { get; set; }
         public string Usuario { get; set; }
         public string Correo { get; set; }

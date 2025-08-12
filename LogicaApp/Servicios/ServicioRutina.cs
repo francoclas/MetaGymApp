@@ -11,10 +11,11 @@ using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Repositorios;
 using LogicaNegocio.Interfaces.Servicios;
+using Microsoft.EntityFrameworkCore;
 
 namespace LogicaApp.Servicios
 {
-    public class ServicioRutina : IRutinaServicio
+    public class ServicioRutina : IRutinaServicio 
     {
         private readonly IRepositorioRutina repositorioRutina;
         private readonly IRepositorioEjercicio repositorioEjercicio;
@@ -130,11 +131,6 @@ namespace LogicaApp.Servicios
             return MapeoEjercicioDTO(repositorioEjercicio.ObtenerPorProfesional(Id));
         }
 
-        public List<SesionRutina> ObtenerHistorialClienteDTO(int clienteId)
-        {
-            return repositorioRutina.ObtenerSesionesPorCliente(clienteId);
-        }
-
         public List<RutinaAsignada> ObtenerRutinasAsignadasCliente(int clienteId)
         {
             return repositorioRutina.ObtenerAsignacionesPorCliente(clienteId);
@@ -165,7 +161,7 @@ namespace LogicaApp.Servicios
             if (sesion == null)
                 throw new Exception("La sesión no puede ser nula");
 
-            var rutinaAsignada = repositorioRutina.ObtenerAsignacion(sesion.RutinaAsignadaId);
+            var rutinaAsignada = repositorioRutina.ObtenerAsignacion((int)sesion.RutinaAsignadaId);
             if (rutinaAsignada == null)
                 throw new Exception("No se encontró la rutina asignada");
 
@@ -175,17 +171,30 @@ namespace LogicaApp.Servicios
             if (sesion.EjerciciosRealizados == null || !sesion.EjerciciosRealizados.Any())
                 throw new Exception("Debe registrar al menos un ejercicio");
 
+            // Guardar snapshot de la rutina
+            sesion.NombreRutinaHistorial = rutinaAsignada.Rutina.NombreRutina;
+            sesion.TipoRutinaHistorial = rutinaAsignada.Rutina.Tipo;
+
             foreach (var ej in sesion.EjerciciosRealizados)
             {
+                var ejercicioOriginal = repositorioEjercicio.ObtenerPorId((int)ej.EjercicioId);
+                if (ejercicioOriginal == null)
+                    throw new Exception($"No se encontró el ejercicio con ID {ej.EjercicioId}");
+
+                // Copiar datos históricos del ejercicio
+                ej.NombreHistorial = ejercicioOriginal.Nombre;
+                ej.TipoHistorial = ejercicioOriginal.Tipo;
+                ej.GrupoMuscularHistorial = ejercicioOriginal.GrupoMuscular;
+                ej.InstruccionesHistorial = ejercicioOriginal.Instrucciones;
+                ej.ImagenUrlHistorial = ejercicioOriginal.Medias.FirstOrDefault()?.Url ?? "";
+
                 if (ej.SeRealizo)
                 {
                     if (ej.Series == null || !ej.Series.Any())
-                        throw new Exception($"El ejercicio {ej.EjercicioId} está marcado como realizado pero no tiene series");
+                        throw new Exception($"El ejercicio {ejercicioOriginal.Nombre} está marcado como realizado pero no tiene series");
 
                     // Validación de mediciones obligatorias
-                    var ejercicioOriginal = repositorioEjercicio.ObtenerPorId(ej.EjercicioId);
                     var obligatorias = ejercicioOriginal.Mediciones.Where(m => m.EsObligatoria).ToList();
-
                     foreach (var ob in obligatorias)
                     {
                         if (!ej.ValoresMediciones.Any(vm => vm.MedicionId == ob.Id && !string.IsNullOrWhiteSpace(vm.Valor)))
@@ -196,6 +205,11 @@ namespace LogicaApp.Servicios
 
             sesion.FechaRealizada = DateTime.Now;
             return repositorioRutina.RegistrarSesion(sesion);
+        }
+
+        public void ActualizarEjerciciosRutina(Rutina rutina, List<int> nuevosIds)
+        {
+            repositorioRutina.ActualizarRutina(rutina, nuevosIds);
         }
         public List<SesionRutina> ObtenerSesionesPorAsignacion(int rutinaAsignadaId)
         {
@@ -269,12 +283,71 @@ namespace LogicaApp.Servicios
 
             return dto;
         }
+        public List<SesionEntrenadaDTO> ObtenerHistorialClienteDTO(int clienteId)
+        {
+            List<SesionEntrenadaDTO> salida = new List<SesionEntrenadaDTO>();
 
+            foreach (var sesion in repositorioRutina.ObtenerSesionesPorCliente(clienteId))
+            {
+                var aux = new SesionEntrenadaDTO
+                {
+                    SesionRutinaId = sesion.Id,
+                    NombreCliente = sesion.Cliente.NombreCompleto,
+                    NombreRutina = sesion.RutinaAsignada != null
+                        ? sesion.RutinaAsignada.Rutina.NombreRutina
+                        : sesion.NombreRutinaHistorial,
+                    FechaRealizada = sesion.FechaRealizada,
+                    DuracionMin = sesion.DuracionMin
+                };
+
+                if (!salida.Any(x => x.SesionRutinaId == aux.SesionRutinaId))
+                    salida.Add(aux);
+            }
+
+            return salida;
+        }
         public string ObtenerNombreRutina(int idRutina)
         {
             Rutina salida = repositorioRutina.ObtenerPorId(idRutina);
 
             return salida.NombreRutina;
+        }
+
+        public List<SesionRutina> ObtenerSesionesCliente(int clienteId)
+        {
+            return repositorioRutina.ObtenerSesionesPorCliente(clienteId);
+        }
+
+        public SesionEntrenadaDTO ObtenerSesionEntrenamiento(int sesionId)
+        {
+            SesionRutina sesion = repositorioRutina.ObtenerSesionPorId(sesionId);
+            SesionEntrenadaDTO dto = new SesionEntrenadaDTO
+            {
+                NombreRutina =  sesion.NombreRutinaHistorial,
+                FechaRealizada = sesion.FechaRealizada,
+                DuracionMin = sesion.DuracionMin,
+                Ejercicios = sesion.EjerciciosRealizados.Select(er => new EjercicioRealizadoDTO
+                {
+                    Nombre = er.NombreHistorial,
+                    Tipo = er.TipoHistorial,
+                    GrupoMuscular = er.GrupoMuscularHistorial,
+
+                    ImagenURL = er.ImagenUrlHistorial, // snapshot
+                    Series = er.Series.Select(s => new SerieDTO
+                    {
+                        Repeticiones = s.Repeticiones,
+                        PesoUtilizado = s.PesoUtilizado
+                    }).ToList(),
+
+                    Mediciones = er.ValoresMediciones.Select(vm => new MedicionDTO
+                    {
+                        Nombre = vm.Medicion?.Nombre,  // si es snapshot, puede ser null
+                        Unidad = vm.Medicion?.Unidad,
+                        Valor = vm.Valor
+                    }).ToList()
+                }).ToList()
+            };
+            return dto;
         }
     }
 }

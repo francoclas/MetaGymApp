@@ -21,7 +21,7 @@ public static class GestionJWT
                 new Claim(ClaimTypes.NameIdentifier, usuario.UsuarioId.ToString()),
                 new Claim(ClaimTypes.Name, usuario.Nombre),
             }),
-            Expires = DateTime.UtcNow.AddHours(2),
+            Expires = DateTime.UtcNow.AddDays(31),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(clave),
                 SecurityAlgorithms.HmacSha256Signature)

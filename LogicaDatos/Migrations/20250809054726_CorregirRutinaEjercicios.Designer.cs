@@ -4,6 +4,7 @@ using LogicaDatos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LogicaDatos.Migrations
 {
     [DbContext(typeof(DbContextApp))]
-    partial class DbContextAppModelSnapshot : ModelSnapshot
+    [Migration("20250809054726_CorregirRutinaEjercicios")]
+    partial class CorregirRutinaEjercicios
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -293,23 +296,8 @@ namespace LogicaDatos.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("EjercicioId")
+                    b.Property<int>("EjercicioId")
                         .HasColumnType("int");
-
-                    b.Property<string>("GrupoMuscularHistorial")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImagenUrlHistorial")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InstruccionesHistorial")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NombreHistorial")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Observaciones")
                         .HasColumnType("nvarchar(max)");
@@ -322,10 +310,6 @@ namespace LogicaDatos.Migrations
 
                     b.Property<int>("SesionRutinaId")
                         .HasColumnType("int");
-
-                    b.Property<string>("TipoHistorial")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -832,16 +816,8 @@ namespace LogicaDatos.Migrations
                     b.Property<DateTime>("FechaRealizada")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("NombreRutinaHistorial")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("RutinaAsignadaId")
+                    b.Property<int>("RutinaAsignadaId")
                         .HasColumnType("int");
-
-                    b.Property<string>("TipoRutinaHistorial")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1065,7 +1041,8 @@ namespace LogicaDatos.Migrations
                     b.HasOne("LogicaNegocio.Clases.Ejercicio", "Ejercicio")
                         .WithMany()
                         .HasForeignKey("EjercicioId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("LogicaNegocio.Clases.SesionRutina", "SesionRutina")
                         .WithMany("EjerciciosRealizados")
@@ -1244,7 +1221,7 @@ namespace LogicaDatos.Migrations
                     b.HasOne("LogicaNegocio.Clases.Rutina", "Rutina")
                         .WithMany("Asignaciones")
                         .HasForeignKey("RutinaId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cliente");
@@ -1257,7 +1234,7 @@ namespace LogicaDatos.Migrations
                     b.HasOne("LogicaNegocio.Clases.Ejercicio", "Ejercicio")
                         .WithMany("RutinaEjercicios")
                         .HasForeignKey("EjercicioId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("LogicaNegocio.Clases.Rutina", "Rutina")
@@ -1282,7 +1259,8 @@ namespace LogicaDatos.Migrations
                     b.HasOne("LogicaNegocio.Clases.RutinaAsignada", "RutinaAsignada")
                         .WithMany("Sesiones")
                         .HasForeignKey("RutinaAsignadaId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Cliente");
 

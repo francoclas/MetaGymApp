@@ -14,6 +14,6 @@ namespace LogicaNegocio.Interfaces.DTOS
         public string Tipo { get; set; }
         public DateTime FechaCreacion { get; set; }
         public DateTime UltimaModificacion { get; set; }
-        List<Ejercicio> Ejercicios { get; set; }
+        public List<EjercicioDTO> Ejercicios { get; set; }
     }
 }
