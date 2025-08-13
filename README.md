@@ -1,0 +1,2 @@
+Aplicación Web desarrollada como parte del Proyecto Integrador de la carrera Analista Programador en ORT Uruguay. El sistema está pensado para digitalizar y mejorar la gestión de turnos, rutinas de rehabilitación, publicaciones y comunicación entre profesionales y pacientes/Clientes de MetaGym Uy.
+Las tecnologias utilizadas para este proyecto son: ASP.NET COre 7 y Entity Framework core para el backend. ASP.NET Razor MVC en conjunto con BOostrap 5 y Javascript para la aplicacion web. Se utilizo SQL Server Express para la base de datos.
