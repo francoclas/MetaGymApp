@@ -17,7 +17,8 @@ namespace LogicaApp.Servicios
     {
         private readonly IRepositorioCita repositorioCita;
         private readonly IRepositorioExtra repositorioExtra;
-        public ServicioCita(IRepositorioCita repocita,IRepositorioExtra repoex) { 
+        public ServicioCita(IRepositorioCita repocita, IRepositorioExtra repoex)
+        {
             repositorioCita = repocita;
             repositorioExtra = repoex;
         }
@@ -83,7 +84,8 @@ namespace LogicaApp.Servicios
             TipoAtencion tipoAtencionAux = repositorioExtra.ObtenerTipoAtencionId(cita.TipoAtencionId);
 
             // Crea la nueva cita con estado EnEspera y sin profesional asignado
-            Cita Nueva = new Cita{
+            Cita Nueva = new Cita
+            {
                 ClienteId = cita.ClienteId,
                 Especialidad = especialidadAux,
                 Profesional = null,
@@ -176,7 +178,7 @@ namespace LogicaApp.Servicios
             return Salida;
         }
         public List<Cita> SolicitarHistorialProfesional(int profesionalID)
-        {  
+        {
             List<Cita> Salida = repositorioCita.ObtenerPorProfesional(profesionalID);
             return Salida;
         }
@@ -242,6 +244,68 @@ namespace LogicaApp.Servicios
             };
             CrearCita(nueva);
         }
-    }
 
+        public List<CitaDTO> ObtenerCitasClientes(int clienteId, int estadoCita)
+        {
+            List<Cita> aux = repositorioCita.ObtenerPorCliente(clienteId);
+            List<CitaDTO> Salida = new List<CitaDTO>();
+            foreach (Cita cita in aux)
+            {
+                if (cita.Estado == (EstadoCita)estadoCita)
+                {
+                    Salida.Add(new CitaDTO
+                    {
+                        CitaId = cita.Id,
+                        ClienteId = clienteId,
+                        Cliente = cita.Cliente,
+                        Estado = cita.Estado,
+                        EspecialidadId = cita.EspecialidadId,
+                        Especialidad = cita.Especialidad,
+                        TipoAtencion = cita.TipoAtencion,
+                        Establecimiento = cita.Establecimiento,
+                        Descripcion = cita.Descripcion,
+                        FechaAsistencia = (DateTime)cita.FechaAsistencia,
+                        FechaCreacion = cita.FechaCreacion,
+                        FechaFinalizacion = cita.FechaFinalizacion,
+                        Conclusion = cita.Conclusion,
+                        NombreProfesional = cita.Profesional.NombreCompleto,
+                        TelefonoProfesional = cita.Profesional.Telefono
+                        
+
+                        
+                    });
+                }
+
+            }
+            return Salida;
+        }
+
+        public CitaDTO ObtenerDetallesCita(int citaId)
+        {
+            Cita au = repositorioCita.ObtenerPorId(citaId);
+            if (au == null) { throw new Exception("La cita no existe o se elimino."); }
+            CitaDTO salida = new CitaDTO
+            {
+                CitaId = citaId,
+                Cliente = au.Cliente,
+                Estado = au.Estado,
+                Especialidad = au.Especialidad,
+                TipoAtencion = au.TipoAtencion,
+                Establecimiento = au.Establecimiento,
+                Descripcion = au.Descripcion,
+                FechaCreacion = (DateTime)au.FechaCreacion,
+                ProfesionalId = au.ProfesionalId,
+                NombreProfesional = au.Profesional.NombreCompleto,
+                TelefonoProfesional = au.Profesional.Telefono
+            };
+
+            if (au.FechaFinalizacion != null)
+                salida.FechaFinalizacion = au.FechaFinalizacion;
+            if (au.FechaAsistencia != null)
+                au.FechaAsistencia = au.FechaAsistencia;
+
+            return salida;
+        }
+
+    }
 }

@@ -198,6 +198,7 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult SesionEntrenada(int id)
         {
+            int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
             SesionRutina sesion = rutinaServicio.ObtenerSesionPorId(id);
 
             // Si la rutina asignada existe, la traemos; si no, es snapshot
@@ -255,9 +256,6 @@ namespace MetaGymWebApp.Controllers
         public IActionResult HistoricoSesionesEntrenamiento()
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            List<SesionRutina> sesiones = rutinaServicio.ObtenerSesionesCliente(clienteId);
-            return View(sesiones);
-        }
 
             var sesiones = rutinaServicio.ObtenerHistorialClienteDTO(clienteId);
 

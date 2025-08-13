@@ -27,6 +27,7 @@ namespace LogicaApp.DTOS
         public DateTime? FechaFinalizacion { get; set; }
         public int? ProfesionalId { get; set; }
         public string NombreProfesional { get; set; }
+        public string TelefonoProfesional { get; set; }
         public string? Conclusion { get; set; }
     }
 }

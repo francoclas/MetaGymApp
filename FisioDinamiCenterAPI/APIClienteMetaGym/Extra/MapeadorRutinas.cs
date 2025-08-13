@@ -1,4 +1,5 @@
 ﻿using LogicaNegocio.Clases;
+using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 
 namespace APIClienteMetaGym.Extra
@@ -49,5 +50,6 @@ namespace APIClienteMetaGym.Extra
 
             return medis;
         }
+      
     }
 }

@@ -36,5 +36,9 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<Cita> BuscarSolicitudesSegunTiposAtencion(List<int> tiposAtencionId);
         void ActualizarEntidad(Cita cita);
         void RegistrarCitaPorProfesional(CitaDTO cita);
+        //Api
+
+        List<CitaDTO> ObtenerCitasClientes(int clienteId, int estadoCita);
+        CitaDTO ObtenerDetallesCita(int citaId);
     }
 }

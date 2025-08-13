@@ -29,8 +29,6 @@ public class UsuarioController : ControllerBase
     /// </summary>
     /// <param name="loginDto">DTO con usuario/correo y contraseña.</param>
     /// <returns>Sesión del cliente con token JWT si las credenciales son válidas.</returns>
-    /// <response code="200">Login exitoso.</response>
-    /// <response code="401">Credenciales incorrectas.</response>
     [HttpPost("login")]
     [ProducesResponseType(typeof(RespuestaApi<SesionDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status401Unauthorized)]
