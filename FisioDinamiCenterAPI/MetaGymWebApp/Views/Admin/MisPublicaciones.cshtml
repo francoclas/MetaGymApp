@@ -5,7 +5,9 @@
 <link rel="stylesheet" href="~/css/admin/misPublicacionesAdmin.css" />
 
 <h2 class="text-white">Mis Publicaciones</h2>
-
+<div>
+    <a href="/Admin/CrearPublicacion" class="btn btn btn-outline-success mb-3">Nueva publicacion</a>
+</div>
 <ul class="nav nav-tabs mt-4" id="tabsPublicaciones">
     <li class="nav-item">
         <a class="nav-link active" data-tab="creadas">Creadas</a>
@@ -28,8 +30,11 @@
                     <div class="card card-publicacion">
                         <div class="card-body">
                             <h5 class="card-title">@pub.Titulo</h5>
+                            <span>Fecha publicacion: @pub.FechaCreacion</span>
                             <p class="card-text">@pub.Descripcion</p>
+                            <hr />
                             <a href="@Url.Action("DetallesPublicacion", "Admin", new { id = pub.Id })" class="btn btn-outline-light btn-sm">Ver detalles</a>
+                            <a href="@Url.Action("EditarPublicacion", "Admin", new { id = pub.Id })" class="btn-outline-warning btn-sm">Editar publicacion</a>
                         </div>
                     </div>
                 }
@@ -52,6 +57,7 @@
                             <h5 class="card-title">@pub.Titulo</h5>
                             <p class="card-text">@pub.Descripcion</p>
                             <a href="@Url.Action("DetallesPublicacion", "Admin", new { id = pub.Id })" class="btn btn-outline-light btn-sm">Ver detalles</a>
+                            <a href="@Url.Action("EditarPublicacion", "Admin", new { id = pub.Id })" class="btn-outline-warning btn-sm">Editar publicacion</a>
                         </div>
                     </div>
                 }

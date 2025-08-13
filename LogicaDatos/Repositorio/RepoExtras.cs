@@ -46,7 +46,9 @@ namespace LogicaDatos.Repositorio
 
         public List<Especialidad> ListarEspecialidades()
         {
-            return _context.Especialidades.ToList();
+            return _context.Especialidades
+                .Include(e => e.TiposAtencion)
+                .ToList();
         }
 
         public List<Establecimiento> ListarEstablecimientos()
@@ -77,6 +79,55 @@ namespace LogicaDatos.Repositorio
         public void GuardarCambios()
         {
             _context.SaveChanges();
+        }
+        public void CrearTipoAtencion(TipoAtencion tipo)
+        {
+            _context.Add(tipo);
+            _context.SaveChanges();
+        }
+
+        public List<TipoAtencion> ObtenerTiposAtencionPorEspecialidad(int especialidadId)
+        {
+            return _context.TipoAtenciones
+                .Where(t => t.EspecialidadId == especialidadId)
+                .ToList();
+        }
+        public List<TipoAtencion> ObtenerTiposAtencionPorEspecialidades(List<int> especialidadIds)
+        {
+            return _context.TipoAtenciones
+                .Where(t => especialidadIds.Contains(t.EspecialidadId))
+                .ToList();
+        }
+        public TipoAtencion ObtenerTipoPorId(int id)
+        {
+            return _context.TipoAtenciones.Find(id);
+        }
+        public List<TipoAtencion> ObtenerTiposAtencionPorIds(List<int> ids)
+        {
+            return _context.TipoAtenciones
+                .Where(t => ids.Contains(t.Id))
+                .ToList();
+        }
+
+        public List<TipoAtencion> ObtenerTiposAtencionTodos()
+        {
+            return _context.TipoAtenciones
+                .Include(t => t.Especialidad)
+                .ToList();
+
+        }
+        public List<TipoAtencion> ObtenerTiposAtencionPorProfesional(int profesionalId)
+        {
+            return _context.TipoAtenciones
+                .Include(t => t.Especialidad)
+                .Where(t => t.Especialidad.Profesionales.Any(p => p.Id == profesionalId))
+                .ToList();
+        }
+        public TipoAtencion ObtenerTipoAtencionId(int? tipoAtencionId)
+        {
+            return _context.TipoAtenciones
+                .Include(t => t.Especialidad)
+                .FirstOrDefault(ta => ta.Id == tipoAtencionId);
         }
     }
 }

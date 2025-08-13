@@ -14,7 +14,10 @@ namespace LogicaNegocio.Interfaces.Repositorios
         void Agregar(Comentario comentario);
         void ActualizarContenido(int comentarioId, string nuevoContenido);
         void Desactivar(int comentarioId);
-        void IncrementarLikes(int comentarioId);
-        void DecrementarLikes(int comentarioId);
+        bool UsuarioYaDioLike(int comentarioId, int usuarioId, string rol);
+        void DarLike(int comentarioId, int usuarioId, string rol);
+        void QuitarLike(int comentarioId, int usuarioId, string rol);
+        int ContarLikes(int comentarioId);
+        void Actualizar(Comentario comentario);
     }
-}
+    }

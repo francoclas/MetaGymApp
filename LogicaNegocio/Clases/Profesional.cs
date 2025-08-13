@@ -17,17 +17,27 @@ namespace LogicaNegocio.Clases
         public string Pass { get; set; }
         public string Correo { get; set; }
         public string Telefono { get; set; }
+        public bool UsuarioActivo { get; set; } = true;
+
         public Profesional() { }
 
         //Relaciones
+        //atencion citas
+        public List<TipoAtencion> TiposAtencion { get; set; } = new List<TipoAtencion>();
         public List<Especialidad> Especialidades { get; set; } = new List<Especialidad>();
+        public List<AgendaProfesional> Agendas { get; set; } = new List<AgendaProfesional>();
         public List<Cita> Citas { get; set; } = new List<Cita>();
-        public List<Rutina> Rutinas { get; set; } = new List<Rutina>();
-        public List<Publicacion> Publicaciones { get; set; } = new List<Publicacion>();
+        //Rutinas y ejercicios
         public List<Ejercicio> Ejercicios { get; set; } = new List<Ejercicio>();
+        public List<Rutina> Rutinas { get; set; } = new List<Rutina>();
+        //Publicaciones y multimedia
+        public List<Publicacion> Publicaciones { get; set; } = new List<Publicacion>();
         public List<Media> FotosPerfil { get; set; } = new List<Media>();
-
+        public List<Notificacion> Notificaciones { get; set; } = new List<Notificacion>();
         public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
+        //Interacciones
+        public List<LikePublicacion> LikesPublicaciones { get; set; } = new();
+        public List<LikeComentario> LikesComentarios { get; set; } = new();
         public Profesional(string ci, string nombreusuario, string nombreCompleto, string pass, string correo, string telefono)
         {
             this.NombreUsuario = nombreusuario;

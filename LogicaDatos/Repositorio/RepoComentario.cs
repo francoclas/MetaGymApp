@@ -69,24 +69,53 @@ namespace LogicaDatos.Repositorio
             }
         }
 
-        public void IncrementarLikes(int comentarioId)
+        public bool UsuarioYaDioLike(int comentarioId, int usuarioId, string rol)
         {
-            var comentario = _context.Comentarios.Find(comentarioId);
-            if (comentario != null)
+            return _context.LikeComentarios.Any(l =>
+                l.ComentarioId == comentarioId &&
+                l.UsuarioId == usuarioId &&
+                l.TipoUsuario == rol);
+        }
+
+        public void DarLike(int comentarioId, int usuarioId, string rol)
+        {
+            if (!UsuarioYaDioLike(comentarioId, usuarioId, rol))
             {
-                comentario.CantLikes++;
+                _context.LikeComentarios.Add(new LikeComentario
+                {
+                    ComentarioId = comentarioId,
+                    UsuarioId = usuarioId,
+                    TipoUsuario = rol,
+                    Fecha = DateTime.Now
+                });
+
+                var comentario = _context.Comentarios.Find(comentarioId);
+
                 _context.SaveChanges();
             }
         }
 
-        public void DecrementarLikes(int comentarioId)
+        public void QuitarLike(int comentarioId, int usuarioId, string rol)
         {
-            var comentario = _context.Comentarios.Find(comentarioId);
-            if (comentario != null && comentario.CantLikes > 0)
+            var like = _context.LikeComentarios.FirstOrDefault(l =>
+                l.ComentarioId == comentarioId &&
+                l.UsuarioId == usuarioId &&
+                l.TipoUsuario == rol);
+
+            if (like != null)
             {
-                comentario.CantLikes--;
+                _context.LikeComentarios.Remove(like);
                 _context.SaveChanges();
             }
+        }
+        public int ContarLikes(int comentarioId)
+        {
+            return _context.LikeComentarios.Count(l => l.ComentarioId == comentarioId);
+        }
+
+        public void Actualizar(Comentario comentario)
+        {
+            _context.SaveChanges();
         }
     }
 }

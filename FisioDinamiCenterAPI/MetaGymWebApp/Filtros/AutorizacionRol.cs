@@ -22,6 +22,10 @@ namespace MetaGymWebApp.Filtros
             if (string.IsNullOrEmpty(sesionJson))
             {
                 // Redirige al login si no hay sesión
+                var factory = context.HttpContext.RequestServices.GetService<ITempDataDictionaryFactory>();
+                var tempData = factory.GetTempData(context.HttpContext);
+                tempData["Mensaje"] = "Tu sesión ha expirado. Por favor iniciá sesión nuevamente.";
+                tempData["TipoMensaje"] = "danger";
                 context.Result = new RedirectToActionResult("Login", "Home", null);
                 return;
             }

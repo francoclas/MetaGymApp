@@ -1,0 +1,49 @@
+﻿@using LogicaApp.DTOS
+@using LogicaNegocio.Extra
+@model CitaDTO
+
+<div class="container mt-4 bg-dark border rounded py-4 text-white">
+    <h2 class="mb-4">🛠️ Editar Cita</h2>
+
+    <form asp-action="EditarCita" method="post">
+        <input type="hidden" asp-for="CitaId" />
+        <input type="hidden" asp-for="EstablecimientoId" />
+        <div class="mb-3">
+            <label class="form-label">📅 Fecha y hora:</label>
+            <input asp-for="FechaAsistencia" type="datetime-local" class="form-control" />
+            <span asp-validation-for="FechaAsistencia" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">📝 Descripción:</label>
+            <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Descripcion" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">⚕️ Tipo de atención:</label>
+            <select asp-for="TipoAtencionId" class="form-select" asp-items="ViewBag.TiposAtencion"></select>
+            <span asp-validation-for="TipoAtencionId" class="text-danger"></span>
+        </div>
+        <hr />
+        <div class="form-group mb-3">
+            <label for="Estado">📌 Estado de la cita:</label>
+            <select asp-for="Estado" class="form-control">
+                <option value="@EstadoCita.Aceptada">Aceptada</option>
+                <option value="@EstadoCita.Finalizada">Finalizada</option>
+                <option value="@EstadoCita.Cancelada">Cancelada</option>
+                <option value="@EstadoCita.NoAsistio">No Asistió</option>
+                <option value="@EstadoCita.Rechazada">Rechazada</option>
+            </select>
+        </div>
+        <div class="form-group mb-3">
+            <label for="Conclusion">🧾 Conclusión:</label>
+            <textarea asp-for="Conclusion" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Conclusion" class="text-danger"></span>
+        </div>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+            <a href="@Url.Action("GestionCitas", "Profesional")" class="btn btn-outline-light">Cancelar</a>
+        </div>
+    </form>
+</div>

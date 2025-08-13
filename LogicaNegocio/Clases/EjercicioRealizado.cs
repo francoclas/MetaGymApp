@@ -11,17 +11,21 @@ namespace LogicaNegocio.Clases
     public class EjercicioRealizado
     {
         public int Id { get; set; }
-
         public int SesionRutinaId { get; set; }
         public SesionRutina SesionRutina { get; set; }
-
-        public int EjercicioId { get; set; }
+        public int? EjercicioId { get; set; }
         public Ejercicio Ejercicio { get; set; }
-
-        public int? Orden { get; set; } // opcional si querés preservar el orden
+        // Datos históricos del ejercicio
+        public string NombreHistorial { get; set; }
+        public string TipoHistorial { get; set; }
+        public string GrupoMuscularHistorial { get; set; }
+        public string ImagenUrlHistorial { get; set; }
+        public string? InstruccionesHistorial { get; set; }
+        public int? Orden { get; set; } 
         public bool SeRealizo { get; set; }
         public string? Observaciones { get; set; }
-
         public List<SerieRealizada> Series { get; set; } = new();
+        //Solicitados por profesional
+        public List<ValorMedicion> ValoresMediciones { get; set; } = new();
     }
 }

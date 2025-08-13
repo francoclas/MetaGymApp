@@ -6,31 +6,39 @@
     <h2>Mis rutinas</h2>
 
     <div class="mb-3 d-flex justify-content-between">
-        <a href="@Url.Action("RegistrarRutina", "Profesional")" class="btn btn-success">+ Generar nueva rutina</a>
-        <a href="@Url.Action("GestionEjercicios", "Profesional")" class="btn btn-success"> - Mis ejercicios</a>
-        <a href="@Url.Action("RegistrarEjercicio", "Profesional")" class="btn btn-secondary">+ Generar nuevo ejercicio</a>
+        <a href="@Url.Action("RegistrarRutina", "Profesional")" class="btn btn-secondary">➕ Generar nueva rutina</a>
+        <a href="@Url.Action("GestionEjercicios", "Profesional")" class="btn btn-secondary">➖ Mis ejercicios</a>
+        <a href="@Url.Action("RegistrarEjercicio", "Profesional")" class="btn btn-secondary">➕ Generar nuevo ejercicio</a>
+        <a href="@Url.Action("BuscarHistorialClientes", "Profesional")" class="btn btn-secondary">Buscar historial de entrenamiento clientes</a>
     </div>
-
 
     <hr />
 
-    @foreach (var rutina in Model)
+    @if (Model == null || !Model.Any())
     {
-        <div class="card mb-3 rutina-item">
-            <div class="card-body">
-                <strong class="nombre">@rutina.NombreRutina</strong><br />
-                <span class="tipo">Tipo: @rutina.Tipo</span><br />
-                <small class="text-muted">Última modificación: @rutina.UltimaModificacion.ToShortDateString()</small>
-                <div class="mt-2">
-                    <a href="@Url.Action("EditarRutina", "Profesional", new { id = rutina.Id })" class="btn btn-secondary btn-sm">Modificar / Gestionar clientes</a>
-                </div>
-            </div>
+        <div class="p-4 rounded border text-center">
+            <h5 class="text-muted">Aún no has generado ninguna rutina.</h5>
+            <p>Podés comenzar creando una rutina desde el botón <strong>+ Generar nueva rutina</strong>.</p>
         </div>
     }
-    </div>
+    else
+    {
+        foreach (var rutina in Model)
+        {
+            <div class="card mb-3 rutina-item">
+                <div class="card-body">
+                    <strong class="nombre">@rutina.NombreRutina</strong><br />
+                    <span class="tipo">Tipo: @rutina.Tipo</span><br />
+                    <small class="text-muted">Última modificación: @rutina.UltimaModificacion.ToShortDateString()</small>
+                    <div class="mt-2">
+                        <a href="@Url.Action("EditarRutina", "Profesional", new { id = rutina.Id })" class="btn btn-secondary btn-sm">Modificar / Gestionar clientes</a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
 
 @section Scripts {
-    <script src="~/js/profesional/gestionRutina.js">
-
-    </script>
+    <script src="~/js/profesional/gestionRutina.js"></script>
 }

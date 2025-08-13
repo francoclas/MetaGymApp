@@ -15,11 +15,14 @@ namespace MetaGymWebApp.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IUsuarioServicio _usuarioServicio;
         private readonly IMediaServicio _mediaServicio;
-        public HomeController(ILogger<HomeController> logger,IUsuarioServicio usuario, IMediaServicio mediaServicio)
+        private readonly INotificacionServicio notificacionServicio;
+        public HomeController(ILogger<HomeController> logger,IUsuarioServicio usuario, IMediaServicio mediaServicio,INotificacionServicio notificacion)
         {
             _logger = logger;
             _usuarioServicio = usuario;
             _mediaServicio = mediaServicio;
+            notificacionServicio = notificacion;
+
         }
 
         public IActionResult Index()
@@ -37,11 +40,6 @@ namespace MetaGymWebApp.Controllers
             return View("~/Views/Legal/TerminosUso.cshtml");
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
         [HttpGet]
         public IActionResult Login()
         {
@@ -84,8 +82,6 @@ namespace MetaGymWebApp.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return View();
                 if (cliente.Password != cliente.ConfPass)
                 {
                     throw new Exception("La confirmacion no coincide.");
@@ -170,6 +166,13 @@ namespace MetaGymWebApp.Controllers
             string rol = GestionSesion.ObtenerRol(HttpContext);
 
             UsuarioGenericoDTO dto = _usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId, rol);
+            dto.Notificaciones = notificacionServicio.ObtenerPorUsuario(usuarioId,rol);
+            List<string> tipos = new List<string>();
+            foreach (var item in Enum.GetValues(typeof(Enum_TipoNotificacion)))
+            {
+                tipos.Add(item.ToString());
+            }
+            ViewBag.TiposNotificacion = tipos; ;
             return View(dto);
         }
         [HttpGet]

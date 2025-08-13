@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
+using LogicaDatos.Migrations;
 
 namespace LogicaDatos
 {
@@ -21,6 +22,8 @@ namespace LogicaDatos
         public DbSet<Admin> Administradores { get; set; }
         //Citas
         public DbSet<Cita> Citas { get; set; }
+        public DbSet<TipoAtencion> TipoAtenciones { get; set; }
+        public DbSet<AgendaProfesional> AgendaProfesionales { get; set; }
         //Ejercicios
         public DbSet<Ejercicio> Ejercicios { get; set; }
         public DbSet<Rutina> Rutinas { get; set; }  
@@ -29,18 +32,23 @@ namespace LogicaDatos
         public DbSet<SesionRutina> SesionesRutina { get; set; }          
         public DbSet<EjercicioRealizado> EjercicioRealizadosPorClientes { get; set; }
         public DbSet<SerieRealizada> SeriesParaEjerciciosDeCliente { get; set; }
-
+        public DbSet<Medicion> Mediciones { get; set; }
+        public DbSet<ValorMedicion> MedicionesEjercicio { get; set; }
         //Publicaciones
         public DbSet<Publicacion> Publicaciones { get; set; }
         public DbSet<Comentario> Comentarios { get; set; }
+        public DbSet<LikePublicacion> LikePublicaciones { get; set; }
+        public DbSet<LikeComentario> LikeComentarios { get; set; }
+
         //Extras
         public DbSet<Especialidad> Especialidades { get; set; }
         public DbSet<Establecimiento> Establecimientos { get; set; }
         //Imagenes y video
         public DbSet<Media> Medias { get; set; }
+        //Notificaciones 
+        public DbSet<Notificacion> Notificaciones { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             //Enum de estadocitas
             modelBuilder.Entity<Cita>()
            .Property(c => c.Estado)
@@ -65,15 +73,98 @@ namespace LogicaDatos
                 .WithMany()
                 .HasForeignKey(p => p.AdminCreadorId)
                 .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<Publicacion>()
                 .HasOne(p => p.AdminAprobador)
                 .WithMany()
                 .HasForeignKey(p => p.AdminAprobadorId)
                 .OnDelete(DeleteBehavior.Restrict);
+            //Interacciones
+            modelBuilder.Entity<LikePublicacion>()
+                .HasOne(lp => lp.Publicacion)
+                .WithMany(p => p.Likes)
+                .HasForeignKey(lp => lp.PublicacionId);
+     
+            modelBuilder.Entity<LikeComentario>()
+                .HasOne(lc => lc.Comentario)
+                .WithMany(c => c.Likes)
+                .HasForeignKey(lc => lc.ComentarioId);
+            modelBuilder.Entity<ValorMedicion>()
+                .HasOne(vm => vm.Medicion)
+                .WithMany()
+                .HasForeignKey(vm => vm.MedicionId)
+                .OnDelete(DeleteBehavior.Restrict); 
+            //Rutinas
+            modelBuilder.Entity<ValorMedicion>()
+                .HasOne(vm => vm.EjercicioRealizado)
+                .WithMany(er => er.ValoresMediciones)
+                .HasForeignKey(vm => vm.EjercicioRealizadoId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<SesionRutina>()
+                .HasOne(sr => sr.Cliente)
+                .WithMany(c => c.Entrenamientos)
+                .HasForeignKey(sr => sr.ClienteId)
+                .OnDelete(DeleteBehavior.Restrict);
+            // Rutina -> RutinaEjercicio (join)
+            modelBuilder.Entity<RutinaEjercicio>()
+                .HasOne(re => re.Rutina)
+                .WithMany(r => r.Ejercicios)
+                .HasForeignKey(re => re.RutinaId)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<RutinaEjercicio>()
+                .HasOne(re => re.Ejercicio)
+                .WithMany(e => e.RutinaEjercicios)
+                .HasForeignKey(re => re.EjercicioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Rutina -> Asignaciones
+            modelBuilder.Entity<RutinaAsignada>()
+                .HasOne(ra => ra.Rutina)
+                .WithMany(r => r.Asignaciones)
+                .HasForeignKey(ra => ra.RutinaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Asignacion -> Sesiones
+            modelBuilder.Entity<SesionRutina>()
+                .HasOne(sr => sr.RutinaAsignada)
+                .WithMany(ra => ra.Sesiones)
+                .HasForeignKey(sr => sr.RutinaAsignadaId)
+                .OnDelete(DeleteBehavior.SetNull);
+            // Sesion -> EjerciciosRealizados (podés dejar Cascade dentro de la sesión)
+            modelBuilder.Entity<EjercicioRealizado>()
+                .HasOne(er => er.SesionRutina)
+                .WithMany(sr => sr.EjerciciosRealizados)
+                .HasForeignKey(er => er.SesionRutinaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // EjerciciosRealizados -> Series / Mediciones (cascada interna está OK)
+            modelBuilder.Entity<SerieRealizada>()
+                .HasOne(s => s.EjercicioRealizado)
+                .WithMany(er => er.Series)
+                .HasForeignKey(s => s.EjercicioRealizadoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ValorMedicion>()
+                .HasOne(vm => vm.EjercicioRealizado)
+                .WithMany(er => er.ValoresMediciones)
+                .HasForeignKey(vm => vm.EjercicioRealizadoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // MUY IMPORTANTE: No borrar históricos si eliminan un ejercicio del catálogo
+            modelBuilder.Entity<EjercicioRealizado>()
+                .HasOne(er => er.Ejercicio)
+                .WithMany() // o .WithMany(e => e.EjerciciosRealizados) si tenés la nav
+                .HasForeignKey(er => er.EjercicioId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Ya tenías esto, lo mantengo:
+            modelBuilder.Entity<SesionRutina>()
+                .HasOne(sr => sr.Cliente)
+                .WithMany(c => c.Entrenamientos)
+                .HasForeignKey(sr => sr.ClienteId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
+    }
 
     }
 
-}

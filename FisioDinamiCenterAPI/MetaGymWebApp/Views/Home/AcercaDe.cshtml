@@ -1,11 +1,11 @@
 ﻿@{
-    ViewData["Title"] = "Acerca de MetaGym";
+    ViewData["Title"] = "Inicio";
 }
 
 <!-- Seccion inicial -->
-<div class="hero-banner text-white d-flex align-items-center justify-content-center text-center">
+<div class="hero-banner text-white d-flex align-items-center justify-content-center text-center p-5" style="min-height: 60vh;">
     <div>
-        <h1 class="display-4 fw-bold">¡Superá tus límites en MetaGym!</h1>
+        <h1 class="display-5 display-md-4 fw-bold">¡Superá tus límites en MetaGym!</h1>
         <p class="lead">Entrená con los mejores profesionales, rutinas personalizadas y motivación sin límites.</p>
         <a href="@Url.Action("RegistrarUsuario", "Home")" class="btn btn-success btn-lg mt-3">¡Hacete miembro hoy!</a>
     </div>
@@ -14,7 +14,6 @@
 <!-- Planes -->
 <div class="container my-5">
     <h2 class="text-center mb-4 text-light">Nuestros Planes</h2>
-
     <div class="row row-cols-1 row-cols-md-3 g-4">
         <!-- Plan 1 -->
         <div class="col">
@@ -64,22 +63,22 @@
     <div id="slideshowGym" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="@Url.Content("~/MediaWeb/Imagenes/gym1.jpg")" class="d-block w-100 rounded" />
+                <img src="@Url.Content("~/MediaWeb/Imagenes/gym1.jpg")" class="d-block w-100 rounded img-fluid" />
             </div>
             <div class="carousel-item">
-                <img src="@Url.Content("~/MediaWeb/Imagenes/gym2.jpg")" class="d-block w-100 rounded" />
+                <img src="@Url.Content("~/MediaWeb/Imagenes/gym2.jpg")" class="d-block w-100 rounded img-fluid" />
             </div>
             <div class="carousel-item">
-                <img src="@Url.Content("~/MediaWeb/Imagenes/gym3.jpg")" class="d-block w-100 rounded" />
+                <img src="@Url.Content("~/MediaWeb/Imagenes/gym3.jpg")" class="d-block w-100 rounded img-fluid" />
             </div>
             <div class="carousel-item">
-                <img src="@Url.Content("~/MediaWeb/Imagenes/gym4.jpg")" class="d-block w-100 rounded" />
+                <img src="@Url.Content("~/MediaWeb/Imagenes/gym4.jpg")" class="d-block w-100 rounded img-fluid" />
             </div>
             <div class="carousel-item">
-                <img src="@Url.Content("~/MediaWeb/Imagenes/gym5.jpg")" class="d-block w-100 rounded" />
+                <img src="@Url.Content("~/MediaWeb/Imagenes/gym5.jpg")" class="d-block w-100 rounded img-fluid" />
             </div>
             <div class="carousel-item">
-                <img src="@Url.Content("~/MediaWeb/Imagenes/gym6.jpg")" class="d-block w-100 rounded" />
+                <img src="@Url.Content("~/MediaWeb/Imagenes/gym6.jpg")" class="d-block w-100 rounded img-fluid" />
             </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#slideshowGym" data-bs-slide="prev">
@@ -95,13 +94,13 @@
 <div class="container my-5">
     <h2 class="text-center mb-4">¿Dónde estamos?</h2>
     <div class="ratio ratio-16x9">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3272.0791566378657!2d-56.1848743!3d-34.904463!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f81005a74b34b%3A0x7e1f91bdadd4f2ca!2sMetaGym!5e0!3m2!1ses!2suy!4v1750360108083!5m2!1ses!2suy"
-            width="600" 
-            height="450" 
-            style="border:0;" 
-            allowfullscreen="" 
-            loading="lazy" 
-            referrerpolicy="no-referrer-when-downgrade">
+        <iframe class="rounded" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3272.0791566378657!2d-56.1848743!3d-34.904463!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f81005a74b34b%3A0x7e1f91bdadd4f2ca!2sMetaGym!5e0!3m2!1ses!2suy!4v1750360108083!5m2!1ses!2suy"
+                width="600"
+                height="450"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
         </iframe>
     </div>
 </div>

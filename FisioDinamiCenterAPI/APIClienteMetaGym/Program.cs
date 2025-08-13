@@ -11,12 +11,19 @@ using LogicaDatos.Precarga;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Reflection;
+using LogicaNegocio.Extra;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ---------- Servicios base ----------
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 //------------- Token -------------
 // Configuración de JWT
@@ -26,6 +33,7 @@ var key = Encoding.ASCII.GetBytes(clave);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
@@ -52,6 +60,8 @@ builder.Services.AddScoped<IRepositorioEjercicio, RepoEjercicios>();
 builder.Services.AddScoped<IRepositorioMedia, RepoMedias>();
 builder.Services.AddScoped<IRepositorioComentario, RepoComentario>();
 builder.Services.AddScoped<IRepositorioPublicacion, RepoPublicacion>();
+builder.Services.AddScoped<IRepositorioNotificacion, RepoNotificacion>();
+
 
 // ---------- Servicios ----------
 builder.Services.AddScoped<IClienteServicio, ServicioCliente>();
@@ -64,6 +74,9 @@ builder.Services.AddScoped<IRutinaServicio, ServicioRutina>();
 builder.Services.AddScoped<IMediaServicio, ServicioMedia>();
 builder.Services.AddScoped<IComentarioServicio, ServicioComentario>();
 builder.Services.AddScoped<IPublicacionServicio, ServicioPublicacion>();
+builder.Services.AddScoped<INotificacionServicio, ServicioNotificacion>();
+builder.Services.AddScoped<IRutinaServicio, ServicioRutina>();
+builder.Services.AddScoped(typeof(Lazy<>), typeof(LazyResolver<>));
 
 // ---------- CORS ----------
 builder.Services.AddCors(options =>
@@ -79,6 +92,47 @@ builder.Services.AddCors(options =>
 // ---------- Swagger ----------
 builder.Services.AddEndpointsApiExplorer();
 object value = builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "MetaGym Cliente API",
+        Version = "v1",
+        Description = "API para clientes externos con autenticación JWT"
+    });
+
+    // Definición del esquema JWT para Swagger
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Token JWT. Escribí: Bearer {token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 // ---------- Build ----------
 var app = builder.Build();
@@ -92,7 +146,7 @@ using (var scope = app.Services.CreateScope())
 
 // ---------- Precarga ----------
 CargaAdmin.CargarAdminBase(app.Services);
-
+app.UseStaticFiles();
 // ---------- Middleware ----------
 app.UseCors("ClientePolicy");
 app.UseHttpsRedirection();

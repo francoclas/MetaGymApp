@@ -1,0 +1,23 @@
+﻿@using LogicaApp.DTOS
+@model CitaDTO
+<div class="container mt-4 bg-dark text-white border rounded py-4">
+    <h2>Detalle de Cita</h2>
+    <hr />
+
+    <h4>Cliente</h4>
+    <p><strong>@Model.Cliente.NombreCompleto</strong></p>
+    <p><strong>Fecha:</strong> @Model.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</p>
+    <p><strong>Especialidad:</strong> @Model.Especialidad.NombreEspecialidad</p>
+    <p><strong>Establecimiento:</strong> @Model.Establecimiento.Nombre</p>
+    <p><strong>Descripción:</strong> @Model.Descripcion</p>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Conclusion))
+    {
+        <hr />
+        <h4>Conclusión</h4>
+        <p>@Model.Conclusion</p>
+    }
+
+    <a href="@Url.Action("GestionCitas", "Profesional")" class="btn btn-outline-light mt-3">Volver</a>
+</div>
+

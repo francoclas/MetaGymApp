@@ -1,0 +1,29 @@
+﻿@model List<PublicacionDTO>
+
+<table class="table table-dark table-bordered dataTable no-footer">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Estado</th>
+            <th>Fecha creación</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pub in Model)
+        {
+            <tr>
+                <td>@pub.Titulo</td>
+                <td>@pub.Estado</td>
+                <td>@pub.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+                    <a asp-action="DetallePublicacion" asp-route-id="@pub.Id" class="btn btn-sm btn-outline-primary">Ver</a>
+                    @if (pub.Estado == LogicaNegocio.Extra.Enum_EstadoPublicacion.Aprobada)
+                    {
+                        <a asp-action="EditarPublicacion" asp-route-id="@pub.Id" class="btn btn-sm btn-outline-warning">Editar</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

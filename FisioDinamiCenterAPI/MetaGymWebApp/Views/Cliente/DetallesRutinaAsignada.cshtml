@@ -1,4 +1,7 @@
 ﻿@model RutinaAsignadaDTO
+@{
+    ViewData["Title"] = @Model.NombreRutina + " - Informacion de rutina" + @Model.NombreRutina;
+}
 <div class="container">
     <h2>@Model.NombreRutina</h2>
     <p><strong>Tipo:</strong> @Model.Tipo</p>
@@ -20,7 +23,7 @@
                 <div class="tarjeta-ejercicio">
                     <img src="@img" class="img-ejercicio" alt="Imagen ejercicio" />
                     <strong>@ej.Nombre</strong><br />
-                    <a class="btn btn-sm btn-outline-secondary mt-1" asp-action="InformacionEjercicio" asp-route-id="@ej.Id">Ver</a>
+                    <a class="btn btn-sm btn-outline-secondary mt-1" target="_blank" asp-action="InformacionEjercicio" asp-route-id="@ej.Id">Ver</a>
                 </div>
             }
         </div>

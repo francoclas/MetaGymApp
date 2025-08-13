@@ -1,5 +1,11 @@
 ﻿@model LoginDTO
 
+
+@{
+    ViewData["Title"] = "Inicio de sesion";
+}
+<!-- Mensaje temporal -->
+@Html.Partial("_MensajeTemporal")
 <div class="login-wrapper d-flex flex-column align-items-center justify-content-center">
     <img src="@Url.Content("~/MediaWeb/Imagenes/metagymLogo.png")" alt="MetaGym Logo" class="login-logo mb-3" />
     <h2 class="text-center mb-4">Inicio de sesión</h2>
@@ -17,10 +23,5 @@
         <div class="text-center mt-3">
             <small>¿No tiene cuenta? <a href="@Url.Action("RegistrarUsuario", "Home")">Regístrese aquí</a></small>
         </div>
-
-        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-        {
-            <div class="text-danger mt-2 text-center">@error.ErrorMessage</div>
-        }
     </form>
 </div>

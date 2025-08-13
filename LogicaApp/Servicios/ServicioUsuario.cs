@@ -25,24 +25,58 @@ namespace LogicaNegocio.Servicios
             repoProfesional = rPro;
             this.mediaServicio = mediaServicio;
         }
-        public void AgregarTelefono(string Usuario, string NumeroNuevo)
+        public void CambiarTelefono(int IdCliente, string Usuario, string NumeroNuevo)
         {
-            throw new NotImplementedException();
+            Cliente cliente = repoCliente.ObtenerPorId(IdCliente);
+
+            if (cliente == null || cliente.NombreUsuario != Usuario)
+                throw new Exception("Cliente no encontrado o usuario inválido.");
+
+            cliente.Telefono = NumeroNuevo;
+            repoCliente.Actualizar(cliente);
+            repoCliente.GuardarCambios();
         }
 
-        public void CambiarCorreo(string Usuario, string Correo)
+        public void CambiarCorreo(int IdCliente, string Usuario, string Correo)
         {
-            throw new NotImplementedException();
+            Cliente cliente = repoCliente.ObtenerPorId(IdCliente);
+
+            if (cliente == null || cliente.NombreUsuario != Usuario)
+                throw new Exception("Cliente no encontrado o usuario inválido.");
+            if(FuncionesAuxiliares.EsCorreoValido(Correo))
+                throw new Exception("Verifique el correo ingresado.");
+
+            cliente.Correo = Correo;
+            repoCliente.Actualizar(cliente);
+            repoCliente.GuardarCambios();
         }
 
-        public void CambiarNombre(string Usuario, string Nombre)
+        public void CambiarNombre(int IdCliente, string Usuario, string Nombre)
         {
-            throw new NotImplementedException();
+            Cliente cliente = repoCliente.ObtenerPorId(IdCliente);
+
+            if (cliente == null || cliente.NombreUsuario != Usuario)
+                throw new Exception("Cliente no encontrado o usuario inválido.");
+
+            cliente.NombreCompleto = Nombre;
+            repoCliente.Actualizar(cliente);
+            repoCliente.GuardarCambios();
         }
 
-        public void CambiarPass(string Usuario, string NuevaPassword, string ConfPassword)
+        public void CambiarPass(int IdCliente, string Usuario, string NuevaPassword, string ConfPassword)
         {
-            throw new NotImplementedException();
+            if (NuevaPassword != ConfPassword)
+                throw new Exception("Las contraseñas no coinciden.");
+            if (FuncionesAuxiliares.EsContrasenaValida(NuevaPassword))
+                throw new Exception("Pruebe con otra contraseña");
+
+            Cliente cliente = repoCliente.ObtenerPorId(IdCliente);
+            if (cliente == null || cliente.NombreUsuario != Usuario)
+                throw new Exception("Cliente no encontrado o usuario inválido.");
+
+            cliente.Pass = HashContrasena.Hashear(NuevaPassword);
+            repoCliente.Actualizar(cliente);
+            repoCliente.GuardarCambios();
         }
 
         public void CrearAdmin(string Ci, string Usuario,string NombreCompleto, string Correo,string Password, string Telefono)
@@ -106,6 +140,9 @@ namespace LogicaNegocio.Servicios
             var admin = repoAdmin.ObtenerPorUsuario(login.NombreUsuario);
             if (admin != null && HashContrasena.Verificar(admin.Pass, login.Password))
             {
+                if (!admin.UsuarioActivo)
+                    throw new UsuarioException("Tu cuenta de administrador está deshabilitada.");
+
                 return new SesionDTO
                 {
                     UsuarioId = admin.Id,
@@ -119,6 +156,9 @@ namespace LogicaNegocio.Servicios
             var profesional = repoProfesional.ObtenerPorUsuario(login.NombreUsuario);
             if (profesional != null && HashContrasena.Verificar(profesional.Pass, login.Password))
             {
+                if (!profesional.UsuarioActivo)
+                    throw new UsuarioException("Tu cuenta de profesional está deshabilitada.");
+
                 return new SesionDTO
                 {
                     UsuarioId = profesional.Id,
@@ -132,6 +172,9 @@ namespace LogicaNegocio.Servicios
             var cliente = repoCliente.ObtenerPorUsuario(login.NombreUsuario);
             if (cliente != null && HashContrasena.Verificar(cliente.Pass, login.Password))
             {
+                if (!cliente.UsuarioActivo)
+                    throw new UsuarioException("Tu cuenta de cliente está deshabilitada.");
+
                 return new SesionDTO
                 {
                     UsuarioId = cliente.Id,
@@ -146,30 +189,23 @@ namespace LogicaNegocio.Servicios
 
         public SesionDTO IniciarSesionCliente(LoginDTO login)
         {
-            Cliente UsuarioCliente = null;
-            //Verifico si es correo o no
-            if (EsCorreo(login.NombreUsuario))
+            Cliente cliente = repoCliente.ObtenerPorUsuario(login.NombreUsuario);
+
+            if (cliente != null && HashContrasena.Verificar(cliente.Pass, login.Password))
             {
-                //Implementar inicio correo UsuarioCliente 
-                return null;
-            }
-            else //Inicio con usuario
-            {
-                var cliente = repoCliente.ObtenerPorUsuario(login.NombreUsuario);
-                //Valido
-                if (cliente != null && HashContrasena.Verificar(cliente.Pass,login.Password))
+                if (!cliente.UsuarioActivo)
+                    throw new UsuarioException("Tu cuenta de cliente está deshabilitada.");
+
+                return new SesionDTO
                 {
-                    //Mapeo y devuelvo
-                    return new SesionDTO
-                    {
-                        Nombre = cliente.NombreUsuario,
-                        NombreCompleto = cliente.NombreCompleto,
-                        UsuarioId = cliente.Id,
-                        Rol = "Cliente"
-                    };
-                }
-                return null;
+                    Nombre = cliente.NombreUsuario,
+                    NombreCompleto = cliente.NombreCompleto,
+                    UsuarioId = cliente.Id,
+                    Rol = "Cliente"
+                };
             }
+
+            throw new UsuarioException("Revisar credenciales ingresadas");
         }
 
         public UsuarioGenericoDTO ObtenerUsuarioGenericoDTO(int usuarioId, string rol)
@@ -218,11 +254,13 @@ namespace LogicaNegocio.Servicios
             {
                 Rol = "Cliente",
                 Id = cliente.Id,
+                Ci = cliente.CI,
                 Nombre = cliente.NombreCompleto,
                 Correo = cliente.Correo,
                 Medias = mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Cliente, cliente.Id),
                 Telefono = cliente.Telefono,
-                Perfil = mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Cliente, cliente.Id)
+                Perfil = mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Cliente, cliente.Id),
+                UsuarioActivo = cliente.UsuarioActivo
             };
 
         }
@@ -236,7 +274,8 @@ namespace LogicaNegocio.Servicios
                 Correo = admin.Correo,
                 Medias = mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Admin, admin.Id),
                 Telefono = admin.Telefono,
-                Perfil = mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Admin, admin.Id)
+                Perfil = mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Admin, admin.Id),
+                UsuarioActivo = admin.UsuarioActivo
             };
         }
         private UsuarioGenericoDTO MapeoProfesionalUsuarioDTO(Profesional profesional)
@@ -249,7 +288,8 @@ namespace LogicaNegocio.Servicios
                 Correo = profesional.Correo,
                 Medias = mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Profesional, profesional.Id),
                 Telefono = profesional.Telefono,
-                Perfil = mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Profesional, profesional.Id)
+                Perfil = mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Profesional, profesional.Id),
+                UsuarioActivo = profesional.UsuarioActivo
             };
         }
 

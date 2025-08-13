@@ -1,39 +1,171 @@
-﻿using LogicaNegocio.Interfaces.DTOS;
+﻿using APIClienteMetaGym.DTO;
+using APIClienteMetaGym.Extra;
+using LogicaNegocio.Interfaces.DTOS;
+using LogicaNegocio.Interfaces.DTOS.API;
 using LogicaNegocio.Interfaces.Servicios;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace APIClienteMetaGym.Controllers
+namespace APIClienteMetaGym.Controllers;
+
+/// <summary>
+/// Endpoints de autenticación de clientes.
+/// </summary>
+[ApiController]
+[Route("api/usuario")]
+public class UsuarioController : ControllerBase
 {
-    [ApiController]
-    [Route("api/Usuario")]
-    public class UsuarioController : Controller
+    private readonly IUsuarioServicio _usuarioServicio;
+    private readonly IConfiguration _configuration;
+
+    public UsuarioController(IUsuarioServicio usuarioServicio, IConfiguration configuration)
     {
-        private readonly IUsuarioServicio _usuarioServicio;
-        private readonly IConfiguration _configuration;
+        _usuarioServicio = usuarioServicio;
+        _configuration = configuration;
+    }
 
-        public UsuarioController(IUsuarioServicio usuarioServicio, IConfiguration configuration)
+    /// <summary>
+    /// Inicia sesión de un cliente con usuario o correo y contraseña.
+    /// </summary>
+    /// <param name="loginDto">DTO con usuario/correo y contraseña.</param>
+    /// <returns>Sesión del cliente con token JWT si las credenciales son válidas.</returns>
+    /// <response code="200">Login exitoso.</response>
+    /// <response code="401">Credenciales incorrectas.</response>
+    [HttpPost("login")]
+    [ProducesResponseType(typeof(RespuestaApi<SesionDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status401Unauthorized)]
+    public IActionResult Login([FromBody] LoginDTO loginDto)
+    {
+        try
         {
-            _usuarioServicio = usuarioServicio;
-            _configuration = configuration;
-        }
+            var usuario = _usuarioServicio.IniciarSesionCliente(loginDto);
 
-        [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginDTO loginDto)
-        {
-            SesionDTO usuario = _usuarioServicio.IniciarSesionCliente(loginDto);
-            //Verifico si esta bien
-            if(usuario == null)
-            {
-                return Unauthorized(new { success = false, error = "Verificar credenciales" });
-            }
-            // Obtener la clave JWT desde appsettings.json
+            if (usuario == null)
+                return Unauthorized(RespuestaApi<string>.Unauthorized("Credenciales inválidas."));
+
             var clave = _configuration["Jwt:Key"];
             var token = GestionJWT.GenerarToken(usuario, clave);
-
             usuario.Token = token;
 
-            return Ok(new { success = true, data = usuario });
+            return Ok(RespuestaApi<SesionDTO>.Ok(usuario));
         }
+        catch (Exception e)
+        {
+            return Unauthorized(RespuestaApi<string>.Unauthorized(e.Message));
+        }
+        
+    }
 
+
+    private bool EsCliente(string rol) =>
+        string.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Obtiene la información básica del cliente autenticado.
+    /// </summary>
+    [Authorize]
+    [HttpGet("perfil")]
+    [ProducesResponseType(typeof(RespuestaApi<UsuarioGenericoDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]
+    public IActionResult ObtenerPerfil(int usuarioId, string rol)
+    {
+        if (!EsCliente(rol))
+            return StatusCode(403, RespuestaApi<string>.Forbidden());
+
+        try
+        {
+            var dto = _usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId,"Cliente");
+            return Ok(RespuestaApi<ClienteDTOAPI>.Ok(new MapeadorUsuario().MapearCiente(dto)));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(RespuestaApi<string>.BadRequest(ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Cambia el teléfono del cliente.
+    /// </summary>
+    [Authorize]
+    [HttpPatch("{id}/telefono")]
+    [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]
+    public IActionResult CambiarTelefono(int id, string usuario, string telefonoNuevo, string rol)
+    {
+        if (!EsCliente(rol))
+            return StatusCode(403, RespuestaApi<string>.Forbidden());
+
+        try
+        {
+            _usuarioServicio.CambiarTelefono(id, usuario, telefonoNuevo);
+            return Ok(RespuestaApi<string>.Ok("Teléfono actualizado correctamente."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(RespuestaApi<string>.BadRequest(ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Cambia el correo del cliente.
+    /// </summary>
+    [Authorize]
+    [HttpPatch("{id}/correo")]
+    public IActionResult CambiarCorreo(int id, string usuario, string correoNuevo, string rol)
+    {
+        if (!EsCliente(rol))
+            return StatusCode(403, RespuestaApi<string>.Forbidden());
+
+        try
+        {
+            _usuarioServicio.CambiarCorreo(id, usuario, correoNuevo);
+            return Ok(RespuestaApi<string>.Ok("Correo actualizado correctamente."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(RespuestaApi<string>.BadRequest(ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Cambia el nombre del cliente.
+    /// </summary>
+    [Authorize]
+    [HttpPatch("{id}/nombre")]
+    public IActionResult CambiarNombre(int id, string usuario, string nombreNuevo, string rol)
+    {
+        if (!EsCliente(rol))
+            return StatusCode(403, RespuestaApi<string>.Forbidden());
+
+        try
+        {
+            _usuarioServicio.CambiarNombre(id, usuario, nombreNuevo);
+            return Ok(RespuestaApi<string>.Ok("Nombre actualizado correctamente."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(RespuestaApi<string>.BadRequest(ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Cambia la contraseña del cliente.
+    /// </summary>
+    [Authorize]
+    [HttpPatch("{id}/password")]
+    public IActionResult CambiarPass(int id, string usuario, string nuevaPassword, string confPassword, string rol)
+    {
+        if (!EsCliente(rol))
+            return StatusCode(403, RespuestaApi<string>.Forbidden());
+
+        try
+        {
+            _usuarioServicio.CambiarPass(id, usuario, nuevaPassword, confPassword);
+            return Ok(RespuestaApi<string>.Ok("Contraseña actualizada correctamente."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(RespuestaApi<string>.BadRequest(ex.Message));
+        }
     }
 }

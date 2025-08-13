@@ -21,7 +21,8 @@ namespace LogicaNegocio.Clases
         public List<Profesional> Profesionales { get; set; } = new List<Profesional>();
         //Referencia a citas
         public List<Cita> Citas { get; set; } = new List<Cita>();
-
+        //Refereca tipoatenicon
+        public List<TipoAtencion> TiposAtencion{ get;set;}
         public Especialidad() { }
         public Especialidad(string Nombre,string DescripcionEspecialidad)
         {

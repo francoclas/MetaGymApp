@@ -21,5 +21,13 @@ namespace LogicaDatos.Interfaces.Repos
         List<Especialidad> ListarEspecialidades();
         void AltaMedia(Media nueva);
         void GuardarCambios();
+        void CrearTipoAtencion(TipoAtencion tipo);
+        TipoAtencion ObtenerTipoPorId(int id);
+        List<TipoAtencion> ObtenerTiposAtencionPorEspecialidad(int especialidadId);
+        List<TipoAtencion> ObtenerTiposAtencionPorEspecialidades(List<int> especialidadIds);
+        List<TipoAtencion> ObtenerTiposAtencionPorIds(List<int> ids);
+        List<TipoAtencion> ObtenerTiposAtencionPorProfesional(int profesionalId);
+        List<TipoAtencion> ObtenerTiposAtencionTodos();
+        TipoAtencion ObtenerTipoAtencionId(int? tipoAtencionId);
     }
 }

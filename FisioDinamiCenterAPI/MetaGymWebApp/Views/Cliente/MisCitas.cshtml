@@ -3,52 +3,76 @@
     ViewData["Title"] = "Mis Citas";
 }
 
-<div class="container mt-4 bg-dark border rounded py-4">
+<div class="container mt-4 bg-dark border rounded py-4 text-white">
+
+    <div class="row align-items-center bg-secondary rounded p-4 mb-4">
+        <div class="col-md-8">
+            <h3 class="mb-3">¿Necesitás atención profesional?</h3>
+            <p class="mb-2">En MetaGym podés solicitar una consulta con nuestros kinesiólogos o entrenadores certificados. Ya sea que tengas una molestia, estés recuperándote de una lesión o necesites una evaluación personalizada, estamos para ayudarte.</p>
+            <a class="btn btn-outline-light mt-2" asp-action="GenerarConsultaCita">Solicitar cita ahora</a>
+        </div>
+    </div>
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Mis Citas</h2>
-        <a class="btn btn-success" asp-action="GenerarConsultaCita">Solicitar nueva cita</a>
+        <a class="btn btn-success" asp-action="GenerarConsultaCita">Nueva cita</a>
     </div>
 
-    <div class="mb-3">
-        <input type="text" id="filtroCitas" class="form-control" placeholder="Buscar...">
+    <div class="row mb-3 g-2">
+        <div class="col-md-4">
+            <input type="text" id="filtroCitas" class="form-control" placeholder="Buscar por especialidad o descripción...">
+        </div>
+        <div class="col-md-5 d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-primary btn-sm" onclick="filtrarEstado('')">Todas</button>
+            <button class="btn btn-outline-warning btn-sm" onclick="filtrarEstado('EnEspera')">Pendientes</button>
+            <button class="btn btn-outline-info btn-sm" onclick="filtrarEstado('Aceptada')">Aceptadas</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="filtrarEstado('FinalizadaCancelada')">Historial</button>
+        </div>
+        <div class="col-md-3 d-flex justify-content-end gap-2">
+            <button class="btn btn-outline-light btn-sm" onclick="ordenarCitas('asc')">Más viejas</button>
+            <button class="btn btn-outline-light btn-sm" onclick="ordenarCitas('desc')">Más nuevas</button>
+        </div>
     </div>
 
-    <div class="mb-3 d-flex gap-2 flex-wrap">
-        <button class="btn btn-outline-primary btn-sm" onclick="filtrarEstado('')">Todas</button>
-        <button class="btn btn-outline-warning btn-sm" onclick="filtrarEstado('EnEspera')">Pendientes</button>
-        <button class="btn btn-outline-info btn-sm" onclick="filtrarEstado('Aceptada')">Aceptadas</button>
-        <button class="btn btn-outline-info btn-sm" onclick="filtrarEstado('FinalizadaCancelada')">Historial</button>
-        <button class="btn btn-outline-light btn-sm ms-auto" onclick="ordenarCitas('asc')">Más viejas</button>
-        <button class="btn btn-outline-light btn-sm" onclick="ordenarCitas('desc')">Más nuevas</button>
-
-    </div>
     <div class="alert alert-info py-2" id="mensajeEstado">
         Mostrando todas las citas
     </div>
-    <div id="contenedor-citas">
-        @foreach (var cita in Model)
-        {
-            var estado = cita.Estado.ToString();
-            var estadoGrupo = estado;
-            if (estado == "Finalizada" || estado == "Cancelada")
+
+    <!-- Citas -->
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center">
+            <h5 class="text-danger">No tenés citas registradas todavía</h5>
+            <p>¿Sentís molestias musculares? ¿Necesitás una sesión de recuperación o asesoramiento personalizado?</p>
+            <a class="btn btn-outline-light mt-2" asp-action="GenerarConsultaCita">Solicitar cita ahora</a>
+        </div>
+    }
+    else
+    {
+        <div id="contenedor-citas">
+            @foreach (var cita in Model)
             {
-                estadoGrupo = "FinalizadaCancelada";
-            }
-            <div class="card mb-3 cita-card"
-                 data-fecha="@cita.FechaAsistencia.ToString("yyyy-MM-ddTHH:mm")"
-                 data-estado="@estadoGrupo">
-                <div class="card-body">
-                    <h5 class="card-title">@cita.Especialidad.NombreEspecialidad</h5>
-                    <p class="card-text">@cita.Descripcion</p>
-                    <p class="card-text"><strong>Fecha:</strong> @cita.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</p>
-                    <p class="card-text"><strong>Estado:</strong> @estado</p>
-                    <a href="@Url.Action("VerDetalleCita", "Cliente", new { id = cita.CitaId })" class="btn btn-sm btn-outline-primary">Ver detalles</a>
+                var estado = cita.Estado.ToString();
+                var estadoGrupo = estado == "Finalizada" || estado == "Cancelada" ? "FinalizadaCancelada" : estado;
+
+                <div class="card mb-3 cita-card bg-secondary text-white"
+                     data-fecha="@cita.FechaAsistencia.ToString("yyyy-MM-ddTHH:mm")"
+                     data-estado="@estadoGrupo">
+                    <div class="card-body">
+                        <h5 class="card-title">@cita.Especialidad.NombreEspecialidad</h5>
+                        <p class="card-text">@cita.Descripcion</p>
+                        <p class="card-text"><strong>Fecha:</strong> @cita.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</p>
+                        <p class="card-text"><strong>Estado:</strong> @estado</p>
+                        <a href="@Url.Action("VerDetalleCita", "Cliente", new { id = cita.CitaId })" class="btn btn-sm btn-outline-light">Ver detalles</a>
+                    </div>
                 </div>
-            </div>
-        }
-    </div>
-    <div id="sinResultados" class="alert alert-warning mt-3" style="display: none;">
-        No hay citas para mostrar.
-    </div>
+            }
+        </div>
+
+        <div id="sinResultados" class="alert alert-warning mt-3" style="display: none;">
+            No hay citas para mostrar con esos filtros.
+        </div>
+    }
 </div>
+
 <script src="~/js/cliente/misCitas.js"></script>

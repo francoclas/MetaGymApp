@@ -1,0 +1,57 @@
+﻿@using LogicaApp.DTOS
+@model List<SesionEntrenadaDTO>
+
+@{
+    ViewData["Title"] = "Historial de Entrenamiento";
+    var nombreCliente = Model.FirstOrDefault()?.NombreCliente;
+}
+
+<div class="container mt-4">
+    <h2>Historial de entrenamiento de @nombreCliente</h2>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="bg-dark p-4 rounded border text-center mt-4">
+            <h5 class="text-muted">Todavía no hay sesiones registradas para este cliente.</h5>
+            <p>Una vez que entrene alguna rutina, aparecerán sus sesiones acá.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" id="buscadorHistorial" class="form-control" placeholder="Buscar por nombre de rutina" onkeyup="filtrarHistorialEntrenamiento()" />
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped" id="tablaHistorialEntrenamiento">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre Rutina</th>
+                    <th>Fecha</th>
+                    <th>Duración (min)</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var sesion in Model)
+                {
+                    <tr>
+                        <td>@sesion.SesionRutinaId</td>
+                        <td>@sesion.NombreRutina</td>
+                        <td>@sesion.FechaRealizada.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@(sesion.DuracionMin?.ToString() ?? "-")</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-info" asp-action="SesionEntrenada" asp-controller="Cliente" asp-route-id="@sesion.SesionRutinaId" target="_blank">Ver detalles</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/profesional/historialEntrenamiento.js"></script>
+}

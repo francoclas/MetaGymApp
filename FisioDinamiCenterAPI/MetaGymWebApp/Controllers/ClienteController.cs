@@ -6,12 +6,13 @@ using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
 using MetaGymWebApp.Filtros;
+using MetaGymWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using static LogicaNegocio.Interfaces.DTOS.EstablecimientoDTO;
 
 namespace MetaGymWebApp.Controllers
 {
-    [AutorizacionRol("Admin", "Cliente")]
+    [AutorizacionRol("Admin", "Cliente","Profesional")]
     public class ClienteController : Controller
     {
         private readonly IUsuarioServicio usuarioServicio;
@@ -49,54 +50,54 @@ namespace MetaGymWebApp.Controllers
             return View();
         }
         //Enviar Cita
+        // GET
         [HttpGet]
         public IActionResult GenerarConsultaCita()
         {
+            var especialidades = extraServicio.ObtenerEspecialidadesDTO(); // devuelve List<EspecialidadDTO>
+            var establecimientos = extraServicio.ObtenerEstablecimientosDTO(); // List<EstablecimientoDTO>
+            var tiposAtencion = extraServicio.ObtenerTiposAtencionDTO(); // List<TipoAtencionDTO>
 
-            var especialidades = extraServicio.ObtenerEspecialidades();
-            var establecimientos = extraServicio.ObtenerEstablecimientos();
-            //Mapeo a DTOs para vista
-            var establecimientosDTO = establecimientos.Select(e => new EstablecimientoPreviewDTO
+            var modelo = new GenerarCitaModelo
             {
-                Id = e.Id,
-                Nombre = e.Nombre,
-                Direccion = e.Direccion,
-                UrlMedia = e.Media?.FirstOrDefault()?.Url
-            }).ToList();
-            ViewBag.Especialidades = especialidades;
-            ViewBag.Establecimientos = establecimientos;
-            //Serializo para poder mostrar imagenes desde la vista
-            ViewBag.EstablecimientosJson = JsonSerializer.Serialize(establecimientosDTO, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
+                Cita = new CitaDTO(),
+                Especialidades = especialidades,
+                Establecimientos = establecimientos,
+                TiposAtencion = tiposAtencion
+            };
 
-            return View(new CitaDTO());
+            return View(modelo);
         }
+
+        // POST
         [HttpPost]
-        public IActionResult GenerarConsultaCita(CitaDTO dto)
+        public IActionResult GenerarConsultaCita(GenerarCitaModelo vm)
         {
             try
             {
                 int clienteId = GestionSesion.ObtenerUsuarioId(this.HttpContext);
-                dto.ClienteId = clienteId;
-                //Valido informcion
-                if (dto.ClienteId == 0) throw new Exception("Vuelva a iniciar sesion.");
-                if (string.IsNullOrEmpty(dto.Descripcion)) throw new Exception("La descripcion no puede estar vacia.");
-                if (dto.FechaAsistencia < DateTime.Today) throw new Exception("La fecha deseada debe ser posterior a hoy.");
-                //Llamo al repo
-                citaServicio.GenerarNuevaCita(dto);
+                vm.Cita.ClienteId = clienteId;
+
+                if (clienteId == 0) throw new Exception("Vuelva a iniciar sesión.");
+                if (string.IsNullOrEmpty(vm.Cita.Descripcion)) throw new Exception("La descripción no puede estar vacía.");
+                if (vm.Cita.FechaAsistencia < DateTime.Today) throw new Exception("La fecha deseada debe ser posterior a hoy.");
+                if (vm.Cita.TipoAtencionId == 0) throw new Exception("Debe seleccionar un tipo de atención.");
+
+                citaServicio.GenerarNuevaCita(vm.Cita);
                 return RedirectToAction("MisCitas");
             }
             catch (Exception e)
             {
                 TempData["Mensaje"] = e.Message;
                 TempData["TipoMensaje"] = "danger";
-                return View(dto);
+
+                // Recargo el modelo para la vista
+                vm.Especialidades = extraServicio.ObtenerEspecialidadesDTO();
+                vm.Establecimientos = extraServicio.ObtenerEstablecimientosDTO();
+                vm.TiposAtencion = extraServicio.ObtenerTiposAtencionDTO();
+
+                return View(vm);
             }
-            //Obtengo id del cliente logueado
-
-
         }
         //Seccion de citas del cliente
         [HttpGet]
@@ -109,7 +110,7 @@ namespace MetaGymWebApp.Controllers
             //Mapeo a DTO
             var dtoList = citas.Select(c => new CitaDTO
             {
-                CitaId = c.Id,
+                CitaId = c.CitaId,
                 ClienteId = c.ClienteId,
                 Cliente = c.Cliente,
                 EspecialidadId = c.EspecialidadId,
@@ -118,7 +119,7 @@ namespace MetaGymWebApp.Controllers
                 EstablecimientoId = c.EstablecimientoId,
                 Establecimiento = c.Establecimiento,
                 Descripcion = c.Descripcion,
-                FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
+                FechaAsistencia = c.FechaAsistencia,
                 FechaCreacion = c.FechaCreacion,
                 ProfesionalId = c.ProfesionalId,
                 Conclusion = c.Conclusion
@@ -150,11 +151,22 @@ namespace MetaGymWebApp.Controllers
                 Descripcion = cita.Descripcion,
                 FechaAsistencia = cita.FechaAsistencia ?? DateTime.MinValue,
                 FechaCreacion = cita.FechaCreacion,
-                ProfesionalId = cita.ProfesionalId,
                 Conclusion = cita.Conclusion,
                 Estado = cita.Estado
             };
-
+            if (cita.TipoAtencion != null)
+            {
+                dto.TipoAtencion = cita.TipoAtencion;
+            }
+            else
+            {
+                dto.TipoAtencion = new TipoAtencion { Nombre = "-" };
+            }
+            if (cita.Profesional != null)
+            {
+                dto.NombreProfesional = cita.Profesional.NombreCompleto;
+                dto.ProfesionalId = cita.ProfesionalId;
+            }
             return View("DetalleCita", dto);
         }
         //Rutinas
@@ -163,16 +175,17 @@ namespace MetaGymWebApp.Controllers
         public IActionResult MisRutinas()
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var asignaciones = rutinaServicio.ObtenerRutinasAsignadasCliente(clienteId);
-
+            //Obtengo rutinas del cliente
+            List<RutinaAsignada> asignaciones = rutinaServicio.ObtenerRutinasAsignadasCliente(clienteId);
             return View(asignaciones);
         }
         [HttpGet]
         public IActionResult DetallesRutinaAsignada(int id)
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            //OBtengo rutina del repo
             var dto = rutinaServicio.ObtenerDetalleRutinaAsignadaDTO(id, clienteId);
-
+            //Devuelvo a menu si no existe
             if (dto == null)
             {
                 TempData["Mensaje"] = "No tenés acceso a esta rutina.";
@@ -182,33 +195,83 @@ namespace MetaGymWebApp.Controllers
 
             return View(dto);
         }
-        //Sesiones de entrenamiento
         [HttpGet]
         public IActionResult SesionEntrenada(int id)
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var sesion = rutinaServicio.ObtenerSesionPorId(id);
+            SesionRutina sesion = rutinaServicio.ObtenerSesionPorId(id);
 
-            // Cargar datos necesarios para vista (Rutina y Ejercicios completos)
-            var rutina = rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignadaId);
+            // Si la rutina asignada existe, la traemos; si no, es snapshot
+            Rutina rutina = sesion.RutinaAsignada != null
+                ? rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignada.RutinaId)
+                : null;
 
-            foreach (var er in sesion.EjerciciosRealizados)
+            if (rutina != null)
             {
-                er.Ejercicio = rutina.Ejercicios
-                    .FirstOrDefault(re => re.EjercicioId == er.EjercicioId)?.Ejercicio;
+                // Vincular ejercicios reales solo si la rutina original existe
+                foreach (var er in sesion.EjerciciosRealizados)
+                {
+                    er.Ejercicio = rutina.Ejercicios
+                        .FirstOrDefault(re => re.Ejercicio.Id == er.EjercicioId)?.Ejercicio;
+                }
             }
 
-            ViewBag.RutinaNombre = rutina.NombreRutina;
-            return View(sesion);
+            var dto = new SesionEntrenadaDTO
+            {
+                NombreRutina = rutina != null
+                    ? rutina.NombreRutina
+                    : sesion.NombreRutinaHistorial, // snapshot
+                FechaRealizada = sesion.FechaRealizada,
+                DuracionMin = sesion.DuracionMin,
+                Ejercicios = sesion.EjerciciosRealizados.Select(er => new EjercicioRealizadoDTO
+                {
+                    Nombre = er.NombreHistorial,
+                    Tipo = er.TipoHistorial,
+                    GrupoMuscular = er.GrupoMuscularHistorial,
+
+                    ImagenURL = rutina != null
+                        ? er.Ejercicio?.Medias.FirstOrDefault()?.Url
+                        : er.ImagenUrlHistorial, // snapshot
+
+                    Series = er.Series.Select(s => new SerieDTO
+                    {
+                        Repeticiones = s.Repeticiones,
+                        PesoUtilizado = s.PesoUtilizado
+                    }).ToList(),
+
+                    Mediciones = er.ValoresMediciones.Select(vm => new MedicionDTO
+                    {
+                        Nombre = vm.Medicion?.Nombre,  // si es snapshot, puede ser null
+                        Unidad = vm.Medicion?.Unidad,
+                        Valor = vm.Valor
+                    }).ToList()
+                }).ToList()
+            };
+
+            return View(dto);
         }
+
+
         [HttpGet]
         public IActionResult HistoricoSesionesEntrenamiento()
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var sesiones = rutinaServicio.ObtenerHistorialCliente(clienteId);
-            return View(sesiones);
-        }
 
+            var sesiones = rutinaServicio.ObtenerHistorialClienteDTO(clienteId);
+
+            var modeloOrdenado = sesiones
+                .OrderByDescending(s => s.FechaRealizada)
+                .ToList();
+
+            ViewBag.UltimaSesion = modeloOrdenado.FirstOrDefault();
+            ViewBag.PromedioDuracion = modeloOrdenado
+                .Where(s => s.DuracionMin.HasValue)
+                .Select(s => s.DuracionMin.Value)
+                .DefaultIfEmpty(0)
+                .Average();
+
+            return View(modeloOrdenado);
+        }
         //Ver detalles de ejercicio
         [HttpGet]
         public IActionResult InformacionEjercicio(int id)

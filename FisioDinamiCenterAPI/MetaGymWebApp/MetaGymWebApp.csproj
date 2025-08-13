@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\MediaWeb\Default\iconos\" />
     <Folder Include="wwwroot\MediaWeb\Imagenes\Ejercicios\" />
     <Folder Include="wwwroot\MediaWeb\Imagenes\Establecimientos\" />
     <Folder Include="wwwroot\MediaWeb\Imagenes\Publicaciones\" />

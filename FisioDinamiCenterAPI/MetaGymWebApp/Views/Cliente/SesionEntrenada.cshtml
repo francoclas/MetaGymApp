@@ -1,70 +1,73 @@
-﻿@using LogicaNegocio.Clases
-@using LogicaNegocio.Extra
-@model SesionRutina
-
+﻿@model SesionEntrenadaDTO
 @{
-    ViewData["Title"] = "Detalle de Sesión Entrenada";
+    ViewData["Title"] = "Sesión Entrenada";
 }
 
-<link rel="stylesheet" href="~/css/cliente/sesionEntrenada.css" />
+<div class="container mt-4">
+    <div class="bg-dark p-4 rounded border mb-4">
+        <h2 class="text-white">Rutina: @Model.NombreRutina</h2>
+        <p class="text-light mb-1"><strong>Fecha realizada:</strong> @Model.FechaRealizada.ToString("dd/MM/yyyy")</p>
+        <p class="text-light"><strong>Duración:</strong> @(Model.DuracionMin ?? 0) minutos</p>
+    </div>
 
-<h2>@ViewBag.RutinaNombre</h2>
+    @foreach (var ejercicio in Model.Ejercicios)
+    {
+        <div class="card mb-4">
+            <div class="card-header d-flex align-items-center">
+                <img src="@Url.Content(ejercicio.ImagenURL)" alt="Imagen" class="me-3" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;" />
+                <div>
+                    <h5 class="mb-1">@ejercicio.Nombre</h5>
+                    <p class="mb-0 text-muted">@ejercicio.Tipo | Grupo muscular: @ejercicio.GrupoMuscular</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <h6>Series realizadas</h6>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Repeticiones</th>
+                            <th>Peso utilizado (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var serie in ejercicio.Series)
+                        {
+                            <tr>
+                                <td>@serie.Repeticiones</td>
+                                <td>@(serie.PesoUtilizado ?? 0)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
 
-<div class="info-sesion">
-    <span><strong>Duración:</strong> @(Model.DuracionMin ?? 0) min</span>
-    <span><strong>Fecha:</strong> @Model.FechaRealizada.ToShortDateString()</span>
-</div>
-
-<hr />
-
-@if (!Model.EjerciciosRealizados.Any())
-{
-    <p>No hay ejercicios registrados para esta sesión.</p>
-}
-else
-{
-    <div class="contenedor-ejercicios">
-        @foreach (var realizado in Model.EjerciciosRealizados.OrderBy(e => e.EjercicioId))
-        {
-            var ejercicio = realizado.Ejercicio;
-            var img = ejercicio?.Medias?.FirstOrDefault(m => m.Tipo == Enum_TipoMedia.Imagen)?.Url ?? "/img/default.png";
-
-            <div class="tarjeta-ejercicio">
-                <img src="@img" class="img-ejercicio" />
-                <h4>@ejercicio?.Nombre</h4>
-                <hr />
-
-                @if (realizado.SeRealizo)
+                @if (ejercicio.Mediciones.Any())
                 {
-                    <table>
+                    <h6 class="mt-3">Mediciones</h6>
+                    <table class="table table-sm table-bordered">
                         <thead>
-                            <tr><th>Serie</th><th>Repeticiones</th><th>Peso</th></tr>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Unidad</th>
+                                <th>Valor</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            @for (int i = 0; i < realizado.Series.Count; i++)
+                            @foreach (var med in ejercicio.Mediciones)
                             {
-                                var s = realizado.Series[i];
                                 <tr>
-                                    <td>Serie @(i + 1)</td>
-                                    <td>@s.Repeticiones</td>
-                                    <td>@(s.PesoUtilizado.HasValue ? $"{s.PesoUtilizado} kg" : "-")</td>
+                                    <td>@med.Nombre</td>
+                                    <td>@med.Unidad</td>
+                                    <td>@med.Valor</td>
                                 </tr>
                             }
                         </tbody>
                     </table>
-
-                    @if (!string.IsNullOrWhiteSpace(realizado.Observaciones))
-                    {
-                        <hr />
-                        <p><strong>Observaciones:</strong></p>
-                        <p>@realizado.Observaciones</p>
-                    }
                 }
                 else
                 {
-                    <p class="no-realizado">Este ejercicio no se realizó en esta sesión.</p>
+                    <p class="text-muted fst-italic">Sin mediciones registradas.</p>
                 }
             </div>
-        }
-    </div>
-}
+        </div>
+    }
+</div>

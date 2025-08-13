@@ -1,0 +1,35 @@
+﻿@model AgendaProfesional
+@using LogicaNegocio.Clases
+@using LogicaNegocio.Extra
+
+@{
+    ViewData["Title"] = "Registrar Franja Horaria";
+}
+
+<div class="container">
+    <h2 class="mb-4 text-light">Registrar Franja Horaria</h2>
+
+    <form asp-action="Crear" method="post" class="bg-dark text-light p-4 rounded shadow">
+        <div class="mb-3">
+            <label class="form-label">Día de la semana</label>
+            <select asp-for="Dia" class="form-select">
+                @foreach (var dia in Enum.GetValues(typeof(Enum_DiaSemana)))
+                {
+                    <option value="@dia">@dia</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Hora de inicio</label>
+            <input asp-for="HoraInicio" class="form-control" type="time" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Hora de fin</label>
+            <input asp-for="HoraFin" class="form-control" type="time" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Registrar</button>
+    </form>
+</div>

@@ -3,24 +3,50 @@
     ViewData["Title"] = "Editar Especialidad - " + Model.NombreEspecialidad;
 }
 
-<div class="card py-2 container">
-    <h2>Editar especialidad</h2>
+<div class="container mt-4">
+    <div class="card bg-dark text-white p-4 mb-4">
+        <h2 class="mb-3">Editar Especialidad</h2>
 
-    <form asp-action="EditarEspecialidad" method="post">
-        <input type="hidden" asp-for="Id" />
+        <form asp-action="EditarEspecialidad" method="post">
+            <input type="hidden" asp-for="Id" />
 
-        <div class="form-group">
-            <label>Nombre</label>
-            <input asp-for="NombreEspecialidad" class="form-control" />
-            <span asp-validation-for="NombreEspecialidad" class="text-danger"></span>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Nombre de la especialidad</label>
+                <input asp-for="NombreEspecialidad" class="form-control" />
+                <span asp-validation-for="NombreEspecialidad" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label>Descripción</label>
-            <textarea asp-for="DescripcionEspecialidad" class="form-control"></textarea>
-            <span asp-validation-for="DescripcionEspecialidad" class="text-danger"></span>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Descripción</label>
+                <textarea asp-for="DescripcionEspecialidad" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="DescripcionEspecialidad" class="text-danger"></span>
+            </div>
 
-        <button type="submit" class="btn btn-warning mt-3">Guardar cambios</button>
-    </form>
+            <button type="submit" class="btn btn-warning">Guardar cambios</button>
+        </form>
+    </div>
+
+    <div class="card bg-secondary text-white p-4 mt-4">
+        <h4 class="mb-3">Agregar area de especializacion</h4>
+        <p class="text-light fst-italic">
+            Un <strong>area de especializacion</strong> es una subcategoría dentro de una especialidad. <br />
+            Por ejemplo: dentro de <strong>Kinesiología</strong>, puede haber <em>masajes de descarga</em>, <em>tratamientos articulares</em> o <em>rehabilitación postural</em>.
+        </p>
+
+        <form asp-action="AgregarTipoAtencion" method="post">
+            <input type="hidden" name="especialidadId" value="@Model.Id" />
+
+            <div class="mb-3">
+                <label class="form-label">Nombre del area de especializacion</label>
+                <input name="nombre" class="form-control" placeholder="Ej: Masaje terapéutico" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Descripción breve</label>
+                <input name="descripcion" class="form-control" placeholder="Ej: Sesión centrada en relajación muscular" required />
+            </div>
+
+            <button type="submit" class="btn btn-success">Agregar nueva area</button>
+        </form>
+    </div>
 </div>

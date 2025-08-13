@@ -8,7 +8,7 @@ using LogicaNegocio.Interfaces.DTOS;
 
 namespace LogicaNegocio.Interfaces.Servicios
 {
-    public interface IRutinaServicio
+    public interface                                    IRutinaServicio
     {
         // Rutinas
         List<Rutina> ObtenerRutinasProfesional(int profesionalId);
@@ -33,15 +33,16 @@ namespace LogicaNegocio.Interfaces.Servicios
 
         // Sesiones
         SesionRutina RegistrarSesion(SesionRutina sesion);
-        List<SesionRutina> ObtenerHistorialCliente(int clienteId);
+        List<SesionEntrenadaDTO> ObtenerHistorialClienteDTO(int clienteId);
         SesionRutina? ObtenerSesionPorId(int sesionId);
-       
+        SesionEntrenadaDTO ObtenerSesionEntrenamiento(int sesionId);
         List<Rutina> ObtenerTodasRutinas();
         void AsignarRutina(Rutina rutina, Cliente cliente);
         void DesasignarRutina(Rutina rutina, Cliente cliente);
         List<RutinaAsignada> ObtenerAsignacionesPorRutina(int rutinaId);
         //DTOs
         RutinaAsignadaDTO ObtenerDetalleRutinaAsignadaDTO(int rutinaAsignadaId, int clienteId);
-
+        string ObtenerNombreRutina(int idRutina);
+        void ActualizarEjerciciosRutina(Rutina rutina, List<int> idsEjerciciosSeleccionados);
     }
 }

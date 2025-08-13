@@ -1,0 +1,88 @@
+﻿@using LogicaNegocio.Extra
+@model EjercicioDTO
+
+@{
+    ViewData["Title"] = "Información del Ejercicio";
+}
+
+<div class="container">
+    <h2>@Model.Nombre</h2>
+    <p class="autor">(Creado por Profesional ID: @Model.ProfesionalId)</p>
+    <p class="info">@Model.Tipo | Grupo muscular: @Model.GrupoMuscular</p>
+
+    <hr />
+    <h3>Instrucciones</h3>
+    @if (!string.IsNullOrWhiteSpace(Model.Instrucciones))
+    {
+        <div class="instrucciones">
+            @Model.Instrucciones
+        </div>
+    }
+    else
+    {
+        <p class="no-instrucciones">Este ejercicio no cuenta con instrucciones.</p>
+    }
+
+    <hr />
+    <h3>Videos</h3>
+    @if (Model.Medias.Any(m => m.Tipo == Enum_TipoMedia.Video))
+    {
+        <div class="contenedor-videos">
+            @foreach (var media in Model.Medias.Where(m => m.Tipo == Enum_TipoMedia.Video))
+            {
+                <video controls src="@media.Url" class="video"></video>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="no-videos">No hay videos disponibles para este ejercicio.</p>
+    }
+
+    <hr />
+    <h3>Imágenes</h3>
+    @if (Model.Medias.Any(m => m.Tipo == Enum_TipoMedia.Imagen))
+    {
+        <div class="slideshow-container" id="slideshow">
+            @foreach (var media in Model.Medias.Where(m => m.Tipo == Enum_TipoMedia.Imagen))
+            {
+                <div class="slide">
+                    <img src="@media.Url" alt="Imagen del ejercicio" class="slide-img" />
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="no-imagenes">No hay imágenes disponibles para este ejercicio.</p>
+    }
+
+    <hr />
+    <h3>Mediciones configuradas</h3>
+    @if (Model.Mediciones.Any())
+    {
+        <ul class="lista-mediciones">
+            @foreach (var med in Model.Mediciones)
+            {
+                <li>
+                    <strong>@med.Nombre</strong> - @med.Unidad
+                    @if (!string.IsNullOrWhiteSpace(med.Descripcion))
+                    {
+                        <div class="texto-descripcion">@med.Descripcion</div>
+                    }
+                    <span class="badge bg-secondary">@med.Unidad</span>
+                    @if (med.EsObligatoria)
+                    {
+                        <span class="badge bg-danger ms-2">Obligatoria</span>
+                    }
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p class="no-mediciones">No hay mediciones configuradas para este ejercicio.</p>
+    }
+</div>
+<link rel="stylesheet" href="~/css/cliente/infoEjercicio.css" />
+<script src="~/js/cliente/infoEjercicio.js"></script>

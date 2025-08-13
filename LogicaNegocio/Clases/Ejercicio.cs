@@ -24,6 +24,8 @@ namespace LogicaNegocio.Clases
         public int ProfesionalId { get; set; }
         public Profesional Profesional { get; set; }
         public List<Media> Medias { get; set; } = new List<Media>();
-        public List<SesionRutina> RutinaEjercicios { get; set; } = new List<SesionRutina> { };
+        public List<RutinaEjercicio> RutinaEjercicios { get; set; } = new();
+        //Medicion
+        public List<Medicion> Mediciones { get; set; } = new();
     }
 }

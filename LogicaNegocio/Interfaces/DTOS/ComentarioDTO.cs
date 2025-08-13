@@ -8,12 +8,13 @@ using LogicaNegocio.Clases;
 namespace LogicaNegocio.Interfaces.DTOS
 {
     public class ComentarioDTO
-    {
+    {   
+        public int PublicacionId { get; set; }
         public int ComentarioId { get; set; }
         public string Contenido { get; set; }
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaEdicion { get; set; }
-
+        public bool EstaActivo { get; set; }
         public int AutorId { get; set; }
         public string AutorNombre { get; set; }
         public string RolAutor { get; set; }

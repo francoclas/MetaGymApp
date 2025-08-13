@@ -2,36 +2,45 @@
 @{
     ViewData["Title"] = "Editar administrador - " + Model.Usuario;
 }
-<div class="container card py-4">
-    <h2>Editar Profesional</h2>
+
+<div class="container text-light bg-dark rounded p-4 mt-4 shadow-sm">
+    <h2 class="mb-3">Editar Profesional</h2>
 
     <form asp-action="GuardarEdicionAdmin" asp-controller="Admin" method="post">
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="Rol" />
 
-        <div class="form-group">
-            <label asp-for="Nombre"></label>
-            <input asp-for="Nombre" class="form-control" />
+        <div class="mb-3">
+            <label asp-for="Nombre" class="form-label">Nombre</label>
+            <input asp-for="Nombre" class="form-control" minlength="3" maxlength="50" title="Debe tener entre 3 y 50 caracteres" />
         </div>
 
-        <div class="form-group">
-            <label asp-for="Usuario" readonly="readonly">Usuario</label>
-            <input asp-for="Usuario" class="form-control" />
+        <div class="mb-3">
+            <label asp-for="Usuario" class="form-label">Usuario</label>
+            <input asp-for="Usuario" class="form-control" readonly minlength="4" maxlength="20" title="Debe tener entre 4 y 20 caracteres" />
         </div>
 
-        <div class="form-group">
-            <label asp-for="Correo"></label>
-            <input asp-for="Correo" class="form-control" />
+        <div class="mb-3">
+            <label asp-for="Correo" class="form-label">Correo</label>
+            <input asp-for="Correo" class="form-control" type="email"
+                   required title="Ingrese un correo válido" />
         </div>
 
-        <div class="form-group">
-            <label asp-for="Pass">Contraseña</label>
-            <input asp-for="Pass" type="password" class="form-control" />
+        <div class="mb-3">
+            <label asp-for="Pass" class="form-label">Contraseña</label>
+            <input asp-for="Pass" type="password" class="form-control" minlength="6" maxlength="30" title="Debe tener entre 6 y 30 caracteres" />
         </div>
 
-        <div class="form-group">
-            <label asp-for="Telefono"></label>
-            <input asp-for="Telefono" class="form-control" />
+        <div class="mb-3">
+            <label asp-for="Telefono" class="form-label">Teléfono</label>
+            <input asp-for="Telefono" class="form-control" minlength="7" maxlength="12" title="Debe tener entre 8 y 12 dígitos numéricos" />
         </div>
-        <button type="submit" class="btn btn-success mt-3">Guardar cambios</button>
+
+        <div class="form-check mb-3">
+            <input asp-for="UsuarioActivo" class="form-check-input" type="checkbox" id="activoCheck" />
+            <label class="form-check-label" for="activoCheck">Cuenta activa</label>
+        </div>
+
+        <button type="submit" class="btn btn-success mt-2">Guardar cambios</button>
     </form>
+</div>

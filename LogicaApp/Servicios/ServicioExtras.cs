@@ -8,6 +8,7 @@ using LogicaDatos.Repositorio;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
+using Microsoft.EntityFrameworkCore;
 
 namespace LogicaApp.Servicios
 {
@@ -21,10 +22,12 @@ namespace LogicaApp.Servicios
 
         public List<Especialidad> BuscarEspecialidad(string Nombre)
         {
+            //Valido especialidad
             if (string.IsNullOrEmpty(Nombre))
             {
                 throw new Exception("La especialidad a buscar no puede estar vacia.");
             }
+            //Devuelvo desde repo
             return repoExtras.BuscarEspecialidad(Nombre);
         }
 
@@ -59,6 +62,7 @@ namespace LogicaApp.Servicios
 
         public Establecimiento ObtenerEstablecimiento(int Id)
         {
+            
             return repoExtras.ObtenerEstablecimientoId(Id);
         }
 
@@ -110,28 +114,143 @@ namespace LogicaApp.Servicios
         //registros solo con dtos
         public void RegistrarEspecialidad(EspecialidadDTO dto)
         {
-            var nueva = new Especialidad
+            //Instancio especialidad desde el dto
+            Especialidad nueva = new Especialidad
             {
                 NombreEspecialidad = dto.NombreEspecialidad,
                 DescripcionEspecialidad = dto.DescripcionEspecialidad
             };
+            //Mando al repo
             repoExtras.AltaEspecialidad(nueva);
          
         }
 
         public void RegistrarEstablecimiento(EstablecimientoDTO dto)
         {
-            var nuevo = new Establecimiento
+            //Instancio nuevo establecimiento desde DTO
+            Establecimiento nuevo = new Establecimiento
             {
                 Nombre = dto.Nombre,
-                Direccion = dto.Direccion
+                Direccion = dto.Direccion,
+                Latitud = dto.Latitud,
+                Longitud = dto.Longitud,
             };
-            repoExtras.AltaEstablecimiento(nuevo);
-                    }
+            //Mando al repo
+                repoExtras.AltaEstablecimiento(nuevo);
+        }
 
         public void GuardarCambios()
         {
             repoExtras.GuardarCambios();
+        }
+        public void CrearTipoAtencion(TipoAtencion tipo)
+        {
+            repoExtras.CrearTipoAtencion(tipo);
+        }
+        public TipoAtencion ObtenerTipoAtencion(int id)
+        {
+            return repoExtras.ObtenerTipoPorId(id);
+        }
+        public List<TipoAtencion> ObtenerTiposAtencionPorEspecialidad(int especialidadId)
+        {
+            return repoExtras.ObtenerTiposAtencionPorEspecialidad(especialidadId);
+        }
+        public List<TipoAtencion> ObtenerTiposAtencionPorEspecialidades(List<int> especialidadIds)
+        {
+            return repoExtras.ObtenerTiposAtencionPorEspecialidades(especialidadIds);
+        }
+
+        public List<TipoAtencion> ObtenerTiposAtencionPorIds(List<int> ids)
+        {
+            return repoExtras.ObtenerTiposAtencionPorIds(ids);
+        }
+        public List<TipoAtencion> ObtenerTiposAtencionPorProfesional(int profesionalId)
+        {
+            return repoExtras.ObtenerTiposAtencionPorProfesional(profesionalId);
+        }
+        public List<TipoAtencion> ObtenerTiposAtencion()
+        {
+            return repoExtras.ObtenerTiposAtencionTodos();
+        }
+
+        public List<TipoAtencionDTO> ObtenerTiposAtencionPorProfesionalDTO(int profesionalId)
+        {
+            List<TipoAtencionDTO> salida = new List<TipoAtencionDTO> ();
+            foreach (var item in repoExtras.ObtenerTiposAtencionPorProfesional(profesionalId))
+            {
+                salida.Add(new TipoAtencionDTO
+                {
+                    Id = item.Id,
+                    Nombre = item.Nombre,
+                    Desc = item.Descripcion,
+                });
+            }
+            return salida;
+        }
+
+        public List<EstablecimientoDTO> ObtenerEstablecimientosDTO()
+        {
+            List<EstablecimientoDTO> salida = new List<EstablecimientoDTO>();
+            foreach (var item in repoExtras.ListarEstablecimientos()) {
+                salida.Add(new EstablecimientoDTO
+                {
+                    Id = item.Id,
+                    Nombre = item.Nombre,
+                    Direccion = item.Direccion,
+                    Latitud = item.Latitud,
+                    Longitud = item.Longitud,
+                    UrlMedia = item.Media.FirstOrDefault().Url,
+                });
+            }
+            return salida;
+        }
+
+        public List<EspecialidadDTO> ObtenerEspecialidadesDTO()
+        {
+            List<EspecialidadDTO> salida = new List<EspecialidadDTO>();
+            foreach (var espe in repoExtras.ListarEspecialidades())
+            {
+                EspecialidadDTO ax = new EspecialidadDTO
+                {
+                    Id = espe.Id,
+                    NombreEspecialidad = espe.NombreEspecialidad,
+                    DescripcionEspecialidad = espe.DescripcionEspecialidad,
+                    TipoAtenciones = new List<TipoAtencionDTO>()
+                };
+                if(espe.TiposAtencion != null || espe.TiposAtencion.Any())
+                {
+                    foreach (var tipo in espe.TiposAtencion)
+                    {
+                        ax.TipoAtenciones.Add(new TipoAtencionDTO
+                        {
+                            Id = tipo.Id,
+                            EspecialidadId = tipo.EspecialidadId,
+                            Desc = tipo.Descripcion,
+                            Nombre = tipo.Nombre
+                        });
+                    }
+                    salida.Add(ax);
+                }
+                
+            }
+            return salida;
+        }
+
+        public List<TipoAtencionDTO> ObtenerTiposAtencionDTO()
+        {
+            List<TipoAtencionDTO> salida = new List<TipoAtencionDTO> ();
+            foreach (var tipo in repoExtras.ObtenerTiposAtencionTodos())
+            {
+                salida.Add(
+                    new TipoAtencionDTO
+                    {
+                        Id = tipo.Id,
+                        EspecialidadId = tipo.EspecialidadId,
+                        Desc = tipo.Descripcion,
+                        Nombre = tipo.Nombre
+                    });
+            }
+            return salida;
         }
     }
 }

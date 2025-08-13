@@ -16,8 +16,7 @@ namespace LogicaNegocio.Clases
         public bool EstaActivo { get; set; } = true;
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaEdicion { get; set; }
-        public int CantLikes { get; set; }
-
+        public List<LikeComentario> Likes { get; set; }
         // Relaciones
         public int PublicacionId { get; set; }
         public Publicacion Publicacion { get; set; }

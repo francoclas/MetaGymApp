@@ -3,11 +3,12 @@
 
 @{
     ViewData["Title"] = "Editar Profesional";
-    var especialidadesDisponibles = ViewBag.EspecialidadesDisponibles as List<Especialidad>; // Lista para agregar
+    var especialidadesDisponibles = ViewBag.EspecialidadesDisponibles as List<Especialidad>;
+    var tiposAtencionDisponibles = ViewBag.TiposAtencionDisponibles as List<TipoAtencion>;
 }
-<div class="container">
-    <div class="card py-2 container">
 
+<div class="container">
+    <div class="card py-3 px-4">
         <h2>Editar Profesional</h2>
 
         <form asp-action="GuardarEdicionProfesional" asp-controller="Admin" method="post">
@@ -15,36 +16,36 @@
             <input type="hidden" asp-for="Rol" />
 
             <div class="form-group">
-                <label asp-for="Nombre"></label>
+                <label>Nombre</label>
                 <input asp-for="Nombre" class="form-control" />
             </div>
 
             <div class="form-group">
-                <label asp-for="Usuario">Usuario</label>
-                <input asp-for="Usuario" class="form-control" />
+                <label>Usuario</label>
+                <input asp-for="Usuario" class="form-control" readonly />
             </div>
 
             <div class="form-group">
-                <label asp-for="Correo"></label>
+                <label>Correo</label>
                 <input asp-for="Correo" class="form-control" />
             </div>
 
             <div class="form-group">
-                <label asp-for="Pass">Contraseña</label>
+                <label>Contraseña (solo si desea cambiarla)</label>
                 <input asp-for="Pass" type="password" class="form-control" />
             </div>
 
             <div class="form-group">
-                <label asp-for="Telefono"></label>
+                <label>Teléfono</label>
                 <input asp-for="Telefono" class="form-control" />
             </div>
-        </<div>
-
-        <hr />
-        <div class="card py-2 container">
-            <div class="form-group">
-                <label>Agregar nueva especialidad</label>
-                <select id="especialidadId" class="form-control" name="especialidadId">
+            <div class="form-check mb-4">
+                <input asp-for="UsuarioActivo" class="form-check-input" type="checkbox" id="activoCheck" />
+                <label class="form-check-label text-white" for="activoCheck">Cuenta activa</label>
+            </div>
+            <div class="form-group mt-3">
+                <label>Agregar especialidad</label>
+                <select name="especialidadId" class="form-control">
                     <option value="">-- Seleccione una --</option>
                     @foreach (var esp in especialidadesDisponibles)
                     {
@@ -52,21 +53,82 @@
                     }
                 </select>
             </div>
-                </div>
-        <button type="submit" class="btn btn-success mt-3">Guardar cambios</button>
-    </form>
-    <h4>Especialidades actuales</h4>
-    <ul>
-        @foreach (var esp in Model.Especialidades)
+
+            <button type="submit" class="btn btn-success mt-3">Guardar cambios</button>
+        </form>
+
+        <hr />
+
+        <h4>Especialidades actuales</h4>
+        <ul>
+            @foreach (var esp in Model.Especialidades)
+            {
+                <li>
+                    @esp.NombreEspecialidad
+                    <form asp-action="EliminarEspecialidadProfesional" asp-controller="Admin" method="post" class="d-inline">
+                        <input type="hidden" name="profesionalId" value="@Model.Id" />
+                        <input type="hidden" name="especialidadId" value="@esp.Id" />
+                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                    </form>
+                </li>
+            }
+        </ul>
+        <hr />
+        <h4>Tipos de Atención asignados</h4>
+        @if (Model.TiposAtencionAsignadas.Any())
         {
-            <li>
-                @esp.NombreEspecialidad
-                <form asp-action="EliminarEspecialidadProfesional" asp-controller="Admin" method="post" class="d-inline">
-                    <input type="hidden" name="profesionalId" value="@Model.Id" />
-                    <input type="hidden" name="especialidadId" value="@esp.Id" />
-                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                </form>
-            </li>
+            <ul>
+                @foreach (var tipo in Model.TiposAtencionAsignadas.Where(t => Model.TiposAtencionIds.Contains(t.Id)))
+                {
+                    <li>
+                        @tipo.Nombre
+                        <form asp-action="EliminarTipoAtencionProfesional" asp-controller="Admin" method="post" class="d-inline">
+                            <input type="hidden" name="profesionalId" value="@Model.Id" />
+                            <input type="hidden" name="tipoAtencionId" value="@tipo.Id" />
+                            <button class="btn btn-sm btn-danger">Eliminar</button>
+                        </form>
+                    </li>
+                }
+            </ul>
         }
-    </ul>
+        else
+        {
+            <p class="text-muted">No tiene tipos de atención asignados.</p>
+        }
+
+        <hr />
+        <h4>Asignar nuevos Tipos de Atención</h4>
+        @if (tiposAtencionDisponibles.Any(t => !Model.TiposAtencionIds.Contains(t.Id)))
+        {
+            <form asp-action="GuardarTiposAtencionProfesional" asp-controller="Admin" method="post" onsubmit="return validarSeleccion();">
+                
+                <input type="hidden" name="profesionalId" value="@Model.Id" />
+
+                @foreach (var tipo in tiposAtencionDisponibles.Where(t => !Model.TiposAtencionIds.Contains(t.Id)))
+                {
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="tiposSeleccionados" value="@tipo.Id" />
+                        <label class="form-check-label">@tipo.Nombre</label>
+                    </div>
+                }
+
+                <button type="submit" class="btn btn-primary mt-2">Agregar seleccionados</button>
+            </form>
+        }
+        else
+        {
+            <p class="text-muted">No hay más tipos de atención disponibles para asignar.</p>
+        }
+    </div>
 </div>
+<!-- Solo para validar que no seleccionen nada antes de mandar el submit-->
+<script>
+    function validarSeleccion() {
+        const checkboxes = document.querySelectorAll('input[name="tiposSeleccionados"]:checked');
+        if (checkboxes.length === 0) {
+            alert("Seleccioná al menos un tipo de atención antes de enviar.");
+            return false;
+        }
+        return true;
+    }
+</script>

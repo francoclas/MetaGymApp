@@ -1,0 +1,46 @@
+﻿@using LogicaNegocio.Extra
+@model List<NotificacionDTO>
+@functions {
+    string ObtenerIcono(Enum_TipoNotificacion tipo)
+    {
+        var basePath = Url.Content("~/MediaWeb/Default/iconos/");
+        return tipo switch
+        {
+            Enum_TipoNotificacion.Rutina => $"{basePath}rutina.png",
+            Enum_TipoNotificacion.Publicacion => $"{basePath}notificacion-base.png",
+            Enum_TipoNotificacion.Cita => $"{basePath}notificacion-alerta.png",
+            Enum_TipoNotificacion.Comentario => $"{basePath}chat.png",
+            Enum_TipoNotificacion.Interaccion => $"{basePath}like.png",
+            _ => $"{basePath}notificacion-base.png"
+        };
+    }
+}
+
+<div id="menuNotificaciones" class="noti-dropdown" style="display:none;">
+    <div class="text-white p-2 pb-0">
+        <h6 class="m-0">Notificaciones</h6>
+        <small class="text-muted">Nuevas</small>
+        <hr class="text-secondary mt-1 mb-2" />
+    </div>
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-white p-2">No hay notificaciones por el momento.</div>
+    }
+    else
+    {
+        <ul class="noti-list">
+            @foreach (var n in Model)
+            {
+                <li class="noti-item d-flex align-items-center gap-2 no-leido">
+                    <img src="@ObtenerIcono(n.Tipo)" alt="icono" class="noti-icon" />
+                    <div class="text-truncate" style="min-width: 0;">
+                        <span class="d-block text-white noti-titulo">@n.Titulo</span>
+                        <span class="d-block text-muted noti-mensaje">@n.Mensaje</span>
+                        <small class="text-secondary noti-fecha">@n.Fecha.ToString("g")</small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-light ms-auto" onclick="marcarComoLeida(@n.Id)">✔</button>
+                </li>
+            }
+        </ul>
+    }
+</div>

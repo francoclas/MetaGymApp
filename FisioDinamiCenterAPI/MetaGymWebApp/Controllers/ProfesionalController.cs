@@ -1,15 +1,12 @@
-﻿using Humanizer;
-using LogicaApp.DTOS;
-using LogicaApp.Servicios;
-using LogicaDatos.Repositorio;
+﻿using LogicaApp.DTOS;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
 using LogicaNegocio.Interfaces.DTOS;
-using LogicaNegocio.Interfaces.Repositorios;
 using LogicaNegocio.Interfaces.Servicios;
 using MetaGymWebApp.Filtros;
 using MetaGymWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MetaGymWebApp.Controllers
 {
@@ -25,7 +22,8 @@ namespace MetaGymWebApp.Controllers
         private readonly IMediaServicio mediaServicio;
         private readonly IClienteServicio clienteServicio;
         private readonly IPublicacionServicio publicacionServicio;
-        public ProfesionalController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio, IProfesionalServicio proservicio, IRutinaServicio rutina, IMediaServicio mediaServicio, IClienteServicio clienteServicio, IPublicacionServicio publicacionServicio)
+        private readonly INotificacionServicio notificacionServicio;
+        public ProfesionalController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio, IProfesionalServicio proservicio, IRutinaServicio rutina, IMediaServicio mediaServicio, IClienteServicio clienteServicio, IPublicacionServicio publicacionServicio,INotificacionServicio notificacion)
         {
             this.usuarioServicio = usuarioServicio;
             this.citaServicio = citaServicio;
@@ -35,6 +33,7 @@ namespace MetaGymWebApp.Controllers
             this.mediaServicio = mediaServicio;
             this.clienteServicio = clienteServicio;
             this.publicacionServicio = publicacionServicio;
+            this.notificacionServicio = notificacion;
         }
         [HttpGet]
         public IActionResult VerSolicitudCitas()
@@ -45,7 +44,22 @@ namespace MetaGymWebApp.Controllers
             return View(salida);
 
         }
+        //Historiales clinicos
+        [HttpGet]
+        public IActionResult BuscarClientesCita()
+        {
+            var listaClientes = clienteServicio.ObtenerTodosDTO()
+                .Select(c => new ClienteDTO
+                {
+                    Id = c.Id,
+                    NombreCompleto = c.NombreCompleto,
+                    Ci = c.Ci,
+                    Correo = c.Correo,
+                    Telefono = c.Telefono
+                }).ToList();
 
+            return View(listaClientes);
+        }
         //Gestionar cita
         [HttpGet]
         public IActionResult RevisarCita(int id)
@@ -67,58 +81,228 @@ namespace MetaGymWebApp.Controllers
         [HttpPost]
         public IActionResult RevisarCita(CitaDTO citaDTO)
         {
-            //Valido
+            try
+            {
+                int profesionalId = GestionSesion.ObtenerUsuarioId(this.HttpContext);
 
-            //Mando a repo
+                // Obtener la cita original
+                Cita cita = citaServicio.ObtenerPorId(citaDTO.CitaId);
 
-            //Redireccion
-            return View();
+                if (cita.Estado != EstadoCita.EnEspera)
+                    throw new Exception("La cita ya fue gestionada.");
+
+                // Asignar profesional y cambiar estado
+                cita.ProfesionalId = profesionalId;
+                cita.Estado = EstadoCita.Aceptada;
+
+                // Validar que esté dentro del horario profesional (esto lo implementás después si querés)
+                cita.Validar();
+
+                // Guardar cambios
+                citaServicio.ActualizarEntidad(cita);
+
+                TempData["Mensaje"] = "Cita aceptada correctamente.";
+                return RedirectToAction("GestionCitas");
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return View(citaDTO);
+            }
         }
 
-        public IActionResult GestionCitas(EstadoCita estado = EstadoCita.EnEspera)
+        public IActionResult GestionCitas()
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
 
-            List<Cita> citas;
+            try
+            {
+                //Valido si usuariorio tiene especialidades
+                List<int> tiene = profesionalServicio.ObtenerTiposAtencionProfesional(profesionalId);
+                if (!tiene.Any())
+                {
+                    GestionCitasModelo salida = new GestionCitasModelo { TieneEspecialidades = false };
+                    return View(salida);
 
-            if (estado == EstadoCita.EnEspera)
-            {
-                citas = citaServicio.BuscarSolicitudesSegunEspecialidades(profesionalServicio.ObtenerEspecialidadesProfesional(profesionalId));
-            }
-            else if (estado == EstadoCita.Aceptada)
-            {
-                citas = citaServicio.SolicitarProximasProfesional(profesionalId);
-            }
-            else if (estado == EstadoCita.Finalizada)
-            {
-                citas = citaServicio.SolicitarHistorialProfesional(profesionalId);
-            }
-            else
-            {
-                citas = new List<Cita>();
-            }
-            //Gestion de rutinas
-            // Mapear a DTOs
-            var dtoList = citas.Select(c => new CitaDTO
-            {
-                CitaId = c.Id,
-                Cliente = c.Cliente,
-                Especialidad = c.Especialidad,
-                Establecimiento = c.Establecimiento,
-                Descripcion = c.Descripcion,
-                FechaAsistencia = c.FechaAsistencia.Value,
-                FechaCreacion = c.FechaCreacion,
-                ProfesionalId = c.ProfesionalId,
-                Conclusion = c.Conclusion
-            }).ToList();
+                }
+                else { 
+                    // Obtener las citas correspondientes
+                    var citasEnEspera = citaServicio
+                    .BuscarSolicitudesSegunTiposAtencion(profesionalServicio.ObtenerTiposAtencionProfesional(profesionalId));
 
-            var model = new GestionCitasModelo
+                var citasProximas = citaServicio
+                    .SolicitarProximasProfesional(profesionalId);
+
+                var citasFinalizadas = citaServicio
+                    .SolicitarHistorialProfesional(profesionalId)
+                    .Where(c => c.Estado == EstadoCita.Finalizada)
+                    .ToList();
+
+                // Mapeo a DTOs
+                GestionCitasModelo modelo = new GestionCitasModelo
+                {
+                    CitasEnEspera = citasEnEspera.Select(c => new CitaDTO
+                    {
+                        CitaId = c.Id,
+                        Cliente = c.Cliente,
+                        Especialidad = c.Especialidad,
+                        Establecimiento = c.Establecimiento,
+                        Descripcion = c.Descripcion,
+                        FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
+                        FechaCreacion = c.FechaCreacion,
+                        ProfesionalId = c.ProfesionalId,
+                        Conclusion = c.Conclusion
+                    }).ToList(),
+
+                    CitasProximasDeProfesional = citasProximas.Select(c => new CitaDTO
+                    {
+                        CitaId = c.Id,
+                        Cliente = c.Cliente,
+                        Especialidad = c.Especialidad,
+                        Establecimiento = c.Establecimiento,
+                        Descripcion = c.Descripcion,
+                        FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
+                        FechaCreacion = c.FechaCreacion,
+                        ProfesionalId = c.ProfesionalId
+                    }).ToList(),
+
+                    CitasAtendidasProfesional = citasFinalizadas.Select(c => new CitaDTO
+                    {
+                        CitaId = c.Id,
+                        Cliente = c.Cliente,
+                        Especialidad = c.Especialidad,
+                        Establecimiento = c.Establecimiento,
+                        Descripcion = c.Descripcion,
+                        FechaAsistencia = c.FechaAsistencia ?? DateTime.MinValue,
+                        FechaCreacion = c.FechaCreacion,
+                        ProfesionalId = c.ProfesionalId,
+                        Conclusion = c.Conclusion
+                    }).ToList(),
+                    TieneEspecialidades = true
+                };
+
+                    return View(modelo);
+
+                }
+            }
+            catch (Exception)
             {
-                Citas = dtoList,
-                EstadoSeleccionado = estado
+
+                throw;
+            }
+            
+        }
+        [HttpGet]
+        public IActionResult EditarCita(int id)
+        {
+            int ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            var cita = citaServicio.ObtenerPorId(id);
+
+            if (cita.Estado != EstadoCita.Aceptada)
+            {
+                TempData["Mensaje"] = "Solo se pueden editar citas aceptadas.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionCitas");
+            }
+            if (cita.ProfesionalId != ProfesionalId)
+            {
+                TempData["Mensaje"] = "No tenes asignada la rutina a editar";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionCitas");
+
+            }
+            var dto = new CitaDTO
+            {
+                CitaId = cita.Id,
+                FechaAsistencia = cita.FechaAsistencia ?? DateTime.Now,
+                EstablecimientoId = cita.EstablecimientoId,
+                ClienteId = cita.ClienteId,
+                ProfesionalId = cita.ProfesionalId,
+                EspecialidadId = cita.EspecialidadId,
+                Descripcion = cita.Descripcion,
+                TipoAtencionId = cita.TipoAtencionId
             };
 
-            return View(model);
+            ViewBag.TiposAtencion = new SelectList(extraServicio.ObtenerTiposAtencionPorProfesional(ProfesionalId), "Id", "Nombre", dto.TipoAtencionId);
+            return View(dto);
+        }
+
+        [HttpPost]
+        public IActionResult EditarCita(CitaDTO citaDTO)
+        {
+            int ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            try
+            {
+
+                Cita cita = citaServicio.ObtenerPorId(citaDTO.CitaId);
+
+                if (cita == null)
+                    throw new Exception("No se encontró la cita.");
+                if (cita.ProfesionalId != ProfesionalId)
+                {
+                    TempData["Mensaje"] = "No tenes asignada la rutina a editar";
+                    TempData["TipoMensaje"] = "danger";
+                    return RedirectToAction("GestionCitas");
+
+                }
+                // Validaciones según nuevo estado
+                if (citaDTO.Estado == EstadoCita.Finalizada ||
+                    citaDTO.Estado == EstadoCita.Cancelada ||
+                    citaDTO.Estado == EstadoCita.NoAsistio ||
+                    citaDTO.Estado == EstadoCita.Rechazada)
+                {
+                    if (string.IsNullOrWhiteSpace(citaDTO.Conclusion))
+                        throw new Exception("Debe ingresar una conclusión para finalizar o cancelar la cita.");
+
+                    cita.Conclusion = citaDTO.Conclusion;
+                    cita.Estado = citaDTO.Estado;
+                    cita.FechaFinalizacion = DateTime.Now;
+                }
+                else
+                {
+                    cita.Estado = citaDTO.Estado; // Aceptada u otro cambio
+                }
+
+                // Fecha o descripción
+                cita.FechaAsistencia = citaDTO.FechaAsistencia;
+                cita.Descripcion = citaDTO.Descripcion;
+
+                // Tipo atención si vino
+                if (citaDTO.TipoAtencionId.HasValue)
+                    cita.TipoAtencionId = citaDTO.TipoAtencionId.Value;
+
+                cita.Validar(); // si usás validaciones internas
+
+                citaServicio.ActualizarEntidad(cita);
+
+                TempData["Mensaje"] = "Cita actualizada correctamente.";
+                return RedirectToAction("GestionCitas");
+            }
+            catch (Exception ex)
+            {
+                TempData["Mensaje"] = ex.Message;
+                TempData["TipoMensaje"] = "danger";
+
+                ViewBag.TiposAtencion = new SelectList(extraServicio.ObtenerTiposAtencionPorProfesional(ProfesionalId), "Id", "Nombre", citaDTO.TipoAtencionId);
+                return View(citaDTO);
+            }
+        }
+        [HttpGet]
+        public IActionResult HistorialClinicoCliente(int id)
+        {
+            List<CitaDTO> historial = citaServicio.SolicitarHistorialCliente(id)
+                .Where(c => c.Estado == EstadoCita.Finalizada)
+                .ToList();
+
+            return View(historial);
+        }
+
+        [HttpGet] 
+        public IActionResult HistorialSesionesCliente(int id)
+        {
+            List<SesionEntrenadaDTO> sesiones = rutinaServicio.ObtenerHistorialClienteDTO(id);
+            return View(sesiones);
         }
         [HttpGet]
         public IActionResult GestionRutinas()
@@ -126,8 +310,11 @@ namespace MetaGymWebApp.Controllers
             try
             {
                 int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
-                var rutinas = rutinaServicio.ObtenerRutinasProfesional(profesionalId);
+                //Obtengo la lista de rutinas desde el repo
+                List<Rutina> rutinas = rutinaServicio.ObtenerRutinasProfesional(profesionalId);
+                //Valido que exista
                 if (rutinas == null) throw new Exception("No se obtuvieron las rutinas, intente iniciando sesion nuevamente.");
+                //Devuelvo mapeando la lista de las rutinas
                 return View(rutinas.Select(r => new RutinaDTO
                 {
                     Id = r.Id,
@@ -144,15 +331,97 @@ namespace MetaGymWebApp.Controllers
             }
             
         }
+        [HttpGet]
+        public IActionResult VerCita(int id)
+        {
+            var cita = citaServicio.ObtenerPorId(id);
+            return View("VerCita", new CitaDTO
+            {
+                CitaId = cita.Id,
+                Cliente = cita.Cliente,
+                Establecimiento = cita.Establecimiento,
+                Especialidad = cita.Especialidad,
+                Descripcion = cita.Descripcion,
+                FechaAsistencia = cita.FechaAsistencia ?? DateTime.Now,
+                Conclusion = cita.Conclusion
+            });
+        }
+        [HttpGet]
+        public IActionResult CrearCita()
+        {
+            int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+
+            RegistroCitaModelo modelo = new RegistroCitaModelo
+            {
+                Clientes = clienteServicio.ObtenerTodosDTO(),
+                Especialidades = profesionalServicio.ObtenerEspecialidadesProfesionalDTO(profesionalId),
+                TiposAtencion = extraServicio.ObtenerTiposAtencionPorProfesionalDTO(profesionalId),
+                Establecimientos = extraServicio.ObtenerEstablecimientosDTO(),
+                Cita = new CitaDTO()
+            };
+
+            return View(modelo);
+        }
+        [HttpPost]
+        public IActionResult CrearCita(RegistroCitaModelo modelo)
+        {
+            try
+            {
+                CitaDTO cita = modelo.Cita;
+                cita.ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+                //Valido la info ingresada
+                if (cita.ClienteId <= 0)
+                    throw new Exception("Debe seleccionar un cliente.");
+
+                if (cita.EspecialidadId <= 0)
+                    throw new Exception("Debe seleccionar una especialidad.");
+
+                if (cita.TipoAtencionId <= 0)
+                    throw new Exception("Debe seleccionar un tipo de atención.");
+
+                if (cita.EstablecimientoId <= 0)
+                    throw new Exception("Debe seleccionar un establecimiento.");
+
+                if (string.IsNullOrWhiteSpace(cita.Descripcion))
+                    throw new Exception("Debe ingresar una descripción para la cita.");
+
+                if (cita.FechaAsistencia == default || cita.FechaAsistencia < DateTime.Now)
+                    throw new Exception("Debe ingresar una fecha y hora válida y futura.");
+                //mando al repo
+                citaServicio.RegistrarCitaPorProfesional(cita);
+
+
+                TempData["Mensaje"] = "Cita registrada correctamente.";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("GestionCitas");
+            }
+            catch (Exception ex)
+            {
+                TempData["Mensaje"] = ex.Message;
+                TempData["TipoMensaje"] = "danger";
+
+                // Recargar listas
+                int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+                modelo.Clientes = clienteServicio.ObtenerTodosDTO();
+                modelo.Especialidades = profesionalServicio.ObtenerEspecialidadesProfesionalDTO(profesionalId);
+                modelo.TiposAtencion = extraServicio.ObtenerTiposAtencionPorProfesionalDTO(profesionalId);
+                modelo.Establecimientos = extraServicio.ObtenerEstablecimientosDTO();
+
+                return View(modelo);
+            }
+        }
+
+
         //Ejercicios
         [HttpGet]
         public IActionResult GestionEjercicios()
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            //Obtengo la lista de ejercicios
+            List<EjercicioDTO> todos = rutinaServicio.ObtenerTodosEjercicios();
 
-            var todos = rutinaServicio.ObtenerTodosEjercicios();
-
-            var modelo = new GestionEjerciciosModelo
+            //Mapeo para el modelo
+            GestionEjerciciosModelo modelo = new GestionEjerciciosModelo
             {
                 EjerciciosProfesional = todos.Where(e => e.ProfesionalId == profesionalId).ToList(),
                 EjerciciosSistema = todos.Where(e => e.ProfesionalId != profesionalId).ToList()
@@ -160,13 +429,29 @@ namespace MetaGymWebApp.Controllers
 
             return View(modelo);
         }
-        
+        [HttpGet]
+        public IActionResult BuscarHistorialClientes()
+        {
+            var listaClientes = clienteServicio.ObtenerTodosDTO()
+                 .Select(c => new ClienteDTO
+                 {
+                     Id = c.Id,
+                     NombreCompleto = c.NombreCompleto,
+                     Ci = c.Ci,
+                     Correo = c.Correo,
+                     Telefono = c.Telefono
+                 }).ToList();
+
+            return View(listaClientes);
+        }
         [HttpGet]
         public IActionResult DetalleEjercicio(int id)
         {
             try
             {
+                //Obtengo el ejercicio a mostrar desde el repo
                 EjercicioDTO ejercicio = rutinaServicio.ObtenerEjercicioDTOId(id);
+                //Verifico que existe
                 if (ejercicio == null) throw new Exception("No se encontro ejercicio o no existe.");
                 if (ejercicio.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext)) throw new Exception("No tiene permisos para editar este ejercicio, no es el autor.");
                 return View(ejercicio);
@@ -179,7 +464,24 @@ namespace MetaGymWebApp.Controllers
             }
             
         }
-
+        [HttpGet]
+        public IActionResult InformacionEjercicio(int id)
+        {
+            try
+            {
+                //Obtengo el ejercicio a mostrar desde el repo
+                EjercicioDTO ejercicio = rutinaServicio.ObtenerEjercicioDTOId(id);
+                //Verifico que existe
+                if (ejercicio == null) throw new Exception("No se encontro ejercicio o no existe.");
+                return View(ejercicio);
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionEjercicios");
+            }
+        }
         //Alta de ejercicio
         [HttpGet]
         public IActionResult RegistrarEjercicio()
@@ -189,18 +491,36 @@ namespace MetaGymWebApp.Controllers
         [HttpPost]
         public IActionResult RegistrarEjercicio(EjercicioDTO dto, List<IFormFile> archivos)
         {
-            var ejercicio = new Ejercicio
+            //valido datos
+            try
+            {
+                if (String.IsNullOrEmpty(dto.Nombre)) throw new Exception("El nombre no puede estar vacio.");
+                if (String.IsNullOrEmpty(dto.GrupoMuscular)) throw new Exception("Debe colocar al menos un grupo muscular");
+                if (String.IsNullOrEmpty(dto.Tipo)) throw new Exception("Debe colocar un tipo de ejercicio.");
+                if (String.IsNullOrEmpty(dto.Instrucciones)) throw new Exception("Debe completar las instrucciones.");
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return View(dto);
+            }
+            //Instancio el ejercicio a registrar
+            Ejercicio ejercicio = new Ejercicio
             {
                 Nombre = dto.Nombre,
                 Tipo = dto.Tipo,
                 GrupoMuscular = dto.GrupoMuscular,
                 Instrucciones = dto.Instrucciones,
                 ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext),
-                Medias = new List<Media>()
+                Medias = new List<Media>(),
+                Mediciones = dto.Mediciones
             };
             try
             {
-                rutinaServicio.GenerarNuevoEjercicio(ejercicio); // primero guardamos para obtener el ID
+                //lo mando al repo para tener id
+                rutinaServicio.GenerarNuevoEjercicio(ejercicio); 
+                //Si salio bien, ahora cargo los archivos.
                 if (archivos != null && archivos.Count > 0)
                 {
                     foreach (var archivo in archivos)
@@ -220,7 +540,6 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("GestionEjercicios");
 
             }
-
         }
 
         //Editar ejercicio
@@ -229,7 +548,8 @@ namespace MetaGymWebApp.Controllers
         {
             try
             {
-                var dto = rutinaServicio.ObtenerEjercicioDTOId(id);
+                //obtengo del repo y mapeo al dto
+                EjercicioDTO dto = rutinaServicio.ObtenerEjercicioDTOId(id);
                 if (dto == null) throw new Exception("No se encontro ejercicio o no existe.");
                 if (dto.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext)) throw new Exception("No tiene permisos para editar este ejercicio.");
                 return View(dto);
@@ -248,15 +568,16 @@ namespace MetaGymWebApp.Controllers
         {
             try
             {
+                //Obtengo el ejercicio desde repo
                 Ejercicio ejercicio = rutinaServicio.ObtenerEjercicioId(dto.Id);
                 if (ejercicio == null) throw new Exception("No se encontro ejercicio o no existe.");
                 if (dto.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext)) throw new Exception("No tiene permisos para editar este ejercicio.");
-                // Actualizar datos principales
+                //Mapeo los cambios
                 ejercicio.Nombre = dto.Nombre;
                 ejercicio.Tipo = dto.Tipo;
                 ejercicio.GrupoMuscular = dto.GrupoMuscular;
                 ejercicio.Instrucciones = dto.Instrucciones;
-
+                ejercicio.Mediciones = dto.Mediciones;
                 // Agregar nuevos archivos 
                 if (archivos != null && archivos.Count > 0)
                 {
@@ -281,70 +602,120 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult RegistrarRutina()
         {
-            //ViewBag.Ejercicios = rutinaServicio.ObtenerTodosEjercicios(); // EjercicioDTO
-            var modelo = new RutinaRegistroDTO
+            //Obtengo ejercicois para listar
+            int profesionalId = GestionSesion.ObtenerUsuarioId(this.HttpContext);
+            List<EjercicioDTO> todos = rutinaServicio.ObtenerTodosEjercicios();
+            //genero modelo para la vista
+            RutinaRegistroDTO modelo = new RutinaRegistroDTO
             {
-                EjerciciosDisponibles = rutinaServicio.ObtenerTodosEjercicios(),
+                MisEjerciciosDisponibles = todos.Where(e => e.ProfesionalId == profesionalId).ToList(),
+                EjerciciosDisponiblesSistema = todos.Where(e => e.ProfesionalId != profesionalId).ToList(),
                 ClientesDisponibles = clienteServicio.ObtenerTodosDTO()
             };
-
             return View(modelo);
         }
-            [HttpPost]
-            public IActionResult RegistrarRutina(RutinaRegistroDTO dto)
+        [HttpPost]
+        public IActionResult RegistrarRutina(RutinaRegistroDTO dto)
         {
-            var rutina = new Rutina
-            {
-                NombreRutina = dto.NombreRutina,
-                Tipo = dto.Tipo,
-                ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext),
-                FechaCreacion = DateTime.Now,
-                FechaModificacion = DateTime.Now,
-                Ejercicios = dto.IdsEjerciciosSeleccionados.Select((id, index) => new RutinaEjercicio
-                {
-                    EjercicioId = id,
-                    Orden = index + 1
-                }).ToList()
-            };
             try
             {
-                // Guardar la rutina primero
+                // Crear la rutina vacía
+                var rutina = new Rutina
+                {
+                    NombreRutina = dto.NombreRutina,
+                    Tipo = dto.Tipo,
+                    ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext),
+                    FechaCreacion = DateTime.Now,
+                    FechaModificacion = DateTime.Now,
+                    Ejercicios = new List<RutinaEjercicio>() // empezamos vacío
+                };
+
+                // Guardar la rutina primero para obtener Id
                 rutinaServicio.GenerarNuevaRutina(rutina);
+
+                // Agregar ejercicios usando el mismo patrón de merge
+                rutinaServicio.ActualizarEjerciciosRutina(rutina, dto.IdsEjerciciosSeleccionados);
+
                 // Asignar a cada cliente
                 foreach (var clienteId in dto.IdsClientesAsignados)
                 {
                     rutinaServicio.AsignarRutinaACliente(clienteId, rutina.Id);
                 }
-                TempData["Mensaje"] = "Se registro la rutina correctamente, se asigno a los usuarios seleccionados.";
-                TempData["TipoMensaje"] = "Success";
+
+                TempData["Mensaje"] = "Se registró la rutina correctamente y se asignó a los usuarios seleccionados.";
+                TempData["TipoMensaje"] = "success";
                 return RedirectToAction("GestionRutinas");
             }
             catch (Exception)
             {
-                TempData["Mensaje"] = "No se logro registrar la rutina, favor de intentar nuevamente mas tarde.";
+                TempData["Mensaje"] = "No se logró registrar la rutina, favor de intentar nuevamente más tarde.";
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("GestionRutinas");
             }
-
         }
         [HttpGet]
         public IActionResult EditarRutina(int id)
         {
             try
             {
-                var rutina = rutinaServicio.ObtenerRutinaPorId(id);
-                if (rutina == null) throw new Exception("No se encontro rutina o no existe.");
-                if (rutina.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext)) throw new Exception("No tiene permisos para editar esta rutina.");
+                int profesionalId = GestionSesion.ObtenerUsuarioId(this.HttpContext);
+
+                // Obtener la rutina
+                Rutina rutina = rutinaServicio.ObtenerRutinaPorId(id);
+                if (rutina == null)
+                    throw new Exception("No se encontró rutina o no existe.");
+                if (rutina.ProfesionalId != profesionalId)
+                    throw new Exception("No tiene permisos para editar esta rutina.");
+
+                // Ejercicios de la rutina
+                var idsSeleccionados = rutina.Ejercicios.Select(e => e.EjercicioId).ToList();
+
+                // Todos los ejercicios
+                List<EjercicioDTO> todosEjercicios = rutinaServicio.ObtenerTodosEjercicios();
+
+                // Clientes asignados a la rutina
+                var idsClientesAsignados = rutinaServicio.ObtenerAsignacionesPorRutina(id)
+                                                         .Select(a => a.ClienteId)
+                                                         .ToList();
+
+                // Todos los clientes
+                List<ClienteDTO> todosClientes = clienteServicio.ObtenerTodosDTO();
+
+                // Armar DTO para la vista
                 var dto = new RutinaRegistroDTO
                 {
                     Id = rutina.Id,
                     NombreRutina = rutina.NombreRutina,
                     Tipo = rutina.Tipo,
-                    IdsEjerciciosSeleccionados = rutina.Ejercicios.Select(e => e.EjercicioId).ToList(),
-                    IdsClientesAsignados = rutinaServicio.ObtenerAsignacionesPorRutina(id).Select(a => a.ClienteId).ToList(),
-                    EjerciciosDisponibles = rutinaServicio.ObtenerTodosEjercicios(),
-                    ClientesDisponibles = clienteServicio.ObtenerTodosDTO()
+
+                    IdsEjerciciosSeleccionados = idsSeleccionados,
+                    IdsClientesAsignados = idsClientesAsignados,
+
+                    // Ejercicios disponibles (se excluyen los ya seleccionados)
+                    MisEjerciciosDisponibles = todosEjercicios
+                        .Where(e => e.ProfesionalId == profesionalId && !idsSeleccionados.Contains(e.Id))
+                        .ToList(),
+
+                    EjerciciosDisponiblesSistema = todosEjercicios
+                        .Where(e => e.ProfesionalId != profesionalId && !idsSeleccionados.Contains(e.Id))
+                        .ToList(),
+
+                    // Ejercicios seleccionados (solo los de la rutina)
+                    EjerciciosSeleccionados = todosEjercicios
+                        .Where(e => idsSeleccionados.Contains(e.Id))
+                        .ToList(),
+
+                    // Clientes disponibles (sin los ya asignados)
+                    ClientesDisponibles = todosClientes
+                        .Where(c => !idsClientesAsignados.Contains(c.Id))
+                        .ToList(),
+
+                    // Clientes seleccionados
+                    ClientesSeleccionados = todosClientes
+                        .Where(c => idsClientesAsignados.Contains(c.Id))
+                        .ToList()
                 };
+
                 return View(dto);
             }
             catch (Exception e)
@@ -353,31 +724,47 @@ namespace MetaGymWebApp.Controllers
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("GestionRutinas");
             }
-            
         }
+
+
+
         [HttpPost]
         public IActionResult EditarRutina(RutinaRegistroDTO dto)
         {
             try
             {
-                var rutina = rutinaServicio.ObtenerRutinaPorId(dto.Id);
-                if (rutina == null) throw new Exception("No se encontro rutina o no existe.");
-                if (rutina.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext)) throw new Exception("No tiene permisos para editar esta rutina.");
+                int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+
+                // Buscar la rutina
+                Rutina rutina = rutinaServicio.ObtenerRutinaPorId(dto.Id);
+                if (rutina == null)
+                    throw new Exception("No se encontró rutina o no existe.");
+                if (rutina.ProfesionalId != profesionalId)
+                    throw new Exception("No tiene permisos para editar esta rutina.");
+
+                // Actualizar datos principales
                 rutina.NombreRutina = dto.NombreRutina;
                 rutina.Tipo = dto.Tipo;
                 rutina.FechaModificacion = DateTime.Now;
-                rutina.Ejercicios = dto.IdsEjerciciosSeleccionados.Select((id, index) => new RutinaEjercicio
+
+                // === Actualizar ejercicios ===
+                rutina.Ejercicios.Clear();
+                foreach (var ejercicioId in dto.IdsEjerciciosSeleccionados)
                 {
-                    EjercicioId = id,
-                    Orden = index + 1
-                }).ToList();
+                    rutina.Ejercicios.Add(new RutinaEjercicio
+                    {
+                        EjercicioId = ejercicioId,
+                        Orden = dto.IdsEjerciciosSeleccionados.IndexOf(ejercicioId) + 1
+                    });
+                }
 
-                rutinaServicio.ModificarRutina(rutina);
-
-                // Reemplazar asignaciones
+                // === Actualizar clientes asignados ===
                 rutinaServicio.ReemplazarAsignaciones(rutina.Id, dto.IdsClientesAsignados);
 
-                TempData["Mensaje"] = "Se modifico la rutina correctamente.";
+                // Guardar cambios
+                rutinaServicio.ModificarRutina(rutina);
+
+                TempData["Mensaje"] = "Rutina actualizada correctamente.";
                 TempData["TipoMensaje"] = "success";
                 return RedirectToAction("GestionRutinas");
             }
@@ -386,10 +773,9 @@ namespace MetaGymWebApp.Controllers
                 TempData["Mensaje"] = e.Message;
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("GestionRutinas");
-
             }
-
         }
+
         //Publicaciones
 
         //Solicitar publicacion
@@ -403,40 +789,61 @@ namespace MetaGymWebApp.Controllers
         public IActionResult SolicitarPublicacion(CrearPublicacionDTO dto, List<IFormFile> ArchivosMedia)
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
-
-            var publicacion = new Publicacion
+            try
             {
-                Titulo = dto.Titulo,
-                Descripcion = dto.Descripcion,
-                FechaCreacion = DateTime.Now,
-                FechaProgramada = dto.FechaProgramada,
-                EsPrivada = dto.EsPrivada,
-                Estado = dto.FechaProgramada.HasValue ? Enum_EstadoPublicacion.Programada : Enum_EstadoPublicacion.Pendiente,
-                ProfesionalId = profesionalId,
-                ListaMedia = new List<Media>()
-            };
-            //Lo creo
-            publicacionServicio.CrearPublicacionImagenes(publicacion);
-
-            //Si hay imagenes las registro
-            if (ArchivosMedia != null && ArchivosMedia.Count > 0)
-            {
-                foreach (var archivo in ArchivosMedia)
+                //valido datos
+                Publicacion publicacion = new Publicacion
                 {
-                    mediaServicio.GuardarArchivo(archivo,Enum_TipoEntidad.Publicacion,publicacion.Id);
+                    Titulo = dto.Titulo,
+                    Descripcion = dto.Descripcion,
+                    FechaCreacion = DateTime.Now,
+                    FechaProgramada = dto.FechaProgramada,
+                    EsPrivada = dto.EsPrivada,
+                    Estado = dto.FechaProgramada.HasValue ? Enum_EstadoPublicacion.Programada : Enum_EstadoPublicacion.Pendiente,
+                    ProfesionalId = profesionalId,
+                    ListaMedia = new List<Media>()
+                };
+           
+                //Envio al repo
+                publicacionServicio.CrearPublicacionImagenes(publicacion);
+                //Si hay imagenes las registro
+                if (ArchivosMedia != null && ArchivosMedia.Count > 0)
+                {
+                    foreach (var archivo in ArchivosMedia)
+                    {
+                        mediaServicio.GuardarArchivo(archivo, Enum_TipoEntidad.Publicacion, publicacion.Id);
+                    }
                 }
+                TempData["Mensaje"] = "Se envio la solicitud para su revision";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("MisPublicaciones");
             }
-            return RedirectToAction("MisPublicaciones");
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("MisPublicaciones");
+            }
+            
         }
         //Mis publicaciones
+        [HttpGet]
         [HttpGet]
         public IActionResult MisPublicaciones()
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
             List<PublicacionDTO> publicaciones = publicacionServicio.ObtenerPorProfesionalId(profesionalId);
 
-            return View(publicaciones);
+            var modelo = new MisPublicacionesProfesional
+            {
+                Pendientes = publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Pendiente).ToList(),
+                Aprobadas = publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Aprobada).ToList(),
+                Rechazadas = publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Rechazada).ToList()
+            };
+
+            return View(modelo);
         }
+
         //Detales
         [HttpGet]
         public IActionResult DetallePublicacion(int id)
@@ -452,7 +859,69 @@ namespace MetaGymWebApp.Controllers
 
             return View(publicacion);
         }
+        [HttpGet]
+        public IActionResult EditarPublicacion(int id)
+        {
+            //Obtengo publicacion desde repo
+            PublicacionDTO publicacion = publicacionServicio.ObtenerPorId(id);
+            int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            //Verifico que no sea null. Y que corresponda al autor que la solicita 
+            if (publicacion == null || publicacion.AutorId != profesionalId || publicacion.RolAutor != "Profesional")
+            {
+                TempData["Mensaje"] = "No tenés permiso para editar esta publicación.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("MisPublicaciones");
+            }
+            return View(publicacion);
+        }
+        [HttpPost]
+        public IActionResult EditarPublicacion(int Id, string Titulo, string Descripcion, List<IFormFile> archivos)
+        {
+            try
+            {
+                //Obtengo publicacion por repo
+                PublicacionDTO pub = publicacionServicio.ObtenerPorId(Id);
+                int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+
+                //Si no es el dueño lo devuevlo al menu
+                if (pub == null || pub.AutorId != profesionalId && pub.RolAutor != "Profesional")
+                    throw new Exception("No podés editar esta publicación.");
+
+                //Mapeo cambiois
+                pub.Titulo = Titulo;
+                pub.Descripcion = Descripcion;
+                pub.FechaProgramada = DateTime.Now;
+                //Queda pendiente de ser aprobada
+                pub.Estado = Enum_EstadoPublicacion.Pendiente;
+                pub.MotivoRechazo = null;
+                //Mando al repo
+                publicacionServicio.ActualizarPublicacion(pub);
+                //Cargo las fotoso nuevas si corresponde.
+                if (archivos != null && archivos.Any())
+                {
+                    foreach (var archivo in archivos)
+                    {
+                        mediaServicio.GuardarArchivo(archivo, Enum_TipoEntidad.Publicacion, pub.Id);
+                    }
+                }
+                TempData["Mensaje"] = "Publicación editada correctamente. Queda pendiente de revisión.";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("MisPublicaciones");
+            }
+            catch (Exception ex)
+            {
+                TempData["Mensaje"] = ex.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("MisPublicaciones");
+            }
+        }
+        [HttpPost]
+        public IActionResult EliminarMedia(int mediaId, int EjercicioId)
+        {
+            mediaServicio.EliminarMedia(mediaId);
+            return RedirectToAction("EditarEjercicio", new { id = EjercicioId });
+        }
     }
-    }
+}
 
 

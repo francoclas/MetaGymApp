@@ -11,5 +11,6 @@ namespace LogicaNegocio.Interfaces.DTOS
         public int Id { get; set; }
         public string NombreEspecialidad { get; set; }
         public string DescripcionEspecialidad { get; set; }
+        public List<TipoAtencionDTO> TipoAtenciones { get; set; }
     }
 }

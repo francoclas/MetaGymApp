@@ -1,28 +1,34 @@
-﻿<footer class="footer mt-5 py-3 bg-dark text-light border-top border-danger border-opacity-25">
-    <div class="container text-center">
-        <div class="row text-center">
-            <div class="col-md-4">
-                <h6>Dirección</h6>
-                <a href="https://maps.app.goo.gl/Kw3UmCq5UnkaBEYt5" target="_blank">Colonia 1466 esq Barrios Amorín</a>
+﻿<footer class="footer mt-5 py-4 bg-dark text-light border-top border-danger border-opacity-25">
+    <div class="container">
+        <div class="row text-center gy-3">
+            <div class="col-12 col-md-4">
+                <h6 class="text-uppercase">Dirección</h6>
+                <a href="https://maps.app.goo.gl/Kw3UmCq5UnkaBEYt5" class="text-light text-decoration-none" target="_blank">
+                    Colonia 1466 esq Barrios Amorín
+                </a>
             </div>
-            <div class="col-md-4">
-                <h6>Instagram</h6>
-                <a href="https://www.instagram.com/metagym.uy/" target="_blank">metagym.uy</a>
+            <div class="col-12 col-md-4">
+                <h6 class="text-uppercase">Instagram</h6>
+                <a href="https://www.instagram.com/metagym.uy/" class="text-light text-decoration-none" target="_blank">
+                    metagym
+                </a>
             </div>
-            <div class="col-md-4">
-                <h6>Contacto</h6>
-                <p><strong>095 074 652</strong></p>
+            <div class="col-12 col-md-4">
+                <h6 class="text-uppercase">Contacto</h6>
+                <p class="mb-0"><strong>095 074 652</strong></p>
             </div>
         </div>
-        <hr class="bg-secondary" />
 
-        <p class="text-muted small mb-0">
-            © @DateTime.Now.Year MetaGym. Todos los derechos reservados. El sitio es de carácter informativo. Para emergencias, contactá con tu centro médico. Política de privacidad y términos disponibles bajo solicitud.
-        </p>
-    </div>
-    <div class="footer-legal mt-3 text-center">
-        <a href="/Home/PoliticaPrivacidad" class="footer-link">Política de Privacidad</a> |
-        <a href="/Home/TerminosUso" class="footer-link">Términos de Uso</a>
+        <hr class="bg-secondary my-3" />
 
+        <div class="text-center small text-muted">
+            © @DateTime.Now.Year MetaGym. Todos los derechos reservados.<br class="d-md-none" />
+            El sitio es de carácter informativo. Para emergencias, contactá con tu centro médico.
+        </div>
+
+        <div class="footer-legal text-center mt-3">
+            <a href="/Home/PoliticaPrivacidad" class="text-light text-decoration-none me-2">Política de Privacidad</a> |
+            <a href="/Home/TerminosUso" class="text-light text-decoration-none ms-2">Términos de Uso</a>
+        </div>
     </div>
 </footer>

@@ -1,0 +1,48 @@
+﻿@model List<ClienteDTO>
+@{
+    ViewData["Title"] = "Buscar Clientes";
+}
+
+<div class="container mt-4">
+    <h2>Buscar Clientes</h2>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <input type="text" id="buscadorInput" class="form-control" placeholder="Buscar..." onkeyup="filtrarClientes()" />
+        </div>
+        <div class="col-md-4">
+            <select id="filtroCampo" class="form-select" onchange="filtrarClientes()">
+                <option value="NombreCompleto">Nombre Completo</option>
+                <option value="Ci">CI</option>
+                <option value="Correo">Correo</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped" id="tablaClientes">
+        <thead>
+            <tr>
+                <th>Nombre Completo</th>
+                <th>CI</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.NombreCompleto</td>
+                    <td>@c.Ci</td>
+                    <td>@c.Correo</td>
+                    <td>@c.Telefono</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" asp-action="HistorialClinicoCliente" asp-route-id="@c.Id" target="_blank">Ver historial clínico</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script src="~/js/profesional/buscarClientesCita.js"></script>

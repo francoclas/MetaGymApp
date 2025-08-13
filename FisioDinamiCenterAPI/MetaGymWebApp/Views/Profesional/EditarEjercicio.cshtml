@@ -3,59 +3,112 @@
 @{
     ViewData["Title"] = "Editar ejercicio";
 }
-
 <div class="container mt-4 text-white">
     <h2 class="mb-4">Editar ejercicio</h2>
 
-    <form asp-action="EditarEjercicio" method="post" enctype="multipart/form-data">
+    <form asp-action="EditarEjercicio" method="post" enctype="multipart/form-data" class="bg-dark p-4 rounded shadow-sm">
         <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ProfesionalId" />
 
-        <div class="mb-2">
-            <label>Nombre</label>
-            <input asp-for="Nombre" class="form-control" />
+        <div class="mb-3">
+            <input asp-for="Nombre" class="form-control" placeholder="Nombre del ejercicio" />
         </div>
-        <div class="mb-2">
-            <label>Tipo</label>
-            <input asp-for="Tipo" class="form-control" />
+        <div class="mb-3">
+            <input asp-for="Tipo" class="form-control" placeholder="Tipo (ej. fuerza, movilidad...)" />
         </div>
-        <div class="mb-2">
-            <label>Grupo muscular</label>
-            <input asp-for="GrupoMuscular" class="form-control" />
+        <div class="mb-3">
+            <input asp-for="GrupoMuscular" class="form-control" placeholder="Grupo muscular (espalda, pierna...)" />
         </div>
-        <div class="mb-2">
-            <label>Instrucciones</label>
-            <textarea asp-for="Instrucciones" class="form-control"></textarea>
+        <div class="mb-3">
+            <textarea asp-for="Instrucciones" class="form-control" placeholder="Instrucciones o consejos"></textarea>
         </div>
 
-        <div class="mb-2">
-            <label>Agregar archivos multimedia</label>
-            <input type="file" name="archivos" multiple class="form-control" />
-        </div>
-
-        <button type="submit" class="btn btn-primary">Guardar cambios</button>
-        <a href="@Url.Action("GestionEjercicios", "Profesional")" class="btn btn-secondary">Volver</a>
-    </form>
-
-    @if (Model.Medias != null && Model.Medias.Any())
-    {
-        <hr />
-        <h5 class="mt-4">Archivos actuales</h5>
-        <div class="row">
-            @foreach (var media in Model.Medias)
+        <hr class="my-4" />
+        <h4>Mediciones asignadas</h4>
+        <div id="contenedorMediciones">
+            @if (Model.Mediciones != null && Model.Mediciones.Any())
             {
-                <div class="col-md-4 mb-3">
-                    @if (media.Tipo == Enum_TipoMedia.Imagen)
+                for (int i = 0; i < Model.Mediciones.Count; i++)
+                {
+                    <div class="card p-3 mb-3 bg-secondary text-white position-relative" id="medicion-@i">
+                        <input type="hidden" name="Mediciones[@i].Id" value="@Model.Mediciones[i].Id" />
+                        <div class="mb-2">
+                            <label class="form-label">¿Qué se va a medir?</label>
+                            <input type="text" name="Mediciones[@i].Nombre" value="@Model.Mediciones[i].Nombre" class="form-control" required />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">¿En qué unidad?</label>
+                            <input type="text" name="Mediciones[@i].Unidad" value="@Model.Mediciones[i].Unidad" class="form-control" required />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Instrucción para el cliente</label>
+                            <input type="text" name="Mediciones[@i].Descripcion" value="@Model.Mediciones[i].Descripcion" class="form-control" required />
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" name="Mediciones[@i].EsObligatoria" class="form-check-input" @(Model.Mediciones[i].EsObligatoria ? "checked" : "") />
+                            <label class="form-check-label">¿Es obligatoria?</label>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2" onclick="eliminarMedicion('medicion-@i')">✖</button>
+                    </div>
+                }
+            }
+        </div>
+        <div class="mb-3">
+            <button type="button" class="btn btn-outline-light btn-sm" onclick="agregarMedicion()">➕ Agregar medición</button>
+        </div>
+
+        <hr />
+        <h5>Agregar nuevos archivos multimedia</h5>
+        <input type="file" name="archivos" multiple class="form-control mb-3" />
+
+        @if (Model.Medias != null && Model.Medias.Any())
+        {
+            var imagenes = Model.Medias.Where(m => m.Tipo == Enum_TipoMedia.Imagen).ToList();
+            var videos = Model.Medias.Where(m => m.Tipo == Enum_TipoMedia.Video).ToList();
+
+            if (imagenes.Any())
+            {
+                <h5>Imágenes actuales</h5>
+                <div class="row">
+                    @foreach (var img in imagenes)
                     {
-                        <img src="@media.Url" class="img-fluid rounded border" />
-                    }
-                    else if (media.Tipo == Enum_TipoMedia.Video)
-                    {
-                        <video controls class="w-100 border rounded">
-                            <source src="@media.Url" type="video/mp4" />
-                        </video>
+                        <div class="col-md-4 mb-3 text-center">
+                            <img src="@img.Url" class="img-fluid rounded border" />
+                            <button type="button" class="btn btn-sm btn-danger mt-2"
+                                    onclick="eliminarMedia(@img.Id, @Model.Id)">
+                                Eliminar
+                            </button>
+                        </div>
                     }
                 </div>
             }
+
+            if (videos.Any())
+            {
+                <h5>Videos actuales</h5>
+                <div class="row">
+                    @foreach (var vid in videos)
+                    {
+                        <div class="col-md-6 mb-3 text-center">
+                            <video src="@vid.Url" class="w-100 border rounded" controls></video>
+                            <button type="button" class="btn btn-sm btn-danger mt-2"
+                                    onclick="eliminarMedia(@vid.Id, @Model.Id)">
+                                Eliminar
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+        }
+
+        <hr />
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">Guardar cambios</button>
+            <a href="@Url.Action("GestionEjercicios", "Profesional")" class="btn btn-secondary">Volver</a>
         </div>
-    }
+    </form>
 </div>
+
+@section Scripts {
+    <script src="~/js/profesional/editarMedicion.js?v=1"></script>
+}

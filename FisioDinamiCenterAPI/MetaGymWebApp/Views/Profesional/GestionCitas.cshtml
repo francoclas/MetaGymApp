@@ -3,35 +3,63 @@
 
 @{
     ViewBag.Title = "Gestión de Citas";
-    var estado = Model.EstadoSeleccionado;
 }
 
-<div class="container mt-4 bg-dark border rounded py-4">
-    <ul class="nav nav-tabs mb-3">
+<link rel="stylesheet" href="~/css/profesional/gestionCitas..css" />
+
+<div class="container mt-4 bg-dark border rounded py-4 text-white">
+    @if (!Model.TieneEspecialidades)
+{
+    <div class="alert mt-3" role="alert">
+        <h5 class="alert-heading">¡Atención!</h5>
+        <p>
+            Actualmente no estás habilitado para atender pacientes porque no tenés ninguna especialidad asignada.
+            Si estás capacitado para brindar atención, por favor comunicate con un administrador para solicitar la habilitación de tu perfil.
+        </p>
+    </div>
+}
+else
+{
+    <a class="btn btn-outline-light mb-3" asp-controller="Agenda" asp-action="MisAgendas">
+        Gestionar mi tiempo de trabajo
+    </a>
+    <a class="btn btn-outline-light mb-3" asp-controller="Profesional" asp-action="BuscarClientesCita">
+            Buscar historial clinico de paciente
+    </a>
+    <a class="btn btn-outline-light mb-3" asp-controller="Profesional" asp-action="CrearCita">
+            ➕ Agendar una cita
+    </a>
+    <ul class="nav nav-tabs mb-4" id="tabsCitas">
         <li class="nav-item">
-            <a class="nav-link @(estado == EstadoCita.EnEspera ? "active" : "")" href="?estado=EnEspera">Solicitudes</a>
+            <a class="nav-link active" data-tab="espera">Solicitudes</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link @(estado == EstadoCita.Aceptada ? "active" : "")" href="?estado=Aceptada">Próximas</a>
+            <a class="nav-link" data-tab="proximas">Próximas</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link @(estado == EstadoCita.Finalizada ? "active" : "")" href="?estado=Finalizada">Finalizadas</a>
+            <a class="nav-link" data-tab="finalizadas">Finalizadas</a>
         </li>
     </ul>
 
-    <h4>@estado - Citas</h4>
-    
-        <div class="mb-3">
-            <input type="text" id="filtroCitas" class="form-control" placeholder="Buscar citas...">
-        </div>
+    <div class="mb-3">
+        <input type="text" id="filtroCitas" class="form-control" placeholder="Buscar citas por nombre, especialidad o descripción...">
+    </div>
 
-        <div class="mb-3">
-            <button class="btn btn-outline-light btn-sm me-2" onclick="ordenarCitas('asc')">Más viejas</button>
-            <button class="btn btn-outline-light btn-sm" onclick="ordenarCitas('desc')">Más nuevas</button>
-        </div>
-    @if (Model.Citas.Any())
+    <div class="mb-4">
+        <button class="btn btn-outline-light btn-sm me-2" onclick="ordenarCitas('asc')">Más viejas</button>
+        <button class="btn btn-outline-light btn-sm" onclick="ordenarCitas('desc')">Más nuevas</button>
+    </div>
+
+    <div class="tab-content" id="tab-espera">
+    @if (!Model.CitasEnEspera.Any())
     {
-        foreach (var cita in Model.Citas)
+        <div class="alert alert-info text-center mt-3">
+            No hay citas pendientes de recepción por el momento.
+        </div>
+    }
+    else
+    {
+        @foreach (var cita in Model.CitasEnEspera)
         {
             <div class="card mb-3 cita-card" data-fecha="@cita.FechaAsistencia.ToString("yyyy-MM-ddTHH:mm")">
                 <div class="card-body d-flex justify-content-between">
@@ -48,9 +76,65 @@
             </div>
         }
     }
+</div>
+
+<div class="tab-content d-none" id="tab-proximas">
+    @if (!Model.CitasProximasDeProfesional.Any())
+    {
+        <div class="alert alert-info text-center mt-3">
+            No hay citas próximas agendadas.
+        </div>
+    }
     else
     {
-        <p>No hay citas en esta categoría.</p>
+        @foreach (var cita in Model.CitasProximasDeProfesional)
+        {
+            <div class="card mb-3 cita-card" data-fecha="@cita.FechaAsistencia.ToString("yyyy-MM-ddTHH:mm")">
+                <div class="card-body d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">@cita.Cliente.NombreCompleto</h5>
+                        <p class="card-text">Especialidad: @cita.Especialidad.NombreEspecialidad</p>
+                        <p class="card-text">@cita.Descripcion</p>
+                        <p class="card-text"><small class="text-muted">Fecha: @cita.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</small></p>
+                    </div>
+                    <div>
+                        <span class="badge bg-success">Confirmada</span>
+                        <a href="@Url.Action("VerCita", "Profesional", new { id = cita.CitaId })" class="btn btn-outline-primary btn-sm">Ver</a>
+                        <a href="@Url.Action("EditarCita", "Profesional", new { id = cita.CitaId })" class="btn btn-outline-primary btn-sm">Editar</a>
+                    </div>
+                </div>
+            </div>
+        }
     }
 </div>
+
+<div class="tab-content d-none" id="tab-finalizadas">
+    @if (!Model.CitasAtendidasProfesional.Any())
+    {
+        <div class="alert alert-info text-center mt-3">
+            Todavía no tenés citas finalizadas.
+        </div>
+    }
+    else
+    {
+        @foreach (var cita in Model.CitasAtendidasProfesional)
+        {
+            <div class="card mb-3 cita-card" data-fecha="@cita.FechaAsistencia.ToString("yyyy-MM-ddTHH:mm")">
+                <div class="card-body">
+                    <h5 class="card-title">@cita.Cliente.NombreCompleto</h5>
+                    <p class="card-text">Especialidad: @cita.Especialidad.NombreEspecialidad</p>
+                    <p class="card-text">@cita.Descripcion</p>
+                    <p class="card-text"><small class="text-muted">Fecha: @cita.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</small></p>
+                    <p class="card-text"><strong>Conclusión:</strong> @cita.Conclusion</p>
+                </div>
+                <div>
+                    <span class="badge bg-success">Finalizada</span>
+                    <a href="@Url.Action("VerCita", "Profesional", new { id = cita.CitaId })" class="btn btn-outline-primary btn-sm">Ver</a>
+                </div>
+            </div>
+        }
+    }
+</div>
+}
+
 <script src="~/js/profesional/gestionCitas.js"></script>

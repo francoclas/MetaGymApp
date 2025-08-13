@@ -1,0 +1,71 @@
+﻿@using LogicaNegocio.Extra
+@model PublicacionDTO
+
+@{
+    ViewData["Title"] = "Editar Publicación";
+}
+
+<h2 class="text-light mb-4">Editar publicación</h2>
+
+<form asp-action="EditarPublicacion" method="post" enctype="multipart/form-data" class="bg-dark text-light p-4 rounded shadow-sm">
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div class="mb-3">
+        <label class="form-label">Título</label>
+        <input name="Titulo" class="form-control" value="@Model.Titulo" placeholder="Título descriptivo..." required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <textarea name="Descripcion" class="form-control" rows="4" placeholder="Agregá contenido útil o motivacional..." required>@Model.Descripcion</textarea>
+    </div>
+
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input" type="checkbox" name="EsPrivada" value="true" @(Model.EsPrivada ? "checked" : "") />
+        <label class="form-check-label">¿Publicación privada?</label>
+    </div>
+
+    <div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" name="MostrarEnNoticiasPublicas" value="true" @(Model.MostrarEnNoticiasPublicas ? "checked" : "") />
+        <label class="form-check-label">Mostrar en noticias públicas</label>
+    </div>
+
+    <h5 class="text-light mt-4">Archivos actuales</h5>
+    @if (Model.Medias != null && Model.Medias.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-3">
+            @foreach (var media in Model.Medias)
+            {
+                <div class="col text-center">
+                    @if (media.Tipo == Enum_TipoMedia.Imagen)
+                    {
+                        <img src="@media.Url" class="img-fluid rounded" style="height: 180px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <video src="@media.Url" class="img-fluid rounded" controls style="height: 180px; object-fit: cover;"></video>
+                    }
+                    <button type="button" class="btn btn-danger btn-sm mt-2"
+                            onclick="eliminarMedia(@media.Id, @Model.Id)">
+                        Eliminar
+                    </button>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">No hay archivos asociados a esta publicación.</p>
+    }
+
+    <div class="mb-3 mt-4">
+        <label class="form-label">Agregar nuevos archivos</label>
+        <input type="file" name="archivos" multiple class="form-control" accept="image/*,video/*" />
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">
+        <i class="bi bi-save me-1"></i> Guardar cambios
+    </button>
+</form>
+
+<script src="~/js/admin/editarPublicacion.js"></script>

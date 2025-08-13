@@ -42,6 +42,63 @@ body, p, span, a, .texto {
     font-size: 1.1rem;
     color: #fff;
 }
+/* ========== Notificaciones ========== */
+.noti-dropdown {
+    background-color: #1a1a1a;
+    padding: 0.5em;
+    width: 320px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #000;
+    z-index: 9999;
+}
+
+.noti-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.noti-item {
+    display: flex;
+    padding: 0.6em;
+    border-radius: 10px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+    .noti-item:hover {
+        background-color: #2f353b;
+        cursor: pointer;
+    }
+
+    .noti-item {
+        background-color: #2e2e2e;
+    }
+
+.noti-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.noti-titulo {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+}
+
+.noti-mensaje {
+    font-size: 0.75rem;
+    color: #bbb;
+}
+
+.noti-fecha {
+    font-size: 0.7rem;
+    color: #888;
+}
+#zonaNotificaciones {
+    max-width: 320px;
+}
 
 /* ========== Hero Banner ========== */
 .hero-banner {
@@ -59,7 +116,6 @@ body, p, span, a, .texto {
         content: '';
         position: absolute;
         inset: 0;
-        background-color: rgba(0, 0, 0, 0.6);
         z-index: 1;
     }
 
@@ -70,20 +126,33 @@ body, p, span, a, .texto {
 
 /* ========== Navbar ========== */
 .nav-link.menu-link {
-    font-size: 1.4rem;
-    color: #e50914;
-    padding: 8px 12px;
+    font-size: 1.1rem;
+    color: white;
+    padding: 6px 10px;
     transition: background-color 0.3s, color 0.3s;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
     .nav-link.menu-link:hover {
-        color: white;
-        background-color: rgba(229, 9, 20, 0.6);
+        color: #e50914;
+        background-color: rgba(229, 9, 20, 0.2);
     }
 
+.login-button, .register-button {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: white;
+    background-color: #e50914;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+    .login-button:hover, .register-button:hover {
+        background-color: white;
+        color: #e50914;
+    }
 /* ========== Enlaces & botones ========== */
-a, .nav-link {
+a {
     color: #e50914;
     text-decoration: none;
 }

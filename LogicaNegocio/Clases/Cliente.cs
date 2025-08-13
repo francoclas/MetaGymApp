@@ -12,18 +12,24 @@ namespace LogicaNegocio.Clases
     public class Cliente : IValidable
     {
         public int Id { get; set; }
-        public string CI { get; set; }
+        public string? CI { get; set; }
         public string NombreUsuario { get; set; }
         public string NombreCompleto { get; set; }
         public string Pass { get; set; }
         public string Correo { get; set; }
-        public string Telefono { get; set; }
+        public string? Telefono { get; set; }
+        public bool UsuarioActivo { get; set; } = true;
         public Cliente() { }
 
         public List<Cita> Citas { get; set; } = new List<Cita>();
         public List<RutinaAsignada> RutinasAsignadas { get; set; } = new List<RutinaAsignada>() ;
+        public List<SesionRutina> Entrenamientos { get; set; } = new List<SesionRutina>(){ };
         public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
         public List<Media> FotosPerfil { get; set; } = new List<Media>();
+        public List<Notificacion> Notificaciones { get; set; } = new List<Notificacion>();
+        //Interacciones
+        public List<LikePublicacion> LikesPublicaciones { get; set; } = new();
+        public List<LikeComentario> LikesComentarios { get; set; } = new();
         //Constructor registro
         public Cliente(string ci, string nombreusuario, string nombreCompleto, string pass, string correo, string telefono)
         {

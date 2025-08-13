@@ -7,6 +7,7 @@ using LogicaApp.Servicios;
 using LogicaNegocio.Servicios;
 using LogicaNegocio.Interfaces.Repositorios;
 using LogicaDatos.Precarga;
+using LogicaNegocio.Extra;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -31,6 +32,8 @@ builder.Services.AddScoped<IRepositorioEjercicio, RepoEjercicios>();
 builder.Services.AddScoped<IRepositorioMedia, RepoMedias>();
 builder.Services.AddScoped<IRepositorioComentario, RepoComentario>();
 builder.Services.AddScoped<IRepositorioPublicacion, RepoPublicacion>();
+builder.Services.AddScoped<IRepositorioNotificacion, RepoNotificacion>();
+builder.Services.AddScoped<IRepositorioAgenda, RepoAgenda>();
 
 // Servicios
 builder.Services.AddScoped<IClienteServicio, ServicioCliente>();
@@ -43,6 +46,9 @@ builder.Services.AddScoped<IRutinaServicio, ServicioRutina>();
 builder.Services.AddScoped<IMediaServicio, ServicioMedia>();
 builder.Services.AddScoped<IComentarioServicio,ServicioComentario>();
 builder.Services.AddScoped<IPublicacionServicio,ServicioPublicacion>();
+builder.Services.AddScoped<INotificacionServicio, ServicioNotificacion>();
+builder.Services.AddScoped<IAgendaServicio, ServicioAgenda>();
+builder.Services.AddScoped(typeof(Lazy<>), typeof(LazyResolver<>));
 
 
 builder.Services.AddSession();
@@ -61,7 +67,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
 }
 app.UseStaticFiles();
-
+app.UseHttpsRedirection();
 app.UseRouting();
 app.UseSession();
 app.UseAuthorization();

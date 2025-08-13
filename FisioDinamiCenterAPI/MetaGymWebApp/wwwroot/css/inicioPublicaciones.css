@@ -1,10 +1,20 @@
-﻿.pub-card {
+﻿/* ===== Container General ===== */
+.container {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* ===== Publicación ===== */
+.pub-card {
     background: #1f1f1f;
     border-radius: 10px;
     padding: 15px;
     color: #fff;
+    box-shadow: 0 0 5px #00000066;
+    max-width: 100%;
 }
 
+/* ===== Encabezado de publicación ===== */
 .pub-header {
     display: flex;
     align-items: center;
@@ -30,35 +40,94 @@
 }
 
 .pub-titulo {
-    margin: 10px 0;
     color: #e50914;
 }
 
+/* ===== Slideshow multimedia ===== */
 .pub-slideshow {
     position: relative;
-    overflow-x: auto;
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+    overflow: hidden;
+    width: 100%;
 }
+
+.pub-slide-container {
+    display: flex;
+    transition: transform 0.3s ease;
+    scroll-behavior: smooth;
+    width: 100%;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+    .pub-slide-container::-webkit-scrollbar {
+        display: none;
+    }
 
 .pub-slide {
+    flex: 0 0 100%;
+    max-height: 400px;
+    position: relative;
     border-radius: 8px;
-    flex: 0 0 auto;
-    max-width: 250px;
-    max-height: 200px;
 }
 
-.pub-slide-img, .pub-slide-video {
+.pub-slide-img,
+.pub-slide-video {
     width: 100%;
-    height: auto;
+    height: 400px;
     object-fit: cover;
+    border-radius: 8px;
 }
 
+/* ===== Navegación slideshow ===== */
+.pub-slide-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.pub-slide-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #aaa;
+    border-radius: 50%;
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+    .pub-slide-dot.active {
+        background-color: white;
+        opacity: 1;
+    }
+
+.pub-slide-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    z-index: 20;
+}
+
+    .pub-slide-btn.left {
+        left: 10px;
+    }
+
+    .pub-slide-btn.right {
+        right: 10px;
+    }
+
+/* ===== Descripción ===== */
 .pub-descripcion {
-    background-color: #2a2a2a;
     border-radius: 8px;
-    padding: 10px;
     margin-bottom: 10px;
 }
 
@@ -70,12 +139,13 @@
     font-size: 0.9rem;
 }
 
+/* ===== Botones de interacción ===== */
 .pub-interacciones button {
     background: none;
     border: none;
     color: #fff;
-    margin-right: 10px;
     font-size: 1rem;
+    margin-right: 10px;
     cursor: pointer;
 }
 
@@ -84,11 +154,28 @@
     color: #e50914;
 }
 
+.like-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    margin: 0 5px 0 0;
+    transition: color 0.3s;
+}
+
+    .like-button:hover {
+        color: #e50914;
+    }
+
+/* ===== Comentarios ===== */
 .pub-comentario {
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 15px;
+    position: relative;
 }
 
 .pub-com-img {
@@ -96,14 +183,107 @@
     height: 32px;
     object-fit: cover;
     border-radius: 50%;
+    flex-shrink: 0;
 }
 
+.pub-com-cuerpo {
+    background-color: #222;
+    border-radius: 10px;
+    padding: 10px 14px;
+    max-width: 100%;
+    flex: 1;
+    box-shadow: 0 0 4px rgba(0,0,0,0.4);
+}
+.comentario-oculto {
+    border: 1px solid #a00;
+    background-color: #2a0d0d;
+}
+
+.comentario-oculto-aviso {
+    font-size: 0.75rem;
+    color: #f88;
+    font-style: italic;
+    margin-top: 6px;
+}
 .pub-com-autor {
     font-weight: bold;
     font-size: 0.85rem;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
+    color: #fff;
 }
-
+.pub-com-fecha {
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 4px;
+}
 .pub-com-texto {
     font-size: 0.95rem;
+    color: #ddd;
+    margin-bottom: 6px;
 }
+
+.pub-btn-responder {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+    .pub-btn-responder:hover {
+        color: #e50914;
+    }
+
+/* ===== Formulario de comentar ===== */
+.pub-comentar-form {
+    background-color: #121212;
+    border: 1px solid #333;
+    border-radius: 20px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+    .pub-comentar-form textarea {
+        background: transparent;
+        border: none;
+        resize: none;
+        color: #fff;
+        flex: 1;
+        outline: none;
+        font-size: 0.95rem;
+    }
+
+    .pub-comentar-form button {
+        border: none;
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+.pub-btn-comentar {
+    background-color: #1DB954;
+    color: #fff;
+}
+
+.pub-btn-cancelar {
+    background-color: #2a2a2a;
+    color: #ccc;
+}
+.btn-outline-danger {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: #f55;
+    border-color: #f55;
+}
+
+    .btn-outline-danger:hover {
+        background-color: #f55;
+        color: white;
+    }

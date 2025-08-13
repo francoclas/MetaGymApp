@@ -24,13 +24,14 @@ namespace LogicaNegocio.Clases
 
         public Enum_EstadoPublicacion Estado { get; set; }
         public string? MotivoRechazo { get; set; }
-
+        public bool MostrarEnNoticiasPublicas {  get; set; } = false;
         public bool EsPrivada { get; set; }
         public int Vistas { get; set; }
         public int CantLikes { get; set; }
         public List<Media> ListaMedia { get; set; } = new List<Media>();
         public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
-
+        //Interacciones
+        public List<LikePublicacion> Likes { get; set; }
         // Quien la crea (opcional: Profesional o Admin)
         public int? ProfesionalId { get; set; }
         public Profesional? Profesional { get; set; }

@@ -24,7 +24,16 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<Especialidad> ObtenerEspecialidades();
         void RegistrarMedia(Media media);
         public void GuardarCambios();
-     
-
+        void CrearTipoAtencion(TipoAtencion tipo);
+        public TipoAtencion ObtenerTipoAtencion(int id);
+        List<TipoAtencion> ObtenerTiposAtencionPorEspecialidad(int especialidadId);
+        List<TipoAtencion> ObtenerTiposAtencionPorEspecialidades(List<int> especialidadIds);
+        List<TipoAtencion> ObtenerTiposAtencionPorIds(List<int> ids);
+        List<TipoAtencion> ObtenerTiposAtencionPorProfesional(int profesionalId);
+        List<TipoAtencion> ObtenerTiposAtencion();
+        List<TipoAtencionDTO> ObtenerTiposAtencionPorProfesionalDTO(int profesionalId);
+        List<EstablecimientoDTO> ObtenerEstablecimientosDTO();
+        List<EspecialidadDTO> ObtenerEspecialidadesDTO();
+        List<TipoAtencionDTO> ObtenerTiposAtencionDTO();
     }
 }
