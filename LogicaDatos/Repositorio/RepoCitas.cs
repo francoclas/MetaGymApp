@@ -65,6 +65,9 @@ namespace LogicaDatos.Repositorio
         public List<Cita> ObtenerPorProfesional(int profesionalId)
         {
             return _context.Citas
+                .Include(C => C.Cliente)
+                .Include(C => C.Profesional)
+                .Include(C => C.TipoAtencion)
                 .Where(c => c.ProfesionalId == profesionalId)
                 .ToList();
         }

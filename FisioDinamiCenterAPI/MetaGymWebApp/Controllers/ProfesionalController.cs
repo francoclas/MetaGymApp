@@ -326,6 +326,56 @@ namespace MetaGymWebApp.Controllers
             }
         }
         [HttpPost]
+        public IActionResult EditarCitaCalendario(CitaDTO citaDTO)
+        {
+            int ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            try
+            {
+                Cita cita = citaServicio.ObtenerPorId(citaDTO.CitaId);
+
+                if (cita == null)
+                    return Json(new { success = false, message = "No se encontró la cita." });
+
+                if (cita.ProfesionalId != ProfesionalId)
+                    return Json(new { success = false, message = "No tenés asignada la cita a editar." });
+
+                if (citaDTO.Estado == EstadoCita.Finalizada ||
+                    citaDTO.Estado == EstadoCita.Cancelada ||
+                    citaDTO.Estado == EstadoCita.NoAsistio ||
+                    citaDTO.Estado == EstadoCita.Rechazada)
+                {
+                    if (string.IsNullOrWhiteSpace(citaDTO.Conclusion))
+                        return Json(new { success = false, message = "Debe ingresar una conclusión para finalizar o cancelar la cita." });
+
+                    cita.Conclusion = citaDTO.Conclusion;
+                    cita.Estado = citaDTO.Estado;
+                    if (citaDTO.Estado == EstadoCita.Finalizada)
+                        cita.FechaFinalizacion = DateTime.Now;
+                }
+                else
+                {
+                    cita.Estado = citaDTO.Estado; 
+                }
+
+     
+                cita.FechaAsistencia = citaDTO.FechaAsistencia;
+                cita.Descripcion = citaDTO.Descripcion;
+
+                if (citaDTO.TipoAtencionId.HasValue)
+                    cita.TipoAtencionId = citaDTO.TipoAtencionId.Value;
+
+                cita.Validar(); 
+
+                citaServicio.ActualizarEntidad(cita);
+
+                return Json(new { success = true, message = "Cita actualizada correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpPost]
         public IActionResult ReprogramarCita(int citaId, DateTime nuevaFecha)
         {
             Cita cita = citaServicio.ObtenerPorId(citaId);
@@ -398,7 +448,7 @@ namespace MetaGymWebApp.Controllers
         public IActionResult VerCitaParcial(int citaId)
         {
             var cita = citaServicio.ObtenerPorId(citaId);
-            return PartialView("VerCita", new CitaDTO
+            return PartialView("_VistaCitaParcial", new CitaDTO
             {
                 CitaId = cita.Id,
                 Cliente = cita.Cliente,
@@ -996,19 +1046,47 @@ namespace MetaGymWebApp.Controllers
         public IActionResult ObtenerCitas(int profesionalId)
         {
             profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var citas = citaServicio.SolicitarProximasProfesional(profesionalId);
+            List<Cita> citas = citaServicio.SolicitarHistorialProfesional(profesionalId);
 
-            var eventos = citas.Select(c => new
+            var eventos = new List<object>();
+
+            foreach (var c in citas)
             {
-                id = c.Id,
-                title = $"Cita con {c.Cliente.NombreCompleto} | {c.TipoAtencion.Nombre}",
-                start = c.FechaAsistencia?.ToString("yyyy-MM-ddTHH:mm:ss"),
-                end = c.FechaAsistencia?.AddMinutes(30).ToString("yyyy-MM-ddTHH:mm:ss"), // duracion fija
-                color = "#ff0000"
-            });
+                string color = "#808080"; // gris por defecto
+                switch (c.Estado)
+                {
+                    case EstadoCita.EnEspera:
+                        color = "#dc3545"; // rojo
+                        break;
+                    case EstadoCita.Aceptada:
+                        color = "#007bff"; // azul
+                        break;
+                    case EstadoCita.Finalizada:
+                        color = "#28a745"; // verde
+                        break;
+                    case EstadoCita.Cancelada:
+                        color = "#6c757d"; // gris oscuro
+                        break;
+                    case EstadoCita.NoAsistio:
+                        color = "#ffc107"; // amarillo
+                        break;
+                }
+                var citaFragmento = new
+                {
+                    id = c.Id,
+                    title = $"Cita con {c.Cliente.NombreCompleto} | {c.TipoAtencion.Nombre}",
+                    start = c.FechaAsistencia?.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    end = c.FechaAsistencia?.AddMinutes(c.TipoAtencion.DuracionMin).ToString("yyyy-MM-ddTHH:mm:ss"),
+                    color = color,
+                    estado = c.Estado.ToString() 
+                };
+
+                eventos.Add(citaFragmento);
+            }
 
             return Json(eventos);
         }
+
     }
 }
 

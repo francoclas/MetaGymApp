@@ -220,10 +220,10 @@ namespace LogicaApp.Servicios
 
             DateTime hoy = DateTime.Now.Date;
 
-            // 2. Iterar por cada agenda activa del profesional
+            //recorro agenda del profesional
             foreach (var agenda in profesional.Agendas.Where(a => a.Activo))
             {
-                // Calcular la fecha del próximo día correspondiente
+                //por cada dia genero el sector
                 int diff = ((int)agenda.Dia - (int)hoy.DayOfWeek + 7) % 7;
                 DateTime fechaAgenda = hoy.AddDays(diff);
 
@@ -232,7 +232,6 @@ namespace LogicaApp.Servicios
 
                 DateTime cursor = inicioFranja;
 
-                // 3. Generar slots de 30 minutos (o duracionMin fija de TipoAtencion si querés)
                 while (cursor.AddMinutes(30) <= finFranja)
                 {
                     var slot = new HorarioDisponibleDTO
