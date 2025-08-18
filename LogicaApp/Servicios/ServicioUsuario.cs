@@ -43,7 +43,7 @@ namespace LogicaNegocio.Servicios
 
             if (cliente == null || cliente.NombreUsuario != Usuario)
                 throw new Exception("Cliente no encontrado o usuario inválido.");
-            if(FuncionesAuxiliares.EsCorreoValido(Correo))
+            if(!FuncionesAuxiliares.EsCorreoValido(Correo))
                 throw new Exception("Verifique el correo ingresado.");
 
             cliente.Correo = Correo;
@@ -67,7 +67,7 @@ namespace LogicaNegocio.Servicios
         {
             if (NuevaPassword != ConfPassword)
                 throw new Exception("Las contraseñas no coinciden.");
-            if (FuncionesAuxiliares.EsContrasenaValida(NuevaPassword))
+            if (!FuncionesAuxiliares.EsContrasenaValida(NuevaPassword))
                 throw new Exception("Pruebe con otra contraseña");
 
             Cliente cliente = repoCliente.ObtenerPorId(IdCliente);

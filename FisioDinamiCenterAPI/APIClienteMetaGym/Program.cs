@@ -135,6 +135,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // ---------- Build ----------
+
 var app = builder.Build();
 
 // ---------- Migración DB ----------

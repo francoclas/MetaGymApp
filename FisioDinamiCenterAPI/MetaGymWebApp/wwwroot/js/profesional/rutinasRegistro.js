@@ -108,3 +108,20 @@ function actualizarListaClientes() {
 document.addEventListener("DOMContentLoaded", () => {
     window.initDatosIniciales();
 });
+// Buscador en "Mis Ejercicios"
+document.getElementById("buscadorMisEjercicios").addEventListener("input", function () {
+    const filtro = this.value.toLowerCase();
+    document.querySelectorAll("#misEjerciciosDisponibles .card-ejercicio").forEach(card => {
+        const nombre = card.dataset.nombre || "";
+        card.style.display = nombre.includes(filtro) ? "block" : "none";
+    });
+});
+
+// Buscador en "Ejercicios del Sistema"
+document.getElementById("buscadorEjerciciosSistema").addEventListener("input", function () {
+    const filtro = this.value.toLowerCase();
+    document.querySelectorAll("#ejerciciosSistemaDisponibles .card-ejercicio").forEach(card => {
+        const nombre = card.dataset.nombre || "";
+        card.style.display = nombre.includes(filtro) ? "block" : "none";
+    });
+});

@@ -37,7 +37,7 @@ namespace LogicaApp.Servicios
             return result;
         }
 
-        public void AgregarComentario(ComentarioDTO dto)
+        public ComentarioDTO AgregarComentario(ComentarioDTO dto)
         {
             //Instancio nuevo comentario
             Comentario nuevo = new Comentario
@@ -97,6 +97,7 @@ namespace LogicaApp.Servicios
                             };
                 }
             }
+            return ConstruirDTO(ObtenerComentarioId(nuevo.ComentarioId));
             }
 
         public void EditarComentario(int comentarioId, string nuevoContenido, int usuarioId)
@@ -139,7 +140,7 @@ namespace LogicaApp.Servicios
 
         private ComentarioDTO ConstruirDTO(Comentario c)
         {
-            return new ComentarioDTO
+            ComentarioDTO aux = new ComentarioDTO
             {
                 ComentarioId = c.ComentarioId,
                 Contenido = c.Contenido,
@@ -155,6 +156,19 @@ namespace LogicaApp.Servicios
                     .Select(r => ConstruirDTO(r))
                     .ToList() ?? new List<ComentarioDTO>()
             };
+
+            if(c.Profesional != null)
+            {
+                aux.ImagenAutor = c.Profesional.FotosPerfil.FirstOrDefault(p => p.EsFavorito);
+            }else if (c.Cliente != null)
+            {
+                aux.ImagenAutor = c.Cliente.FotosPerfil.FirstOrDefault(p => p.EsFavorito);
+            }else
+            {
+                aux.ImagenAutor = c.Admin.FotosPerfil.FirstOrDefault(p => p.EsFavorito);
+            }
+
+            return aux;
         }
         public int ContarLikesComentario(int id)
         {

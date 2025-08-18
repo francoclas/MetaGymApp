@@ -12,3 +12,18 @@
         }
     });
 });
+function normalizarTexto(data) {
+    return !data
+        ? ''
+        : data
+            .toString()
+            .normalize("NFD")                 
+            .replace(/[\u0300-\u036f]/g, "")   
+            .toLowerCase();
+}
+
+if ($.fn && $.fn.dataTable) {
+    $.fn.dataTable.ext.type.search.string = function (data) {
+        return normalizarTexto(data);
+    };
+}

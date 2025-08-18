@@ -28,9 +28,9 @@ namespace LogicaNegocio.Extra
         {
             if (string.IsNullOrWhiteSpace(correo))
                 return false;
-
-            string PatronCorreo = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-            return Regex.IsMatch(correo, PatronCorreo);
+            string aux = correo.Trim('"').Trim();
+            string PatronCorreo = @"^[^@\s]+@[^@\s]+\.[^@\s]+$"; ;
+            return Regex.IsMatch(aux, PatronCorreo);
         }
 
         /*

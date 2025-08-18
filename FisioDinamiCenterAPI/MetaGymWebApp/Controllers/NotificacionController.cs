@@ -64,6 +64,11 @@ namespace WebApp.Controllers
 
         public IActionResult NoLeidas()
         {
+            SesionDTO sesion = GestionSesion.ObtenerSesion(HttpContext);
+            if (sesion == null)
+            {
+                return PartialView("_SesionExpirada");
+            }
             int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
             string rol = GestionSesion.ObtenerRol(HttpContext);
             //Obtengo notificaciones desde repo

@@ -71,7 +71,19 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
+app.Use(async (context, next) =>
+{
+    await next();
 
+    // Si venció la sesión y devolvió un redirect al login
+    if (context.Response.StatusCode == 302 &&
+        context.Request.Headers.ContainsKey("X-Requested-With") &&
+        context.Request.Headers["X-Requested-With"] == "Fetch")
+    {
+        // Forzar 401 para que JS pueda detectarlo
+        context.Response.StatusCode = 401;
+    }
+});
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=AcercaDe}/{id?}");

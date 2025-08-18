@@ -5,48 +5,59 @@
 }
 
 <link rel="stylesheet" href="~/css/admin/controlPublicaciones.css" />
+
 <div class="container">
     <h2 class="text-white mb-3">Solicitudes de Publicaciones</h2>
-    <div class="justify-content-between">
-        <a href="/Admin/MisPublicaciones" class="btn btn-outline-light mb-3">Ver Mis Publicaciones</a>
-        <a href="/Admin/CrearPublicacion" class="btn btn btn-outline-success mb-3">Nueva publicacion</a>
+    <div class="d-flex justify-content-between mb-3">
+        <a href="/Admin/MisPublicaciones" class="btn btn-outline-light">Ver Mis Publicaciones</a>
+        <a href="/Admin/CrearPublicacion" class="btn btn-outline-success">Nueva publicación</a>
     </div>
-    <div class="filtros mb-3">
-        <div class="row g-2">
-            <div class="col-md-3">
-                <label class="text-white">Buscar por texto</label>
-                <input type="text" id="buscadorTexto" class="form-control" placeholder="Solicitante o título..." />
-            </div>
-            <div class="col-md-3">
-                <label class="text-white">Desde</label>
-                <input type="date" id="fechaDesde" class="form-control" />
-            </div>
-            <div class="col-md-3">
-                <label class="text-white">Hasta</label>
-                <input type="date" id="fechaHasta" class="form-control" />
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <button class="btn btn-light me-2" onclick="ordenarPorFecha('asc')">↑ Fecha</button>
-                <button class="btn btn-light" onclick="ordenarPorFecha('desc')">↓ Fecha</button>
-            </div>
+
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <label class="text-white">Desde</label>
+            <input type="date" id="fechaDesde" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label class="text-white">Hasta</label>
+            <input type="date" id="fechaHasta" class="form-control" />
         </div>
     </div>
 
-    <div id="contenedorPublicaciones" class="d-flex flex-row overflow-auto gap-3 p-2">
-        @foreach (var pub in Model.PublicacionesPendientes)
-        {
-            <div class="card tarjeta-publicacion" data-fecha="@pub.FechaCreacion.ToString("yyyy-MM-dd")" data-solicitante="@pub.NombreAutor.ToLower()" data-titulo="@pub.Titulo.ToLower()">
-                <div class="card-body">
-                    <h5 class="card-title">@pub.Titulo</h5>
-                    <p><strong>Solicitante:</strong> @pub.NombreAutor</p>
-                    <p><strong>Fecha de solicitud:</strong> @pub.FechaCreacion.ToShortDateString()</p>
-                    <p>@(pub.Descripcion.Length > 100 ? pub.Descripcion.Substring(0, 90) + "..." : pub.Descripcion)</p>
-                    <a href="/Admin/RevisionPublicacion?id=@pub.Id" class="btn btn-danger">Ver solicitud</a>
-                </div>
-            </div>
-        }
-    </div>
+    @if (Model.PublicacionesPendientes.Any())
+    {
+        <table id="tablaPublicaciones" class="table table-dark table-bordered datatable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Solicitante</th>
+                    <th>Fecha de solicitud</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pub in Model.PublicacionesPendientes)
+                {
+                    <tr>
+                        <td>@pub.Id</td>
+                        <td>@pub.Titulo</td>
+                        <td>@pub.NombreAutor</td>
+                        <td>@pub.FechaCreacion.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <a href="/Admin/RevisionPublicacion?id=@pub.Id" class="btn btn-danger btn-sm">Ver solicitud</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="text-muted">No hay solicitudes de publicaciones pendientes.</p>
+    }
 </div>
+
 @section Scripts {
     <script src="~/js/admin/controlPublicaciones.js"></script>
 }

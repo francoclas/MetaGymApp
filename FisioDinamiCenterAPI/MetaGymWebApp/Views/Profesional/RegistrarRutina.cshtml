@@ -17,36 +17,55 @@
             <input type="text" name="Tipo" class="form-control" required />
         </div>
 
-        <hr class="my-4" />
         <h3 class="mb-3">Mis Ejercicios</h3>
         <input type="text" id="buscadorMisEjercicios" class="form-control mb-3" placeholder="Buscar en mis ejercicios..." />
 
-        <div class="d-flex flex-wrap gap-3" id="misEjerciciosDisponibles">
+        <div class="contenedor-slide" id="misEjerciciosDisponibles">
             @foreach (var ejercicio in Model.MisEjerciciosDisponibles)
             {
                 var img = ejercicio.Media?.Url ?? "/img/default.png";
-                <div class="card-ejercicio bg-secondary p-2 rounded text-center" data-nombre="@ejercicio.Nombre.ToLower()" data-tipo="@ejercicio.Tipo.ToLower()" data-id="@ejercicio.Id">
-                    <img src="@img" alt="Imagen ejercicio" class="img-ejercicio rounded mb-1" />
-                    <strong>@ejercicio.Nombre</strong><br />
-                    <button class="btn btn-sm btn-outline-light mt-1" type="button" onclick="agregarEjercicio(@ejercicio.Id, '@ejercicio.Nombre')">Agregar</button>
-                    <a class="btn btn-sm btn-outline-light mt-1" target="_blank" href="/Profesional/InformacionEjercicio/@ejercicio.Id">Ver</a>
+                <div class="card-ejercicio bg-secondary p-2 rounded text-center"
+                     data-nombre="@ejercicio.Nombre.ToLower()"
+                     data-tipo="@ejercicio.Tipo.ToLower()"
+                     data-id="@ejercicio.Id">
+
+                    <img src="@img" alt="Imagen ejercicio" class="img-ejercicio rounded mb-2" />
+                    <div class="nombre-ejercicio">@ejercicio.Nombre</div>
+
+                    <button class="btn btn-sm btn-outline-light mt-1" type="button"
+                            onclick="agregarEjercicio(@ejercicio.Id, '@ejercicio.Nombre')">
+                        Agregar
+                    </button>
+                    <a class="btn btn-sm btn-outline-light mt-1" target="_blank"
+                       href="/Profesional/InformacionEjercicio/@ejercicio.Id">
+                        Ver
+                    </a>
                 </div>
             }
         </div>
-
         <h3 class="mt-4 mb-3">Ejercicios del Sistema</h3>
         <input type="text" id="buscadorEjerciciosSistema" class="form-control mb-3" placeholder="Buscar en ejercicios del sistema..." />
 
-        <div class="d-flex flex-wrap gap-3" id="ejerciciosSistemaDisponibles">
+        <div class="contenedor-slide" id="ejerciciosSistemaDisponibles">
             @foreach (var ejercicio in Model.EjerciciosDisponiblesSistema)
             {
                 var img = ejercicio.Media?.Url ?? "/img/default.png";
-                <div class="card-ejercicio bg-secondary p-2 rounded text-center" data-nombre="@ejercicio.Nombre.ToLower()" data-tipo="@ejercicio.Tipo.ToLower()" data-id="@ejercicio.Id">
-                    <img src="@img" alt="Imagen ejercicio" class="img-ejercicio rounded mb-1" />
-                    <strong>@ejercicio.Nombre</strong><br />
-                    <button class="btn btn-sm btn-outline-light mt-1" type="button" onclick="agregarEjercicio(@ejercicio.Id, '@ejercicio.Nombre')">Agregar</button>
-                    <a class="btn btn-sm btn-outline-light mt-1" target="_blank" href="/Profesional/InformacionEjercicio/@ejercicio.Id">Ver</a>
+                <div class="card-ejercicio bg-secondary p-2 rounded text-center"
+                     data-nombre="@ejercicio.Nombre.ToLower()"
+                     data-tipo="@ejercicio.Tipo.ToLower()"
+                     data-id="@ejercicio.Id">
 
+                    <img src="@img" alt="Imagen ejercicio" class="img-ejercicio rounded mb-2" />
+                    <div class="nombre-ejercicio">@ejercicio.Nombre</div>
+
+                    <button class="btn btn-sm btn-outline-light mt-1" type="button"
+                            onclick="agregarEjercicio(@ejercicio.Id, '@ejercicio.Nombre')">
+                        Agregar
+                    </button>
+                    <a class="btn btn-sm btn-outline-light mt-1" target="_blank"
+                       href="/Profesional/InformacionEjercicio/@ejercicio.Id">
+                        Ver
+                    </a>
                 </div>
             }
         </div>

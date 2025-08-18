@@ -4,22 +4,23 @@
 }
 
 <div class="container mt-4">
-    <h2>Buscar Clientes</h2>
+    <h2 class="text-white">Buscar Clientes</h2>
 
     <div class="row mb-3">
         <div class="col-md-4">
-            <input type="text" id="buscadorInput" class="form-control" placeholder="Buscar..." onkeyup="filtrarClientes()" />
+            <input type="text" id="buscadorInput" class="form-control" placeholder="Buscar..." />
         </div>
         <div class="col-md-4">
-            <select id="filtroCampo" class="form-select" onchange="filtrarClientes()">
-                <option value="NombreCompleto">Nombre Completo</option>
-                <option value="Ci">CI</option>
-                <option value="Correo">Correo</option>
+            <select id="filtroCampo" class="form-select">
+                <option value="0">Nombre Completo</option>
+                <option value="1">CI</option>
+                <option value="2">Correo</option>
+                <option value="3">Teléfono</option>
             </select>
         </div>
     </div>
 
-    <table class="table table-bordered table-striped" id="tablaClientes">
+    <table class="table table-dark table-bordered" id="tablaClientes">
         <thead>
             <tr>
                 <th>Nombre Completo</th>
@@ -38,11 +39,18 @@
                     <td>@c.Correo</td>
                     <td>@c.Telefono</td>
                     <td>
-                        <a class="btn btn-sm btn-outline-primary" asp-action="HistorialClinicoCliente" asp-route-id="@c.Id" target="_blank">Ver historial clínico</a>
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-action="HistorialClinicoCliente"
+                           asp-controller="Profesional"
+                           asp-route-id="@c.Id"
+                           target="_blank">Ver historial clínico</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
-<script src="~/js/profesional/buscarClientesCita.js"></script>
+
+@section Scripts {
+    <script src="~/js/profesional/buscarClientesCita.js"></script>
+}

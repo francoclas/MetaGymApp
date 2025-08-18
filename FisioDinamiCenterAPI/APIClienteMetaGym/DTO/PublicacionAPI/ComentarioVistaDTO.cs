@@ -4,6 +4,8 @@ namespace APIClienteMetaGym.DTO.PublicacionAPI
 {
     public class ComentarioVistaDTO
     {
+        public int PublicacionId { get; set; }
+        public int? ComentarioPadreId { get; set; }
         public int ComentarioId { get; set; }
         public string Contenido { get; set; }
         public string Autor { get; set; }

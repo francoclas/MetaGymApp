@@ -3,9 +3,19 @@
     if (!zona) return;
 
     if (zona.innerHTML.trim() === "") {
-        fetch('/Notificacion/NoLeidas')
-            .then(r => r.text())
+        fetch('/Notificacion/NoLeidas', {
+            headers: { "X-Requested-With": "Fetch" }
+        })
+            .then(r => {
+                if (r.status === 401) {
+                    // Sesión expirada → redirigir al login
+                    window.location.href = "/Home/Login";
+                    return null;
+                }
+                return r.text();
+            })
             .then(html => {
+                if (!html) return;
                 zona.innerHTML = html;
 
                 const nuevoMenu = document.getElementById("menuNotificaciones");

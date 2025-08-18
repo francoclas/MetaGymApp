@@ -1,4 +1,6 @@
 ﻿using APIClienteMetaGym.DTO;
+using APIClienteMetaGym.DTO.PublicacionAPI;
+using APIClienteMetaGym.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +24,7 @@ namespace APIClienteMetaGym.Controllers
         /// Agrega un comentario o respuesta a una publicación.
         /// </summary>
         [HttpPost]
-        [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(RespuestaApi<ComentarioVistaDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status400BadRequest)]
         public IActionResult AgregarComentario([FromBody] ComentarioCrearDTO dto)
         {
@@ -32,11 +34,20 @@ namespace APIClienteMetaGym.Controllers
             if (dto.RolAutor != "Cliente")
                 return StatusCode(403, RespuestaApi<string>.Forbidden());
 
+            // Guardamos el comentario
             var nuevo = MapearCrearDTO(dto);
-            _comentarioServicio.AgregarComentario(nuevo);
+            var comentarioCreado = _comentarioServicio.AgregarComentario(nuevo);
 
-            return Ok(RespuestaApi<string>.Ok("Comentario agregado correctamente."));
+            if (comentarioCreado == null)
+                return BadRequest(RespuestaApi<string>.Error("No se pudo crear el comentario."));
+
+            // Mapear al DTO de vista
+            var mapeador = new MapeadorPublicaciones();
+            var dtoVista = mapeador.MapearComentario(comentarioCreado);
+
+            return Ok(RespuestaApi<ComentarioVistaDTO>.Ok(dtoVista));
         }
+
 
         /// <summary>
         /// Edita el contenido de un comentario existente.

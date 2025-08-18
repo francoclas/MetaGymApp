@@ -227,7 +227,40 @@ namespace MetaGymWebApp.Controllers
             ViewBag.TiposAtencion = new SelectList(extraServicio.ObtenerTiposAtencionPorProfesional(ProfesionalId), "Id", "Nombre", dto.TipoAtencionId);
             return View(dto);
         }
+        [HttpGet]
+        public IActionResult EditarCitaParcial(int citaId)
+        {
+            int ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            var cita = citaServicio.ObtenerPorId(citaId);
 
+            if (cita.Estado != EstadoCita.Aceptada)
+            {
+                TempData["Mensaje"] = "Solo se pueden editar citas aceptadas.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionCitas");
+            }
+            if (cita.ProfesionalId != ProfesionalId)
+            {
+                TempData["Mensaje"] = "No tenes asignada la rutina a editar";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("Calendario");
+
+            }
+            var dto = new CitaDTO
+            {
+                CitaId = cita.Id,
+                FechaAsistencia = cita.FechaAsistencia ?? DateTime.Now,
+                EstablecimientoId = cita.EstablecimientoId,
+                ClienteId = cita.ClienteId,
+                ProfesionalId = cita.ProfesionalId,
+                EspecialidadId = cita.EspecialidadId,
+                Descripcion = cita.Descripcion,
+                TipoAtencionId = cita.TipoAtencionId
+            };
+
+            ViewBag.TiposAtencion = new SelectList(extraServicio.ObtenerTiposAtencionPorProfesional(ProfesionalId), "Id", "Nombre", dto.TipoAtencionId);
+            return PartialView("EditarCita", dto);
+        }
         [HttpPost]
         public IActionResult EditarCita(CitaDTO citaDTO)
         {
@@ -257,7 +290,11 @@ namespace MetaGymWebApp.Controllers
 
                     cita.Conclusion = citaDTO.Conclusion;
                     cita.Estado = citaDTO.Estado;
-                    cita.FechaFinalizacion = DateTime.Now;
+                    if (citaDTO.Estado == EstadoCita.Finalizada)
+                    {
+                        cita.FechaFinalizacion = DateTime.Now;
+
+                    }
                 }
                 else
                 {
@@ -287,6 +324,17 @@ namespace MetaGymWebApp.Controllers
                 ViewBag.TiposAtencion = new SelectList(extraServicio.ObtenerTiposAtencionPorProfesional(ProfesionalId), "Id", "Nombre", citaDTO.TipoAtencionId);
                 return View(citaDTO);
             }
+        }
+        [HttpPost]
+        public IActionResult ReprogramarCita(int citaId, DateTime nuevaFecha)
+        {
+            Cita cita = citaServicio.ObtenerPorId(citaId);
+            if (cita == null) return NotFound();
+
+            cita.FechaAsistencia = nuevaFecha;
+            citaServicio.ActualizarEntidad(cita);
+
+            return Ok();
         }
         [HttpGet]
         public IActionResult HistorialClinicoCliente(int id)
@@ -336,6 +384,21 @@ namespace MetaGymWebApp.Controllers
         {
             var cita = citaServicio.ObtenerPorId(id);
             return View("VerCita", new CitaDTO
+            {
+                CitaId = cita.Id,
+                Cliente = cita.Cliente,
+                Establecimiento = cita.Establecimiento,
+                Especialidad = cita.Especialidad,
+                Descripcion = cita.Descripcion,
+                FechaAsistencia = cita.FechaAsistencia ?? DateTime.Now,
+                Conclusion = cita.Conclusion
+            });
+        }
+        [HttpGet]
+        public IActionResult VerCitaParcial(int citaId)
+        {
+            var cita = citaServicio.ObtenerPorId(citaId);
+            return PartialView("VerCita", new CitaDTO
             {
                 CitaId = cita.Id,
                 Cliente = cita.Cliente,
@@ -920,6 +983,31 @@ namespace MetaGymWebApp.Controllers
         {
             mediaServicio.EliminarMedia(mediaId);
             return RedirectToAction("EditarEjercicio", new { id = EjercicioId });
+        }
+
+        //Calendarios prueba
+        public IActionResult Calendario(int profesionalId)
+        {
+            List<Cita> citas = citaServicio.SolicitarProximasProfesional(profesionalId);
+            return View(citas);
+        }
+
+        // Endpoint para alimentar FullCalendar con JSON
+        public IActionResult ObtenerCitas(int profesionalId)
+        {
+            profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+            var citas = citaServicio.SolicitarProximasProfesional(profesionalId);
+
+            var eventos = citas.Select(c => new
+            {
+                id = c.Id,
+                title = $"Cita con {c.Cliente.NombreCompleto} | {c.TipoAtencion.Nombre}",
+                start = c.FechaAsistencia?.ToString("yyyy-MM-ddTHH:mm:ss"),
+                end = c.FechaAsistencia?.AddMinutes(30).ToString("yyyy-MM-ddTHH:mm:ss"), // duracion fija
+                color = "#ff0000"
+            });
+
+            return Json(eventos);
         }
     }
 }

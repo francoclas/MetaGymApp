@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LogicaApp.DTOS;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
+using LogicaNegocio.Interfaces.DTOS.API;
 
 namespace LogicaNegocio.Interfaces.Servicios
 {
@@ -32,7 +33,7 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<Cita> BuscarPorClienteYEstado(int clienteID,EstadoCita estado);
         List<Cita> BuscarPorEstado(EstadoCita estado);
         Cita ObtenerPorId(int citaId);
-        public List<DateTime> ObtenerHorariosDisponibles(int profesionalId, DateTime fecha, int duracionMin);
+        public List<HorarioDisponibleDTO> ObtenerHorariosDisponibles(int profesionalId);
         List<Cita> BuscarSolicitudesSegunTiposAtencion(List<int> tiposAtencionId);
         void ActualizarEntidad(Cita cita);
         void RegistrarCitaPorProfesional(CitaDTO cita);
@@ -40,5 +41,6 @@ namespace LogicaNegocio.Interfaces.Servicios
 
         List<CitaDTO> ObtenerCitasClientes(int clienteId, int estadoCita);
         CitaDTO ObtenerDetallesCita(int citaId);
+        List<CitaDTO> ObtenerTodasCitasClientes(int clienteId);
     }
 }

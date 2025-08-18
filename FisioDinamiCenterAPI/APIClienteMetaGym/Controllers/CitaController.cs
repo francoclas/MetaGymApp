@@ -32,19 +32,19 @@ public class CitaController : ControllerBase
     [HttpGet("cliente")]
     [ProducesResponseType(typeof(RespuestaApi<List<CitaAPIDTO>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]
-    public IActionResult ObtenerCitasCliente(int clienteId, int estadoEnum, string rol)
+    public IActionResult ObtenerCitasCliente(int clienteId, int? estadoEnum, string rol)
     {
         if (!EsCliente(rol))
             return StatusCode(403, RespuestaApi<string>.Forbidden());
 
         try
         {
-            List<CitaDTO> citas = _citaServicio.ObtenerCitasClientes(clienteId, estadoEnum);
-            List<CitaAPIDTO> salida = new List<CitaAPIDTO>();
-            MapeadorCitas aux = new MapeadorCitas();
-            foreach (var citaDTO in citas) {
-                salida.Add(aux.MapearCitaAPIDTO(citaDTO));
-            }
+            List<CitaDTO> citas = estadoEnum.HasValue
+                ? _citaServicio.ObtenerCitasClientes(clienteId, estadoEnum.Value)
+                : _citaServicio.ObtenerTodasCitasClientes(clienteId);
+
+            var salida = citas.Select(c => new MapeadorCitas().MapearCitaAPIDTO(c)).ToList();
+
             return Ok(RespuestaApi<List<CitaAPIDTO>>.Ok(salida));
         }
         catch (Exception ex)

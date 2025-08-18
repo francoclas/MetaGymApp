@@ -166,12 +166,15 @@ namespace LogicaDatos.Repositorio
         public SesionRutina? ObtenerSesionPorId(int sesionId)
         {
             return _context.SesionesRutina
-               .Include(sr => sr.RutinaAsignada)
-                .ThenInclude(ra => ra.Rutina)
-               .Include(sr => sr.EjerciciosRealizados)
-               .ThenInclude(er => er.Series)
-               .Include(sr => sr.EjerciciosRealizados)
-                .ThenInclude(er => er.Ejercicio)
+                .Include(sr => sr.RutinaAsignada)
+                    .ThenInclude(ra => ra.Rutina)
+                .Include(sr => sr.EjerciciosRealizados)
+                    .ThenInclude(er => er.Series)
+                .Include(sr => sr.EjerciciosRealizados)
+                    .ThenInclude(er => er.Ejercicio)
+                    .ThenInclude(e => e.Medias)
+                .Include(sr => sr.EjerciciosRealizados)
+                    .ThenInclude(er => er.ValoresMediciones)
                .FirstOrDefault(sr => sr.Id == sesionId);
         }
 

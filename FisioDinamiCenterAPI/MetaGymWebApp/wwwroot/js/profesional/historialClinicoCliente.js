@@ -1,11 +1,15 @@
-﻿function filtrarHistorial() {
-    const texto = document.getElementById("buscadorHistorial").value.toLowerCase();
-    const filas = document.querySelectorAll("#tablaHistorial tbody tr");
-
-    filas.forEach(fila => {
-        const especialidad = fila.children[1].innerText.toLowerCase();
-        const tipoAtencion = fila.children[2].innerText.toLowerCase();
-        const coincide = especialidad.includes(texto) || tipoAtencion.includes(texto);
-        fila.style.display = coincide ? "" : "none";
+﻿document.addEventListener("DOMContentLoaded", () => {
+    const tabla = $("#tablaHistorial").DataTable({
+        pageLength: 20,
+        lengthMenu: [10, 20, 50, 100],
+        order: [[3, "desc"]],
+        language: {
+            url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+        }
     });
-}
+
+    // Conectar el buscador manual al filtro de DataTables
+    document.getElementById("buscadorHistorial").addEventListener("keyup", function () {
+        tabla.search(this.value).draw();
+    });
+});

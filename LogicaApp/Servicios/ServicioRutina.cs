@@ -288,14 +288,17 @@ namespace LogicaApp.Servicios
             List<SesionEntrenadaDTO> salida = new List<SesionEntrenadaDTO>();
             foreach (var sesion in repositorioRutina.ObtenerSesionesPorCliente(clienteId))
             {
+
                 SesionEntrenadaDTO aux = new SesionEntrenadaDTO
                 {
                     SesionRutinaId = sesion.Id,
                     NombreCliente = sesion.Cliente.NombreCompleto,
-                    NombreRutina = sesion.RutinaAsignada.Rutina.NombreRutina,
                     FechaRealizada = sesion.FechaRealizada,
                     DuracionMin = sesion.DuracionMin,
                 };
+                if (sesion.RutinaAsignada != null)
+                    aux.NombreRutina = sesion.RutinaAsignada.Rutina.NombreRutina;
+
                 if (!salida.Contains(aux))
                 {
                     salida.Add(aux);

@@ -7,12 +7,12 @@ using LogicaNegocio.Clases;
 using LogicaNegocio.Interfaces.DTOS;
 
 namespace LogicaNegocio.Interfaces.Servicios
-{
+{   
     public interface 
         IComentarioServicio
     {
             List<ComentarioDTO> ObtenerPorPublicacion(int publicacionId);
-            void AgregarComentario(ComentarioDTO dto);
+            ComentarioDTO AgregarComentario(ComentarioDTO dto);
             void EditarComentario(int comentarioId, string nuevoContenido, int usuarioId);
             void EliminarComentario(int comentarioId, int usuarioId, string rol);
             void DarLikeComentario(int comentarioId, int usuarioId, string rol);

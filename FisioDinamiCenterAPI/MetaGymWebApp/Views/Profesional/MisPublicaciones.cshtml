@@ -2,7 +2,8 @@
 @{
     ViewData["Title"] = "Mis Publicaciones";
 }
-<h2>Mis Publicaciones</h2>
+
+<h2 class="text-white">Mis Publicaciones</h2>
 
 <div class="mb-3">
     <a asp-action="SolicitarPublicacion" class="btn btn-success">➕ Nueva publicación</a>
@@ -29,44 +30,108 @@ else
         </li>
     </ul>
 
+    <!-- Pendientes -->
     <div id="tabla-pendientes" class="tab-publicaciones">
         @if (!Model.Pendientes.Any())
         {
-            <div class="alert alert-info mt-3" role="alert">
-                No tenés publicaciones pendientes de aprobación. Podés generar una nueva solicitud arriba.
-            </div>
+            <div class="alert alert-info mt-3">No tenés publicaciones pendientes.</div>
         }
         else
         {
-            @Html.Partial("_TablaPublicaciones", Model.Pendientes)
+            <table class="table table-dark table-bordered tabla-publicaciones" id="tablaPendientes">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pub in Model.Pendientes)
+                    {
+                        <tr>
+                            <td>@pub.Id</td>
+                            <td>@pub.Titulo</td>
+                            <td>@pub.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-light" asp-action="DetallesPublicacion" asp-route-id="@pub.Id">Ver detalles</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         }
     </div>
 
+    <!-- Aprobadas -->
     <div id="tabla-aprobadas" class="tab-publicaciones d-none">
         @if (!Model.Aprobadas.Any())
         {
-            <div class="alert alert-info mt-3" role="alert">
-                No tenés publicaciones aprobadas todavía.
-            </div>
+            <div class="alert alert-info mt-3">No tenés publicaciones aprobadas todavía.</div>
         }
         else
         {
-            @Html.Partial("_TablaPublicaciones", Model.Aprobadas)
+            <table class="table table-dark table-bordered tabla-publicaciones" id="tablaAprobadas">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pub in Model.Aprobadas)
+                    {
+                        <tr>
+                            <td>@pub.Id</td>
+                            <td>@pub.Titulo</td>
+                            <td>@pub.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-light" asp-action="DetallePublicacion" asp-controller="Profesional" asp-route-id="@pub.Id">Ver detalles</a>
+                                <a class="btn btn-sm btn-outline-warning" asp-action="EditarPublicacion" asp-controller="Profesional" asp-route-id="@pub.Id">Editar</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         }
     </div>
 
+    <!-- Rechazadas -->
     <div id="tabla-rechazadas" class="tab-publicaciones d-none">
         @if (!Model.Rechazadas.Any())
         {
-            <div class="alert alert-info mt-3" role="alert">
-                No tenés publicaciones rechazadas por ahora.
-            </div>
+            <div class="alert alert-info mt-3">No tenés publicaciones rechazadas.</div>
         }
         else
         {
-            @Html.Partial("_TablaPublicaciones", Model.Rechazadas)
+            <table class="table table-dark table-bordered tabla-publicaciones" id="tablaRechazadas">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pub in Model.Rechazadas)
+                    {
+                        <tr>
+                            <td>@pub.Id</td>
+                            <td>@pub.Titulo</td>
+                            <td>@pub.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-light" asp-action="DetallePublicacion" asp-controller="Profesional" asp-route-id="@pub.Id">Ver detalles</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         }
     </div>
 }
 
-<script src="/js/profesional/misPublicacionesProfesional.js"></script>
+    <script src="~/js/profesional/misPublicacionesProfesional.js"></script>

@@ -6,9 +6,9 @@
 }
 
 <div class="container mt-4">
-    <h2>Historial clínico de @nombreCliente</h2>
+    <h2 class="text-white mb-3">Historial clínico de @nombreCliente</h2>
 
-    @if (Model.Count == 0)
+    @if (!Model.Any())
     {
         <div class="bg-dark p-4 rounded border text-center mt-4">
             <h5 class="text-muted">Todavía no hay citas finalizadas para este cliente.</h5>
@@ -19,11 +19,14 @@
     {
         <div class="row mb-3">
             <div class="col-md-6">
-                <input type="text" id="buscadorHistorial" class="form-control" placeholder="Buscar por especialidad o tipo atención" onkeyup="filtrarHistorial()" />
+                <div class="input-group">
+                    <span class="input-group-text bg-dark text-white">🔍</span>
+                    <input type="text" id="buscadorHistorial" class="form-control" placeholder="Buscar por especialidad o tipo de atención..." />
+                </div>
             </div>
         </div>
 
-        <table class="table table-bordered table-striped" id="tablaHistorial">
+        <table class="table table-dark table-bordered datatable" id="tablaHistorial">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -40,7 +43,7 @@
                         <td>@cita.CitaId</td>
                         <td>@cita.Especialidad?.NombreEspecialidad</td>
                         <td>@cita.TipoAtencion?.Nombre</td>
-                        <td>@(cita.FechaFinalizacion?.ToString("dd/MM/yyyy") ?? "-")</td>
+                        <td>@(cita.FechaFinalizacion?.ToString("yyyy-MM-dd") ?? "-")</td>
                         <td>
                             <a class="btn btn-sm btn-outline-info" asp-action="VerCita" asp-route-id="@cita.CitaId" target="_blank">Ver detalles</a>
                         </td>

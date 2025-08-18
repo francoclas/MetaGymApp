@@ -1,4 +1,5 @@
 ﻿using APIClienteMetaGym.DTO.PublicacionAPI;
+using LogicaNegocio.Clases;
 using LogicaNegocio.Interfaces.DTOS;
 
 namespace APIClienteMetaGym.Extra
@@ -21,6 +22,22 @@ namespace APIClienteMetaGym.Extra
                 Comentarios = MapearComentariosJerarquicos(p.Comentarios)
             }).ToList();
         }
+        public ComentarioVistaDTO MapearComentario(ComentarioDTO dto)
+        {
+            if (dto == null) return null;
+
+            return new ComentarioVistaDTO
+            {
+                ComentarioId = dto.ComentarioId,
+                Contenido = dto.Contenido,
+                Autor = dto.AutorNombre,
+                UrlImagenAutor = dto.ImagenAutor?.Url,
+                Fecha = dto.FechaCreacion,
+                CantLikes = dto.CantLikes,
+                PublicacionId = dto.PublicacionId,
+                Respuestas = dto.Respuestas?.Select(MapearComentarioRecursivo).ToList() ?? new()
+            };
+        }
 
         private List<ComentarioVistaDTO> MapearComentariosJerarquicos(List<ComentarioDTO> todos)
         {
@@ -36,6 +53,8 @@ namespace APIClienteMetaGym.Extra
         {
             return new ComentarioVistaDTO
             {
+
+               ComentarioPadreId = dto.ComentarioPadreId,
                ComentarioId = dto.ComentarioId,
                 Contenido = dto.Contenido,
                 Autor = dto.AutorNombre,

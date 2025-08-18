@@ -1,44 +1,33 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
-    const texto = document.getElementById("buscadorTexto");
-    const desde = document.getElementById("fechaDesde");
-    const hasta = document.getElementById("fechaHasta");
-    const tarjetas = document.querySelectorAll(".tarjeta-publicacion");
+﻿document.addEventListener("DOMContentLoaded", () => {
+    // Extender DataTables con filtro de fechas
+    $.fn.dataTable.ext.search.push(function (settings, data) {
+        const desde = document.getElementById("fechaDesde").value;
+        const hasta = document.getElementById("fechaHasta").value;
+        const fecha = data[3]; // columna "Fecha de solicitud"
 
-    function filtrar() {
-        const valTexto = texto.value.toLowerCase();
-        const valDesde = desde.value;
-        const valHasta = hasta.value;
+        if (!fecha) return true;
 
-        tarjetas.forEach(card => {
-            const solicitante = card.dataset.solicitante;
-            const titulo = card.dataset.titulo;
-            const fecha = card.dataset.fecha;
+        const fechaRow = new Date(fecha);
+        const fechaDesde = desde ? new Date(desde) : null;
+        const fechaHasta = hasta ? new Date(hasta) : null;
 
-            const coincideTexto = solicitante.includes(valTexto) || titulo.includes(valTexto);
-            const enRango =
-                (!valDesde || fecha >= valDesde) &&
-                (!valHasta || fecha <= valHasta);
+        if (fechaDesde && fechaRow < fechaDesde) return false;
+        if (fechaHasta && fechaRow > fechaHasta) return false;
 
-            card.style.display = (coincideTexto && enRango) ? "block" : "none";
-        });
-    }
-
-    texto.addEventListener("input", filtrar);
-    desde.addEventListener("change", filtrar);
-    hasta.addEventListener("change", filtrar);
-});
-
-function ordenarPorFecha(direccion) {
-    const contenedor = document.getElementById("contenedorPublicaciones");
-    const tarjetas = Array.from(contenedor.querySelectorAll(".tarjeta-publicacion"));
-
-    tarjetas.sort((a, b) => {
-        const fechaA = a.dataset.fecha;
-        const fechaB = b.dataset.fecha;
-        return direccion === "asc"
-            ? fechaA.localeCompare(fechaB)
-            : fechaB.localeCompare(fechaA);
+        return true;
     });
 
-    tarjetas.forEach(t => contenedor.appendChild(t));
-}
+    // Inicializar tabla
+    const tabla = $("#tablaPublicaciones").DataTable({
+        pageLength: 20,
+        lengthMenu: [10, 20, 50, 100],
+        order: [[3, "desc"]],
+        language: {
+            url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+        }
+    });
+
+    // Redibujar cuando cambien los filtros
+    document.getElementById("fechaDesde").addEventListener("change", () => tabla.draw());
+    document.getElementById("fechaHasta").addEventListener("change", () => tabla.draw());
+});

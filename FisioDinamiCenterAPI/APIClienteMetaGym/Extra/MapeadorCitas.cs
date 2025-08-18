@@ -17,6 +17,7 @@ namespace APIClienteMetaGym.Extra
                 ClienteId = cita.ClienteId,
                 Estado = cita.Estado,
                 Especialidad = cita.Especialidad?.NombreEspecialidad,
+                TipoAtencion = cita.TipoAtencion.Nombre,
                 FechaAsistencia = cita.FechaAsistencia,
                 FechaCreacion = cita.FechaCreacion,
                 FechaFinalizacion = cita.FechaFinalizacion,
