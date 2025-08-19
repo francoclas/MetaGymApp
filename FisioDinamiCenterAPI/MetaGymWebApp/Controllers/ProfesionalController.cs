@@ -858,26 +858,24 @@ namespace MetaGymWebApp.Controllers
                     IdsEjerciciosSeleccionados = idsSeleccionados,
                     IdsClientesAsignados = idsClientesAsignados,
 
-                    // Ejercicios disponibles (se excluyen los ya seleccionados)
+                    // ⚡ Ahora mostramos todos, sin excluir los ya seleccionados
                     MisEjerciciosDisponibles = todosEjercicios
-                        .Where(e => e.ProfesionalId == profesionalId && !idsSeleccionados.Contains(e.Id))
+                        .Where(e => e.ProfesionalId == profesionalId)
                         .ToList(),
 
                     EjerciciosDisponiblesSistema = todosEjercicios
-                        .Where(e => e.ProfesionalId != profesionalId && !idsSeleccionados.Contains(e.Id))
+                        .Where(e => e.ProfesionalId != profesionalId)
                         .ToList(),
 
-                    // Ejercicios seleccionados (solo los de la rutina)
+                    // Ejercicios seleccionados (solo los de la rutina actual)
                     EjerciciosSeleccionados = todosEjercicios
                         .Where(e => idsSeleccionados.Contains(e.Id))
                         .ToList(),
 
-                    // Clientes disponibles (sin los ya asignados)
-                    ClientesDisponibles = todosClientes
-                        .Where(c => !idsClientesAsignados.Contains(c.Id))
+                    // Clientes: mostramos todos en la tabla de disponibles
+                    ClientesDisponibles = todosClientes                   
                         .ToList(),
 
-                    // Clientes seleccionados
                     ClientesSeleccionados = todosClientes
                         .Where(c => idsClientesAsignados.Contains(c.Id))
                         .ToList()
@@ -892,6 +890,7 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("GestionRutinas");
             }
         }
+
 
 
 

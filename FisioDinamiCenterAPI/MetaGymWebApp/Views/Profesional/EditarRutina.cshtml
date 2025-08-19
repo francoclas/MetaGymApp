@@ -3,12 +3,14 @@
     ViewData["Title"] = "Modificar rutina";
 }
 <link rel="stylesheet" href="~/css/ejercicios.css" />
+
 <div class="container text-light">
     <h2 class="mb-4">Editar Rutina</h2>
 
     <form asp-action="EditarRutina" method="post" class="bg-dark p-4 rounded shadow-sm">
         <input type="hidden" name="Id" value="@Model.Id" />
 
+        <!-- Nombre y Tipo -->
         <div class="mb-3">
             <label class="form-label">Nombre de la rutina</label>
             <input type="text" name="NombreRutina" class="form-control" value="@Model.NombreRutina" required />
@@ -18,82 +20,138 @@
             <input type="text" name="Tipo" class="form-control" value="@Model.Tipo" required />
         </div>
 
+        <!-- Ejercicios -->
         <hr class="my-4" />
-        <h3 class="mb-3">Mis Ejercicios</h3>
-        <input type="text" id="buscadorMisEjercicios" class="form-control mb-3" placeholder="Buscar en mis ejercicios..." />
+        <h3 class="mb-3">Ejercicios Disponibles</h3>
 
-        <div class="contenedor-slide" id="misEjerciciosDisponibles">
-            @foreach (var ejercicio in Model.MisEjerciciosDisponibles)
-            {
-                var img = ejercicio.Media?.Url ?? "/img/default.png";
-                <div class="card-ejercicio bg-secondary p-2 rounded text-center"
-                     data-id="@ejercicio.Id" data-nombre="@ejercicio.Nombre.ToLower()" data-tipo="@ejercicio.Tipo.ToLower()">
-                    <img src="@img" alt="Imagen ejercicio" class="img-ejercicio rounded mb-2" />
-                    <div class="nombre-ejercicio">@ejercicio.Nombre</div>
-                    <button type="button" class="btn btn-sm btn-danger mt-1"
-                            onclick="agregar('ejercicio', @ejercicio.Id, '@ejercicio.Nombre', this)">
-                        Agregar
-                    </button>
-                    <a class="btn btn-sm btn-outline-light mt-1" target="_blank"
-                       href="/Profesional/InformacionEjercicio/@ejercicio.Id">Ver</a>
+        <div class="row">
+            <!-- Mis Ejercicios -->
+            <div class="col-md-6">
+                <h5 class="mb-3">Mis Ejercicios</h5>
+                <div class="table-responsive">
+                    <table id="tablaMisEjercicios" class="table table-dark table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Tipo</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ej in Model.MisEjerciciosDisponibles)
+                            {
+                                var img = ej.Media?.Url ?? "/img/default.png";
+                                <tr data-id="@ej.Id" data-nombre="@ej.Nombre">
+                                    <td><img src="@img" alt="img" class="rounded" style="width:60px;height:60px;object-fit:cover;" /></td>
+                                    <td>@ej.Nombre</td>
+                                    <td>@ej.Tipo</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-success"
+                                                onclick="agregarEjercicio(@ej.Id, '@ej.Nombre', '@img')">
+                                            ➕ Agregar
+                                        </button>
+                                        <a class="btn btn-sm btn-outline-light" target="_blank"
+                                           href="/Profesional/InformacionEjercicio/@ej.Id">Ver</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-            }
-        </div>
+            </div>
 
-        <h3 class="mt-4 mb-3">Ejercicios del Sistema</h3>
-        <input type="text" id="buscadorEjerciciosSistema" class="form-control mb-3" placeholder="Buscar en ejercicios del sistema..." />
-
-        <div class="contenedor-slide" id="ejerciciosSistemaDisponibles">
-            @foreach (var ejercicio in Model.EjerciciosDisponiblesSistema)
-            {
-                var img = ejercicio.Media?.Url ?? "/img/default.png";
-                <div class="card-ejercicio bg-secondary p-2 rounded text-center"
-                     data-id="@ejercicio.Id" data-nombre="@ejercicio.Nombre.ToLower()" data-tipo="@ejercicio.Tipo.ToLower()">
-                    <img src="@img" alt="Imagen ejercicio" class="img-ejercicio rounded mb-2" />
-                    <div class="nombre-ejercicio">@ejercicio.Nombre</div>
-                    <button type="button" class="btn btn-sm btn-danger mt-1"
-                            onclick="agregar('ejercicio', @ejercicio.Id, '@ejercicio.Nombre', this)">
-                        Agregar
-                    </button>
-                    <a class="btn btn-sm btn-outline-light mt-1" target="_blank"
-                       href="/Profesional/InformacionEjercicio/@ejercicio.Id">Ver</a>
+            <!-- Ejercicios del Sistema -->
+            <div class="col-md-6">
+                <h5 class="mb-3">Ejercicios del Sistema</h5>
+                <div class="table-responsive">
+                    <table id="tablaEjerciciosSistema" class="table table-dark table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Tipo</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ej in Model.EjerciciosDisponiblesSistema)
+                            {
+                                var img = ej.Media?.Url ?? "/img/default.png";
+                                <tr data-id="@ej.Id" data-nombre="@ej.Nombre">
+                                    <td><img src="@img" alt="img" class="rounded" style="width:60px;height:60px;object-fit:cover;" /></td>
+                                    <td>@ej.Nombre</td>
+                                    <td>@ej.Tipo</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-success"
+                                                onclick="agregarEjercicio(@ej.Id, '@ej.Nombre', '@img')">
+                                            ➕ Agregar
+                                        </button>
+                                        <a class="btn btn-sm btn-outline-light" target="_blank"
+                                           href="/Profesional/InformacionEjercicio/@ej.Id">Ver</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-            }
+            </div>
         </div>
 
         <hr class="my-4" />
         <h3 class="mb-3">Ejercicios Seleccionados</h3>
-        <ul id="lista-ejercicios" class="list-group mb-3">
-            @foreach (var ej in Model.EjerciciosSeleccionados)
-            {
-                var origen = ej.ProfesionalId == GestionSesion.ObtenerUsuarioId(Context) ? "mis" : "sistema";
-                <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center"
-                    data-id="@ej.Id" data-origen="@origen">
-                    @ej.Nombre
-                    <button type="button" class="btn btn-sm btn-danger" onclick="quitar('ejercicio', @ej.Id, this)">X</button>
-                    <input type="hidden" name="IdsEjerciciosSeleccionados" value="@ej.Id" />
-                </li>
-            }
-        </ul>
-
-        <hr class="my-4" />
-        <h3 class="mb-3">Clientes Disponibles</h3>
-        <input type="text" id="buscadorClientes" class="form-control mb-3" placeholder="Buscar por nombre, usuario o CI..." />
-
         <div class="table-responsive">
-            <table class="table table-dark table-bordered">
+            <table id="tablaEjerciciosSeleccionados" class="table table-dark table-bordered">
                 <thead>
-                    <tr><th>Nombre</th><th>Acción</th></tr>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ej in Model.EjerciciosSeleccionados)
+                    {
+                        var img = ej.Media?.Url ?? "/img/default.png";
+                        <tr data-id="@ej.Id">
+                            <td><img src="@img" alt="img" class="rounded" style="width:60px;height:60px;object-fit:cover;" /></td>
+                            <td>@ej.Nombre</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="quitarEjercicio(@ej.Id, this)">❌ Quitar</button>
+                                <input type="hidden" name="IdsEjerciciosSeleccionados" value="@ej.Id" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Clientes -->
+        <hr class="my-4" />
+        <h3 class="mb-3">Clientes del Sistema</h3>
+        <div class="table-responsive">
+            <table id="tablaClientes" class="table table-dark table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Usuario</th>
+                        <th>CI</th>
+                        <th>Correo</th>
+                        <th>Acción</th>
+                    </tr>
                 </thead>
                 <tbody>
                     @foreach (var cli in Model.ClientesDisponibles)
                     {
                         <tr data-id="@cli.Id" data-nombre="@cli.NombreCompleto">
                             <td>@cli.NombreCompleto</td>
+                            <td>@cli.NombreUsuario</td>
+                            <td>@cli.Ci</td>
+                            <td>@cli.Correo</td>
                             <td>
-                                <button type="button" class="btn btn-danger"
-                                        onclick="agregar('cliente', @cli.Id, '@cli.NombreCompleto', this)">
-                                    Agregar
+                                <button type="button" class="btn btn-sm btn-success"
+                                        onclick="agregarCliente(@cli.Id, '@cli.NombreCompleto')">
+                                    ➕ Agregar
                                 </button>
                             </td>
                         </tr>
@@ -104,17 +162,28 @@
 
         <hr class="my-4" />
         <h3 class="mb-3">Clientes Seleccionados</h3>
-        <ul id="lista-clientes" class="list-group mb-3">
-            @foreach (var cli in Model.ClientesSeleccionados)
-            {
-                <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center"
-                    data-id="@cli.Id" data-origen="cliente">
-                    @cli.NombreCompleto
-                    <button type="button" class="btn btn-sm btn-danger" onclick="quitar('cliente', @cli.Id, this)">X</button>
-                    <input type="hidden" name="IdsClientesAsignados" value="@cli.Id" />
-                </li>
-            }
-        </ul>
+        <div class="table-responsive">
+            <table id="tablaClientesSeleccionados" class="table table-dark table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cli in Model.ClientesSeleccionados)
+                    {
+                        <tr data-id="@cli.Id">
+                            <td>@cli.NombreCompleto</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="quitarCliente(@cli.Id, this)">❌ Quitar</button>
+                                <input type="hidden" name="IdsClientesAsignados" value="@cli.Id" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
         <hr class="my-4" />
         <button type="submit" class="btn btn-success">Guardar cambios</button>
@@ -122,5 +191,5 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/profesional/editarRutina.js?v=2"></script>
+    <script src="~/js/profesional/editarRutina.js"></script>
 }

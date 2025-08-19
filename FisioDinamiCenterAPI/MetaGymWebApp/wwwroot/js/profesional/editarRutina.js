@@ -1,63 +1,69 @@
-﻿function agregar(tipo, id, nombre, btn) {
-    const lista = document.getElementById(`lista-${tipo}s`);
+﻿// ==============================
+// INICIALIZACIÓN DE DATATABLES
+// ==============================
+$(document).ready(function () {
+    $("#tablaMisEjercicios, #tablaEjerciciosSistema, #tablaClientes").DataTable({
+        language: { url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json" },
+        info: false
+    });
 
-    const li = document.createElement("li");
-    li.className = "list-group-item bg-dark text-light d-flex justify-content-between align-items-center";
-    li.dataset.id = id;
-
-    if (tipo === "ejercicio") {
-        const card = btn.closest(".card-ejercicio");
-        li.dataset.origen = card.closest("#misEjerciciosDisponibles") ? "mis" : "sistema";
-    } else {
-        li.dataset.origen = "cliente";
-    }
-
-    li.innerHTML = `${nombre} 
-        <button type="button" class="btn btn-sm btn-danger" onclick="quitar('${tipo}', ${id}, this)">X</button>
-        <input type="hidden" name="Ids${capitalizar(tipo)}sSeleccionados" value="${id}" />`;
-
-    lista.appendChild(li);
-
-    if (tipo === "ejercicio") btn.closest(".card").style.display = "none";
-    else btn.closest("tr").style.display = "none";
-}
-
-function quitar(tipo, id, btn) {
-    const li = btn.closest("li");
-    const origen = li.dataset.origen;
-    li.remove();
-
-    if (tipo === "ejercicio") {
-        if (origen === "mis") {
-            const card = document.querySelector(`#misEjerciciosDisponibles .card-ejercicio[data-id="${id}"]`);
-            if (card) card.style.display = "block";
-        } else if (origen === "sistema") {
-            const card = document.querySelector(`#ejerciciosSistemaDisponibles .card-ejercicio[data-id="${id}"]`);
-            if (card) card.style.display = "block";
-        }
-    } else if (tipo === "cliente") {
-        const row = document.querySelector(`tr[data-id="${id}"]`);
-        if (row) row.style.display = "";
-    }
-}
-
-function capitalizar(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-// Buscadores
-document.getElementById("buscadorMisEjercicios").addEventListener("input", function () {
-    const filtro = this.value.toLowerCase();
-    document.querySelectorAll("#misEjerciciosDisponibles .card-ejercicio").forEach(card => {
-        const nombre = card.dataset.nombre || "";
-        card.style.display = nombre.includes(filtro) ? "block" : "none";
+    $("#tablaEjerciciosSeleccionados, #tablaClientesSeleccionados").DataTable({
+        paging: false,
+        searching: false,
+        info: false,
+        language: { url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json" }
     });
 });
 
-document.getElementById("buscadorEjerciciosSistema").addEventListener("input", function () {
-    const filtro = this.value.toLowerCase();
-    document.querySelectorAll("#ejerciciosSistemaDisponibles .card-ejercicio").forEach(card => {
-        const nombre = card.dataset.nombre || "";
-        card.style.display = nombre.includes(filtro) ? "block" : "none";
-    });
-});
+// ==============================
+// FUNCIONES EJERCICIOS
+// ==============================
+function agregarEjercicio(id, nombre, img) {
+    // Evito duplicados
+    if ($(`#tablaEjerciciosSeleccionados tr[data-id='${id}']`).length > 0) {
+        alert("⚠️ El ejercicio ya está en la rutina.");
+        return;
+    }
+
+    let fila = `
+        <tr data-id="${id}">
+            <td><img src="${img}" alt="img" class="rounded" style="width:60px;height:60px;object-fit:cover;" /></td>
+            <td>${nombre}</td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger" onclick="quitarEjercicio(${id}, this)">❌ Quitar</button>
+                <input type="hidden" name="IdsEjerciciosSeleccionados" value="${id}" />
+            </td>
+        </tr>`;
+
+    $("#tablaEjerciciosSeleccionados tbody").append(fila);
+}
+
+function quitarEjercicio(id, btn) {
+    $(btn).closest("tr").remove();
+}
+
+// ==============================
+// FUNCIONES CLIENTES
+// ==============================
+function agregarCliente(id, nombre) {
+    // Evito duplicados
+    if ($(`#tablaClientesSeleccionados tr[data-id='${id}']`).length > 0) {
+        alert("⚠️ El cliente ya está asignado.");
+        return;
+    }
+
+    let fila = `
+        <tr data-id="${id}">
+            <td>${nombre}</td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger" onclick="quitarCliente(${id}, this)">❌ Quitar</button>
+                <input type="hidden" name="IdsClientesAsignados" value="${id}" />
+            </td>
+        </tr>`;
+
+    $("#tablaClientesSeleccionados tbody").append(fila);
+}
+
+function quitarCliente(id, btn) {
+    $(btn).closest("tr").remove();
+}
