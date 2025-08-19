@@ -1,0 +1,19 @@
+﻿#calendario-footer h6 {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+#calendario-footer ul li {
+    margin-bottom: 5px;
+}
+
+#acciones-cita button {
+    margin-right: 8px;
+}
+.fc .fc-bgevent {
+    background-color: rgba(0, 255, 0, 0.1) !important;
+}
+
+.fc .fc-non-business {
+    background-color: rgba(255, 0, 0, 0.2) !important; /* rojo suave */
+}

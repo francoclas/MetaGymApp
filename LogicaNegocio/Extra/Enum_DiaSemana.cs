@@ -15,5 +15,7 @@ namespace LogicaNegocio.Extra
         Viernes,
         Sabado,
         Domingo
+
     }
+
 }

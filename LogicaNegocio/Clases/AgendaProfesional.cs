@@ -16,7 +16,6 @@ namespace LogicaNegocio.Clases
         public Enum_DiaSemana Dia { get; set; } 
         public TimeSpan HoraInicio { get; set; }
         public TimeSpan HoraFin { get; set; }
-
         public bool Activo { get; set; } = true;
     }
 }

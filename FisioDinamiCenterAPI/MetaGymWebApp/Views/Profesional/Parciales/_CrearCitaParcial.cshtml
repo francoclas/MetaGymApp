@@ -1,5 +1,77 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model RegistroCitaModelo
+
+<div class="container mt-3 bg-dark text-white border rounded p-3">
+    <h4>➕ Crear nueva cita</h4>
+    <button type="button" class="btn btn-sm btn-outline-light mb-3" onclick="cerrarPanelDerecho()">✖ Cerrar</button>
+
+    <form asp-action="CrearCitaParcial" method="post" id="form-crear-cita">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <!-- Cliente -->
+        <div class="mb-3">
+            <label asp-for="Cita.ClienteId" class="form-label">Cliente</label>
+            <select asp-for="Cita.ClienteId" class="form-select">
+                <option value="">Seleccione un cliente</option>
+                @foreach (var cliente in Model.Clientes)
+                {
+                    <option value="@cliente.Id">
+                        @cliente.NombreCompleto - @cliente.Ci - @cliente.Correo
+                    </option>
+                }
+            </select>
+            <span asp-validation-for="Cita.ClienteId" class="text-danger"></span>
+        </div>
+
+        <!-- Descripción -->
+        <div class="mb-3">
+            <label asp-for="Cita.Descripcion" class="form-label">Descripción</label>
+            <input asp-for="Cita.Descripcion" type="text" class="form-control" />
+            <span asp-validation-for="Cita.Descripcion" class="text-danger"></span>
+        </div>
+
+        <!-- Especialidad -->
+        <div class="mb-3">
+            <label asp-for="Cita.EspecialidadId" class="form-label">Especialidad</label>
+            <select asp-for="Cita.EspecialidadId" class="form-select">
+                <option value="">Seleccione una especialidad</option>
+                @foreach (var esp in Model.Especialidades)
+                {
+                    <option value="@esp.Id">@esp.NombreEspecialidad</option>
+                }
+            </select>
+            <span asp-validation-for="Cita.EspecialidadId" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Cita.TipoAtencionId" class="form-label">Tipo de atención</label>
+            <select asp-for="Cita.TipoAtencionId" class="form-select">
+                <option value="">Seleccione un tipo de atención</option>
+                @foreach (var tipo in Model.TiposAtencion)
+                {
+                    <option value="@tipo.Id">@tipo.Nombre</option>
+                }
+            </select>
+            <span asp-validation-for="Cita.TipoAtencionId" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Cita.EstablecimientoId" class="form-label">Establecimiento</label>
+            <select asp-for="Cita.EstablecimientoId" class="form-select">
+                <option value="">Seleccione un establecimiento</option>
+                @foreach (var est in Model.Establecimientos)
+                {
+                    <option value="@est.Id">@est.Nombre</option>
+                }
+            </select>
+            <span asp-validation-for="Cita.EstablecimientoId" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Cita.FechaAsistencia" class="form-label">Fecha y Hora</label>
+            <input asp-for="Cita.FechaAsistencia" type="datetime-local" class="form-control" />
+            <span asp-validation-for="Cita.FechaAsistencia" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">💾 Guardar</button>
+            <button type="button" class="btn btn-outline-light" onclick="cerrarPanelDerecho()">Cancelar</button>
+        </div>
+    </form>
+</div>

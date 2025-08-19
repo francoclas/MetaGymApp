@@ -1,20 +1,58 @@
-﻿<div class="container mt-4 bg-dark text-white border rounded py-4">
-    <h2>Detalle de Cita</h2>
+﻿@using LogicaApp.DTOS
+@model CitaDTO
+<div class="container mt-4 bg-dark text-white border rounded py-4">
+
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">
+            <i class="bi bi-calendar-event me-2"></i> Detalle de Cita
+        </h2>
+        <button type="button" class="btn btn-sm btn-outline-light" onclick="cerrarPanelDerecho()">✖</button>
+    </div>
+
+    <!-- Estado -->
+    <div class="mb-3">
+        @if (Model.Estado == LogicaNegocio.Extra.EstadoCita.Finalizada)
+        {
+            <span class="badge bg-success">Finalizada</span>
+        }
+        else if (Model.Estado == LogicaNegocio.Extra.EstadoCita.Aceptada)
+        {
+            <span class="badge bg-primary">Aceptada</span>
+        }
+        else if (Model.Estado == LogicaNegocio.Extra.EstadoCita.EnEspera)
+        {
+            <span class="badge bg-warning text-dark">En espera</span>
+        }
+        else
+        {
+            <span class="badge bg-danger">Cancelada / No asistio</span>
+        }
+    </div>
+
     <hr />
 
-    <h4>Cliente</h4>
-    <p><strong>@Model.Cliente.NombreCompleto</strong></p>
-    <p><strong>Fecha:</strong> @Model.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</p>
-    <p><strong>Especialidad:</strong> @Model.Especialidad.NombreEspecialidad</p>
-    <p><strong>Establecimiento:</strong> @Model.Establecimiento.Nombre</p>
-    <p><strong>Descripción:</strong> @Model.Descripcion</p>
+    <!-- Datos de la cita -->
+    <div class="card bg-secondary text-white mb-3">
+        <div class="card-body">
+            <p class="mb-2"><i class="bi bi-person-fill me-2"></i> <strong>Cliente:</strong> @Model.Cliente.NombreCompleto</p>
+            <p class="mb-2"><i class="bi bi-clock-fill me-2"></i> <strong>Fecha:</strong> @Model.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</p>
+            <p class="mb-2"><i class="bi bi-clipboard2-pulse me-2"></i> <strong>Especialidad:</strong> @Model.Especialidad.NombreEspecialidad</p>
+            <p class="mb-2"><i class="bi bi-building me-2"></i> <strong>Establecimiento:</strong> @Model.Establecimiento.Nombre</p>
+            <p class="mb-0"><i class="bi bi-info-circle me-2"></i> <strong>Descripción:</strong> @Model.Descripcion</p>
+        </div>
+    </div>
 
+    <!-- Conclusión -->
     @if (!string.IsNullOrWhiteSpace(Model.Conclusion))
     {
         <hr />
-        <h4>Conclusión</h4>
-        <p>@Model.Conclusion</p>
+        <h4><i class="bi bi-journal-check me-2"></i> Conclusión</h4>
+        <div class="card bg-dark border-light">
+            <div class="card-body">
+                <p class="mb-0">@Model.Conclusion</p>
+            </div>
+        </div>
     }
 
 </div>
-

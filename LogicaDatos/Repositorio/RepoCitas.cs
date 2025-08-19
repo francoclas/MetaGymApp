@@ -103,6 +103,8 @@ namespace LogicaDatos.Repositorio
                 .Include(c => c.Especialidad)
                 .Include(c=> c.TipoAtencion)
                 .Include(c => c.Establecimiento)
+                .Include(c=> c.Profesional)
+                    .ThenInclude(p=> p.Agendas)
                 .Where(c => c.ProfesionalId == profesionalId && c.Estado == estado)
                 .ToList();
         }
