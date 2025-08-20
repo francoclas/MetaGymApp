@@ -1,14 +1,15 @@
 ﻿@model GenerarCitaModelo
 @{
-    ViewData["Title"] = "Solicitud de atencion";
+    ViewData["Title"] = "Solicitud de atención";
 }
 <div class="container">
     <h2 class="mb-4">Solicitar nueva cita</h2>
 
     <form asp-action="GenerarConsultaCita" method="post" class="border p-4 rounded shadow-sm bg-dark text-white">
-        <div class="mb-3">
+        <!-- Especialidad -->
+        <div class="mb-3" id="bloqueEspecialidad">
             <label asp-for="Cita.EspecialidadId" class="form-label">Especialidad</label>
-            <select asp-for="Cita.EspecialidadId" class="form-select" id="especialidadSelect">
+            <select asp-for="Cita.EspecialidadId" class="form-select" id="selectEspecialidad">
                 <option value="">Seleccione una especialidad</option>
                 @foreach (var esp in Model.Especialidades)
                 {
@@ -17,23 +18,19 @@
             </select>
         </div>
 
-        <div class="mb-3">
+        <!-- Tipo de atención -->
+        <div class="mb-3" id="bloqueTipoAtencion" style="display:none;">
             <label asp-for="Cita.TipoAtencionId" class="form-label">Tipo de Atención</label>
-            <select asp-for="Cita.TipoAtencionId" class="form-select" id="tipoAtencionSelect">
+            <select asp-for="Cita.TipoAtencionId" class="form-select" id="selectTipoAtencion">
                 <option value="">Seleccione un tipo</option>
-                @foreach (var tipo in Model.TiposAtencion)
-                {
-                    <option value="@tipo.Id" data-especialidad="@tipo.EspecialidadId" data-desc="@tipo.Desc">
-                        @tipo.Nombre
-                    </option>
-                }
             </select>
-            <div id="descTipo" class="text-light mt-2 fst-italic"></div>
+            <div id="descripcionTipo" class="text-light mt-2 fst-italic"></div>
         </div>
 
-        <div class="mb-3">
+        <!-- Establecimiento -->
+        <div class="mb-3" id="bloqueEstablecimiento" style="display:none;">
             <label asp-for="Cita.EstablecimientoId" class="form-label">Establecimiento</label>
-            <select asp-for="Cita.EstablecimientoId" class="form-select" id="establecimientoSelect">
+            <select asp-for="Cita.EstablecimientoId" class="form-select" id="selectEstablecimiento">
                 <option value="">Seleccione un establecimiento</option>
                 @foreach (var est in Model.Establecimientos)
                 {
@@ -42,25 +39,31 @@
                     </option>
                 }
             </select>
-            <div class="mt-3" id="mapaEstablecimiento" style="display:none;">
+            <div class="mt-3" id="contenedorMapa" style="display:none;">
                 <iframe id="iframeMapa" width="100%" height="250" style="border:0;" allowfullscreen loading="lazy"></iframe>
             </div>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Cita.Descripcion" class="form-label">Descripción (opcional)</label>
-            <textarea asp-for="Cita.Descripcion" class="form-control" rows="3"
-                      placeholder="Podés agregar detalles sobre tu solicitud..."></textarea>
-        </div>
-
-        <div class="mb-3">
+        <!-- Fecha deseada -->
+        <div class="mb-3" id="bloqueFecha" style="display:none;">
             <label asp-for="Cita.FechaAsistencia" class="form-label">Fecha deseada</label>
             <input asp-for="Cita.FechaAsistencia" type="datetime-local" class="form-control"
                    value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
         </div>
 
-        <button type="submit" class="btn btn-primary">Solicitar Cita</button>
+        <!-- Descripción -->
+        <div class="mb-3" id="bloqueDescripcion" style="display:none;">
+            <label asp-for="Cita.Descripcion" class="form-label">* Agregue detalles sobre su solicitud</label>
+            <textarea asp-for="Cita.Descripcion" class="form-control" rows="3"
+                      placeholder="Agregue detalles sobre su solicitud..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="botonEnviar" style="display:none;">Solicitar Cita</button>
     </form>
 </div>
 
-<script src="/js/cliente/generarConsultaCita.js"></script>
+<!-- Serializamos especialidades -->
+<script>
+    const especialidades = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Especialidades));
+</script>
+<script src="~/js/cliente/generarConsultaCita.js"></script>

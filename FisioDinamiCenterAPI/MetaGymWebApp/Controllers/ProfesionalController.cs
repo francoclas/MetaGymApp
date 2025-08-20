@@ -429,7 +429,10 @@ namespace MetaGymWebApp.Controllers
                 Estado = cita.Estado,
                 Descripcion = cita.Descripcion,
                 FechaAsistencia = cita.FechaAsistencia ?? DateTime.Now,
-                Conclusion = cita.Conclusion
+                Conclusion = cita.Conclusion,
+                NombreProfesional = cita.Profesional.NombreCompleto ?? "-",
+                TelefonoProfesional = cita.Profesional.Telefono ?? "-"
+                
             });
         }
         [HttpGet]

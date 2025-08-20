@@ -164,7 +164,9 @@ namespace MetaGymWebApp.Controllers
             }
             if (cita.Profesional != null)
             {
-                dto.NombreProfesional = cita.Profesional.NombreCompleto;
+                dto.NombreProfesional = cita.Profesional.NombreCompleto ?? "Aun no asignado";
+                dto.TelefonoProfesional = cita.Profesional.Telefono ?? "-";
+                dto.CorreoProfesional = cita.Profesional.Correo ?? "-";
                 dto.ProfesionalId = cita.ProfesionalId;
             }
             return View("DetalleCita", dto);

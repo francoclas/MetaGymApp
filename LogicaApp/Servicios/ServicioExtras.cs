@@ -183,6 +183,7 @@ namespace LogicaApp.Servicios
                     Id = item.Id,
                     Nombre = item.Nombre,
                     Desc = item.Descripcion,
+                    EspecialidadId = item.EspecialidadId
                 });
             }
             return salida;

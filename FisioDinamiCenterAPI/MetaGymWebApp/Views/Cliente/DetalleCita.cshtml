@@ -4,104 +4,110 @@
     ViewData["Title"] = "Detalle de Cita";
 }
 <link rel="stylesheet" href="~/css/cliente/detalleCita.css" />
+
 <div class="container mt-4 text-white">
-
-    <h2 class="mb-3">DETALLE DE LA CITA</h2>
+    <h2 class="mb-3">Información sobre cita</h2>
     <div class="detalle-cita-container p-4">
-    <!-- Estado -->
-    <div class="mb-4">
-        <span class="badge bg-success fs-5">@Model.Estado</span>
-    </div>
 
-    <!-- Especialidad y tipo atención -->
-    <div class="row mb-4 gx-3">
-        <div class="col-md-6 mb-2">
-            <div class="card p-3 bg-dark border border-warning">
-                <p class="campo-titulo mb-1">Especialidad:</p>
-                <p class="campo-valor">@Model.Especialidad.NombreEspecialidad</p>
-            </div>
-        </div>
-        <div class="col-md-6 mb-2">
-            <div class="card p-3 bg-dark border border-warning ">
-                <p class="campo-titulo mb-1">Area de especialidad:</p>
-                <p class="campo-valor">@Model.TipoAtencion.Nombre</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Fechas -->
-    <div class="row text-center mb-4 gx-3">
-        <div class="col-md-4 mb-2">
-            <div class="card p-3 bg-dark border border-success h-100">
-                <p class="campo-titulo">Fecha de solicitud</p>
-                <p class="campo-valor">
-                    @(Model.FechaCreacion?.ToString("dd/MM/yyyy HH:mm") ?? "No registrada")
-                </p>
-            </div>
-        </div>
-        <div class="col-md-4 mb-2">
-            <div class="card p-3 bg-dark border border-success h-100">
-                <p class="campo-titulo">Fecha de asistencia</p>
-                <p class="campo-valor">@Model.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</p>
-            </div>
-        </div>
-        <div class="col-md-4 mb-2">
-            <div class="card p-3 bg-dark border border-success h-100">
-                <p class="campo-titulo">Fecha finalización</p>
-                <p class="campo-valor">
-                    @(Model.FechaFinalizacion?.ToString("dd/MM/yyyy HH:mm") ?? "—")
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Establecimiento + mapa -->
-    <div class="row mb-4 gx-3 card-establecimiento">
-        <div class="col-md-6 mb-2">
-            <div class="card p-3 bg-dark">
-                <h5 class="mb-2">Establecimiento</h5>
-                <p class="campo-titulo mb-0">Nombre</p>
-                <p class="campo-valor">@Model.Establecimiento.Nombre</p>
-                <p class="campo-titulo mb-0">Dirección</p>
-                <p class="campo-valor">@Model.Establecimiento.Direccion</p>
-            </div>
-        </div>
-        <div class="col-md-6 mb-2">
-            <div id="mapaIframe" class="mapa"></div>
-        </div>
-    </div>
-
-    <!-- Descripción -->
-    <div class="mb-4">
-        <h5>Descripción</h5>
-        <p class="campo-valor">
-            @(!string.IsNullOrWhiteSpace(Model.Descripcion) ? Model.Descripcion : "No se ingresó una descripción.")
-        </p>
-    </div>
-
-    <!-- Conclusión -->
-    @if (Model.Estado.ToString() == "Finalizada")
-    {
+        <!-- Estado -->
         <div class="mb-4">
-            <h5>Conclusión</h5>
+            <span class="badge bg-success fs-5">@Model.Estado</span>
+        </div>
+        <div class="row mb-4 gx-3">
+            <!-- Especialidad y Área de especialidad -->
+            <div class="col-md-6 mb-2">
+                <div class="row gx-3">
+                    <div class="col-md-6 mb-2">
+                        <div class="card p-3 bg-dark border border-warning h-100">
+                            <p class="campo-titulo mb-1">Especialidad:</p>
+                            <p class="campo-valor">@Model.Especialidad.NombreEspecialidad</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <div class="card p-3 bg-dark border border-warning h-100">
+                            <p class="campo-titulo mb-1">Área de especialidad:</p>
+                            <p class="campo-valor">@Model.TipoAtencion.Nombre</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profesional -->
+            <div class="col-md-6 mb-2">
+                <div class="card p-3 bg-dark border border-info h-100">
+                    <h5 class="mb-3">Profesional a cargo</h5>
+                    <ul class="mb-0">
+                        <li><span class="campo-titulo">Nombre completo:</span> <span class="campo-valor">@Model.NombreProfesional</span></li>
+                        <li><span class="campo-titulo">Teléfono:</span> <span class="campo-valor">@Model.TelefonoProfesional</span></li>
+                        <li><span class="campo-titulo">Correo:</span> <span class="campo-valor">@Model.CorreoProfesional</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Fechas -->
+        <div class="row text-center mb-4 gx-3">
+            <div class="col-md-4 mb-2">
+                <div class="card p-3 bg-dark border border-success h-100">
+                    <p class="campo-titulo">Fecha de solicitud</p>
+                    <p class="campo-valor">
+                        @(Model.FechaCreacion?.ToString("dd/MM/yyyy HH:mm") ?? "No registrada")
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-2">
+                <div class="card p-3 bg-dark border border-success h-100">
+                    <p class="campo-titulo">Fecha de asistencia</p>
+                    <p class="campo-valor">@Model.FechaAsistencia.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-2">
+                <div class="card p-3 bg-dark border border-success h-100">
+                    <p class="campo-titulo">Fecha finalización</p>
+                    <p class="campo-valor">
+                        @(Model.FechaFinalizacion?.ToString("dd/MM/yyyy HH:mm") ?? "—")
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Establecimiento + mapa -->
+        <div class="row mb-4 gx-3 card-establecimiento">
+            <div class="col-md-6 mb-2">
+                <div class="card p-3 bg-dark">
+                    <h5 class="mb-2">Establecimiento</h5>
+                    <p class="campo-titulo mb-0">Nombre</p>
+                    <p class="campo-valor">@Model.Establecimiento.Nombre</p>
+                    <p class="campo-titulo mb-0">Dirección</p>
+                    <p class="campo-valor">@Model.Establecimiento.Direccion</p>
+                </div>
+            </div>
+            <div class="col-md-6 mb-2">
+                <div id="mapaIframe" class="mapa"></div>
+            </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="mb-4">
+            <h5>Descripción</h5>
             <p class="campo-valor">
-                @(!string.IsNullOrWhiteSpace(Model.Conclusion) ? Model.Conclusion : "No se ingresó una conclusión.")
+                @(!string.IsNullOrWhiteSpace(Model.Descripcion) ? Model.Descripcion : "No se ingresó una descripción.")
             </p>
         </div>
-    }
 
-    <!-- Profesional -->
-    @if (!string.IsNullOrEmpty(Model.NombreProfesional))
-    {
-        <div class="mb-3">
-            <p class="campo-titulo">Atendido por</p>
-            <p class="campo-valor">@Model.NombreProfesional</p>
-        </div>
-    }
+        <!-- Conclusión -->
+        @if (Model.Estado.ToString() == "Finalizada")
+        {
+            <div class="mb-4">
+                <h5>Conclusión</h5>
+                <p class="campo-valor">
+                    @(!string.IsNullOrWhiteSpace(Model.Conclusion) ? Model.Conclusion : "No se ingresó una conclusión.")
+                </p>
+            </div>
+        }
 
-
-    <input type="hidden" id="latitud" value="@Model.Establecimiento.Latitud" />
-    <input type="hidden" id="longitud" value="@Model.Establecimiento.Longitud" />
+        <input type="hidden" id="latitud" value="@Model.Establecimiento.Latitud" />
+        <input type="hidden" id="longitud" value="@Model.Establecimiento.Longitud" />
+    </div>
 </div>
-</div>
+
 <script src="~/js/cliente/verCitaDetalle.js"></script>

@@ -28,6 +28,7 @@ namespace LogicaApp.DTOS
         public int? ProfesionalId { get; set; }
         public string NombreProfesional { get; set; }
         public string TelefonoProfesional { get; set; }
+        public string CorreoProfesional { get; set; }
         public string? Conclusion { get; set; }
     }
 }

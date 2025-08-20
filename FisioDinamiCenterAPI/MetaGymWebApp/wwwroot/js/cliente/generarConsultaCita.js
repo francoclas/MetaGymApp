@@ -1,51 +1,97 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
-    console.log("JS cargado");
+    console.log("JS cargado con paso a paso (todo en español)");
 
-    const especialidadSelect = document.getElementById("especialidadSelect");
-    const tipoAtencionSelect = document.getElementById("tipoAtencionSelect");
-    const descTipo = document.getElementById("descTipo");
-
-    const establecimientoSelect = document.getElementById("establecimientoSelect");
+    const selectEspecialidad = document.getElementById("selectEspecialidad");
+    const selectTipoAtencion = document.getElementById("selectTipoAtencion");
+    const descripcionTipo = document.getElementById("descripcionTipo");
+    const selectEstablecimiento = document.getElementById("selectEstablecimiento");
     const iframeMapa = document.getElementById("iframeMapa");
-    const mapaDiv = document.getElementById("mapaEstablecimiento");
+    const contenedorMapa = document.getElementById("contenedorMapa");
 
-    function filtrarTiposAtencionPorEspecialidad() {
-        const especialidadId = especialidadSelect.value;
+    const bloqueTipoAtencion = document.getElementById("bloqueTipoAtencion");
+    const bloqueEstablecimiento = document.getElementById("bloqueEstablecimiento");
+    const bloqueFecha = document.getElementById("bloqueFecha");
+    const bloqueDescripcion = document.getElementById("bloqueDescripcion");
+    const botonEnviar = document.getElementById("botonEnviar");
 
-        const opciones = tipoAtencionSelect.querySelectorAll("option");
-        opciones.forEach(op => {
-            const espId = op.getAttribute("data-especialidad");
-            if (!espId || espId === especialidadId || op.value === "") {
-                op.style.display = "block";
-            } else {
-                op.style.display = "none";
+    // Cargar tipos según especialidad seleccionada
+    function cargarTiposPorEspecialidad() {
+        const especialidadId = selectEspecialidad.value;
+        selectTipoAtencion.innerHTML = "<option value=''>Seleccione un tipo</option>";
+        descripcionTipo.innerText = "";
+        ocultarBloquesDesde(bloqueTipoAtencion);
+
+        if (especialidadId) {
+            const especialidad = especialidades.find(e => e.id == especialidadId || e.Id == especialidadId);
+            if (especialidad && (especialidad.tipoAtenciones || especialidad.TipoAtenciones)) {
+                const tipos = especialidad.tipoAtenciones || especialidad.TipoAtenciones;
+                tipos.forEach(tipo => {
+                    const opt = document.createElement("option");
+                    opt.value = tipo.id || tipo.Id;
+                    opt.textContent = tipo.nombre || tipo.Nombre;
+                    opt.setAttribute("data-desc", tipo.desc || tipo.Desc);
+                    selectTipoAtencion.appendChild(opt);
+                });
+                bloqueTipoAtencion.style.display = "block";
             }
-        });
-
-        tipoAtencionSelect.value = "";
-        descTipo.innerText = "";
-    }
-
-    function mostrarDescripcionTipoAtencion() {
-        const desc = tipoAtencionSelect.selectedOptions[0]?.getAttribute("data-desc");
-        descTipo.innerText = desc || "";
-    }
-
-    function mostrarMapaEstablecimiento() {
-        const option = establecimientoSelect.selectedOptions[0];
-        const lat = option.getAttribute("data-lat");
-        const lon = option.getAttribute("data-lon");
-
-        if (lat && lon) {
-            iframeMapa.src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
-            mapaDiv.style.display = "block";
-        } else {
-            mapaDiv.style.display = "none";
-            iframeMapa.src = "";
         }
     }
 
-    especialidadSelect.addEventListener("change", filtrarTiposAtencionPorEspecialidad);
-    tipoAtencionSelect.addEventListener("change", mostrarDescripcionTipoAtencion);
-    establecimientoSelect.addEventListener("change", mostrarMapaEstablecimiento);
+    // Mostrar descripción del tipo de atención
+    function mostrarDescripcionTipo() {
+        const desc = selectTipoAtencion.selectedOptions[0]?.getAttribute("data-desc");
+        descripcionTipo.innerText = desc || "";
+
+        if (selectTipoAtencion.value) {
+            bloqueEstablecimiento.style.display = "block";
+        } else {
+            ocultarBloquesDesde(bloqueEstablecimiento);
+        }
+    }
+
+    // Mostrar mapa al elegir establecimiento
+    function mostrarMapaEstablecimiento() {
+        const opcion = selectEstablecimiento.selectedOptions[0];
+        const lat = opcion?.getAttribute("data-lat");
+        const lon = opcion?.getAttribute("data-lon");
+
+        if (lat && lon) {
+            iframeMapa.src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
+            contenedorMapa.style.display = "block";
+        } else {
+            contenedorMapa.style.display = "none";
+            iframeMapa.src = "";
+        }
+
+        if (selectEstablecimiento.value) {
+            bloqueFecha.style.display = "block";
+            bloqueDescripcion.style.display = "block";
+            botonEnviar.style.display = "inline-block";
+        } else {
+            ocultarBloquesDesde(bloqueFecha);
+        }
+    }
+
+    // Ocultar bloques desde uno en adelante
+    function ocultarBloquesDesde(bloque) {
+        bloque.style.display = "none";
+        if (bloque === bloqueTipoAtencion) {
+            bloqueEstablecimiento.style.display = "none";
+            bloqueFecha.style.display = "none";
+            bloqueDescripcion.style.display = "none";
+            botonEnviar.style.display = "none";
+        } else if (bloque === bloqueEstablecimiento) {
+            bloqueFecha.style.display = "none";
+            bloqueDescripcion.style.display = "none";
+            botonEnviar.style.display = "none";
+        } else if (bloque === bloqueFecha) {
+            bloqueDescripcion.style.display = "none";
+            botonEnviar.style.display = "none";
+        }
+    }
+
+    // Eventos
+    selectEspecialidad.addEventListener("change", cargarTiposPorEspecialidad);
+    selectTipoAtencion.addEventListener("change", mostrarDescripcionTipo);
+    selectEstablecimiento.addEventListener("change", mostrarMapaEstablecimiento);
 });
