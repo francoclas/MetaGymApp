@@ -320,7 +320,7 @@ namespace LogicaNegocio.Servicios
             switch (dto.Rol)
             {
                 case "Cliente":
-                    var cliente = repoCliente.ObtenerPorId(dto.Id);
+                    Cliente cliente = repoCliente.ObtenerPorId(dto.Id);
                     cliente.NombreCompleto = dto.Nombre;
                     cliente.Correo = dto.Correo;
                     cliente.Telefono = dto.Telefono;
@@ -328,7 +328,7 @@ namespace LogicaNegocio.Servicios
                     break;
 
                 case "Profesional":
-                    var profesional = repoProfesional.ObtenerPorId(dto.Id);
+                    Profesional profesional = repoProfesional.ObtenerPorId(dto.Id);
                     profesional.NombreCompleto = dto.Nombre;
                     profesional.Correo = dto.Correo;
                     profesional.Telefono = dto.Telefono;
@@ -336,7 +336,7 @@ namespace LogicaNegocio.Servicios
                     break;
 
                 case "Admin":
-                    var admin = repoAdmin.ObtenerPorId(dto.Id);
+                    Admin admin = repoAdmin.ObtenerPorId(dto.Id);
                     admin.NombreCompleto = dto.Nombre;
                     admin.Correo = dto.Correo;
                     admin.Telefono = dto.Telefono;
@@ -347,9 +347,53 @@ namespace LogicaNegocio.Servicios
                     throw new Exception("Rol desconocido.");
             }
         }
-        private bool EsCorreo(string input)
+ 
+
+        public void DeshabilitarUsuario(int usuarioId, string rol, string password)
         {
-            return input.Contains("@") && input.Contains(".");
+            switch (rol)
+            {
+                case "Admin":
+                    Admin admin = repoAdmin.ObtenerPorId(usuarioId);
+                    if (admin != null && HashContrasena.Verificar(admin.Pass, password))
+                    {
+                        admin.UsuarioActivo = false;
+                        repoAdmin.GuardarCambios();
+                    }
+                    else
+                    {
+                        throw new Exception("Verificar contraseña ingresada.");
+                    }
+                    break;
+                case "Profesional":
+                    Profesional profesional = repoProfesional.ObtenerPorId(usuarioId);
+                    if (profesional != null && HashContrasena.Verificar(profesional.Pass, password))
+                    {
+                        profesional.UsuarioActivo = false;
+                        repoProfesional.GuardarCambios();
+                    }
+                    else
+                    {
+                        throw new Exception("Verificar contraseña ingresada.");
+                    }
+                    break;
+                case "Cliente":
+                    Cliente cliente = repoCliente.ObtenerPorId(usuarioId);
+                    if (cliente != null && HashContrasena.Verificar(cliente.Pass, password))
+                    {
+                        cliente.UsuarioActivo = false;
+                        repoCliente.GuardarCambios();
+                    }
+                    else
+                    {
+                        throw new Exception("Verificar contraseña ingresada.");
+                    }
+                    break;
+                default:
+                    throw new Exception ("Rol desconocido.");
+            }
+
         }
+
     }
 }

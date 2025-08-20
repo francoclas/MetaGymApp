@@ -14,7 +14,6 @@ namespace LogicaNegocio.Interfaces.Servicios
 
         SesionDTO IniciarSesion(LoginDTO login);
         SesionDTO IniciarSesionCliente(LoginDTO login);
-
         //Registro usuario
         void RegistrarCliente(ClienteDTO cliente);
         //Cambio de contraseña
@@ -24,6 +23,7 @@ namespace LogicaNegocio.Interfaces.Servicios
         void CambiarNombre(int IdCliente, string NombreUsuario, string Nombre);
         void CambiarCorreo(int IdCliente, string NombreUsuario, string Correo);
         void AsignarFotoFavorita(int mediaId, Extra.Enum_TipoEntidad tipo, int entidadId);
+        void DeshabilitarUsuario(int usuarioId, string rol, string password);
         //Acceso administrador
         void CrearAdmin(string Ci, string NombreUsuario,string NombreCompleto, string Correo, string Password,string Telefono);
         void CrearProfesional(string Ci, string NombreUsuario, string NombreCompleto, string Correo, string Password,string Telefono);

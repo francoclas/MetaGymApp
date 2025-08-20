@@ -36,7 +36,7 @@ namespace MetaGymWebApp.Controllers
             {
                 agenda.ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
                 _agendaServicio.RegistrarAgenda(agenda);
-                TempData["Mensaje"] = "Agenda registrada correctamente.";
+                TempData["Mensaje"] = "Jornada registrada correctamente.";
                 TempData["TipoMensaje"] = "success";
                 return RedirectToAction("MisAgendas");
             }
@@ -44,7 +44,7 @@ namespace MetaGymWebApp.Controllers
             {
                 TempData["Mensaje"] = ex.Message;
                 TempData["TipoMensaje"] = "danger";
-                return View(agenda);
+                return RedirectToAction("MisAgendas");
             }
         }
 

@@ -89,7 +89,7 @@ else
                             <td>@pub.Titulo</td>
                             <td>@pub.FechaCreacion.ToString("dd/MM/yyyy")</td>
                             <td>
-                                <a class="btn btn-sm btn-outline-light" asp-action="DetallesPublicacion" asp-controller="Profesional" asp-route-id="@pub.Id">Ver detalles</a>
+                                <a class="btn btn-sm btn-outline-light" asp-action="DetallePublicacion" asp-controller="Profesional" asp-route-id="@pub.Id">Ver detalles</a>
                                 <a class="btn btn-sm btn-outline-warning" asp-action="EditarPublicacion" asp-controller="Profesional" asp-route-id="@pub.Id">Editar</a>
                             </td>
                         </tr>

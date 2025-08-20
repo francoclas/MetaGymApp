@@ -26,6 +26,21 @@
 </form>
 
 <hr />
+<h4>Deshabilitar Usuario</h4>
+<p class="text-danger">Si deshabilitás tu cuenta no podrás acceder más al sistema.</p>
+
+<form asp-action="DeshabilitarUsuario" method="post" onsubmit="return confirm('¿Estás seguro de que querés deshabilitar tu cuenta?');">
+    <input type="hidden" name="usuarioId" value="@GestionSesion.ObtenerUsuarioId(Context)" />
+    <input type="hidden" name="rol" value="@GestionSesion.ObtenerRol(Context)" />
+
+    <div class="mb-2">
+        <label for="password">Confirmá tu contraseña</label>
+        <input type="password" name="password" class="form-control" required />
+    </div>
+
+    <button class="btn btn-primary mt-2">Deshabilitar cuenta</button>
+</form>
+<hr />
 
 <h4>Foto de Perfil Actual</h4>
 @if (Model.Perfil != null)

@@ -837,18 +837,18 @@ namespace MetaGymWebApp.Controllers
                 if (rutina.ProfesionalId != profesionalId)
                     throw new Exception("No tiene permisos para editar esta rutina.");
 
-                // Ejercicios de la rutina
+                // ejercicios de la rutina
                 var idsSeleccionados = rutina.Ejercicios.Select(e => e.EjercicioId).ToList();
 
-                // Todos los ejercicios
+                // todos los ejercicios
                 List<EjercicioDTO> todosEjercicios = rutinaServicio.ObtenerTodosEjercicios();
 
-                // Clientes asignados a la rutina
+                // clientes asignados a la rutina
                 var idsClientesAsignados = rutinaServicio.ObtenerAsignacionesPorRutina(id)
                                                          .Select(a => a.ClienteId)
                                                          .ToList();
 
-                // Todos los clientes
+                // todos los clientes
                 List<ClienteDTO> todosClientes = clienteServicio.ObtenerTodosDTO();
 
                 // Armar DTO para la vista
@@ -861,24 +861,19 @@ namespace MetaGymWebApp.Controllers
                     IdsEjerciciosSeleccionados = idsSeleccionados,
                     IdsClientesAsignados = idsClientesAsignados,
 
-                    // ⚡ Ahora mostramos todos, sin excluir los ya seleccionados
+                    //filtro los ejercicios
                     MisEjerciciosDisponibles = todosEjercicios
                         .Where(e => e.ProfesionalId == profesionalId)
                         .ToList(),
-
                     EjerciciosDisponiblesSistema = todosEjercicios
                         .Where(e => e.ProfesionalId != profesionalId)
                         .ToList(),
-
-                    // Ejercicios seleccionados (solo los de la rutina actual)
                     EjerciciosSeleccionados = todosEjercicios
                         .Where(e => idsSeleccionados.Contains(e.Id))
                         .ToList(),
-
-                    // Clientes: mostramos todos en la tabla de disponibles
+                    //filtro los clientes
                     ClientesDisponibles = todosClientes                   
                         .ToList(),
-
                     ClientesSeleccionados = todosClientes
                         .Where(c => idsClientesAsignados.Contains(c.Id))
                         .ToList()
@@ -911,12 +906,12 @@ namespace MetaGymWebApp.Controllers
                 if (rutina.ProfesionalId != profesionalId)
                     throw new Exception("No tiene permisos para editar esta rutina.");
 
-                // Actualizar datos principales
+                //Actualizar datos principales
                 rutina.NombreRutina = dto.NombreRutina;
                 rutina.Tipo = dto.Tipo;
                 rutina.FechaModificacion = DateTime.Now;
 
-                // === Actualizar ejercicios ===
+                //Actualizar ejercicios ===
                 rutina.Ejercicios.Clear();
                 foreach (var ejercicioId in dto.IdsEjerciciosSeleccionados)
                 {
@@ -927,7 +922,7 @@ namespace MetaGymWebApp.Controllers
                     });
                 }
 
-                // === Actualizar clientes asignados ===
+                //Actualizar clientes asignados
                 rutinaServicio.ReemplazarAsignaciones(rutina.Id, dto.IdsClientesAsignados);
 
                 // Guardar cambios
@@ -1021,10 +1016,10 @@ namespace MetaGymWebApp.Controllers
             if (publicacion == null)
                 return NotFound();
 
-            // Validación: debe pertenecer al profesional logueado
+            // Valido que sea el creador
             int idSesion = GestionSesion.ObtenerUsuarioId(HttpContext);
             if (publicacion.RolAutor == "Profesional" && publicacion.AutorId != idSesion)
-                return Forbid(); // o RedirectToAction("MisPublicaciones");
+                return Forbid(); 
 
             return View(publicacion);
         }
@@ -1110,6 +1105,7 @@ namespace MetaGymWebApp.Controllers
 
             foreach (var c in citas)
             {
+                //mapeo los colores para el calendairo
                 string color = "#808080"; // gris por defecto
                 switch (c.Estado)
                 {

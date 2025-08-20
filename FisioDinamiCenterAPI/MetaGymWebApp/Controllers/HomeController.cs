@@ -158,6 +158,23 @@ namespace MetaGymWebApp.Controllers
             _usuarioServicio.AsignarFotoFavorita(mediaId, tipo, usuarioId);
             return RedirectToAction("EditarPerfil");
         }
+        [HttpPost]
+        public IActionResult DeshabilitarUsuario(int usuarioId, string rol, string password)
+        {
+            try
+            {
+                _usuarioServicio.DeshabilitarUsuario(usuarioId, rol, password);
+                HttpContext.Session.Clear();
+
+                TempData["Mensaje"] = "Tu cuenta fue deshabilitada correctamente. Si quisieras volver a tener acceso, debes comunicarte con un administrador de MetaGym.";
+                return RedirectToAction("Login");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"No se pudo deshabilitar la cuenta: {ex.Message}";
+                return RedirectToAction("EditarPerfil");
+            }
+        }
         [AutorizacionRol("Cliente","Profesional","Admin")]
         [HttpGet]
         public IActionResult MiPerfil()
