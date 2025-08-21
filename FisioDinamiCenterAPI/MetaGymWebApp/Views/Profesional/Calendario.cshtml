@@ -1,5 +1,6 @@
 ﻿@using LogicaNegocio.Clases
-@model List<Cita>
+@model CargaCalendarioModelo
+
 @{
     ViewData["Title"] = "Calendario Profesional";
 }
@@ -10,52 +11,68 @@
 <link rel="stylesheet" href="~/css/calendarioLogica.css" />
 <script src="~/js/calendarioLogica.js"></script>
 
-<div class="d-flex" style="height: calc(100vh - 60px);">
-    <div class="flex-grow-1 p-2">
-        <div id="calendario"></div>
+<div class="container-fluid">
 
-        <!-- referencias + acciones -->
-        <div id="calendario-footer" class="mt-3 p-2 border border-dark rounded bg-dark text-light">
-            <div class="row">
-                <!-- referencias -->
-                <div class="col-6">
-                    <h6>📌 Referencias</h6>
-                    <ul class="list-unstyled">
-                        <li><span class="badge bg-danger">&nbsp;&nbsp;</span> En espera</li>
-                        <li><span class="badge bg-success">&nbsp;&nbsp;</span> Finalizada</li>
-                        <li><span class="badge bg-primary">&nbsp;&nbsp;</span> Aceptada</li>
-                        <li><span class="badge bg-secondary">&nbsp;&nbsp;</span> Cancelada / Rechazada</li>
-                    </ul>
-                </div>
+    @if (Model.agendas == null || !Model.agendas.Any())
+    {
+        <div class="p-4 rounded border text-center bg-dark text-light mt-4">
+            <h5 class="text-muted">Actualmente no cuenta con registro de sus jornadas en el sistema.</h5>
+            <p>
+                Puede hacerlo desde la sección 
+                <a asp-action="MisAgendas" asp-controller="Agenda" class="btn btn-sm btn-primary ms-1">Gestionar Jornadas</a>
+            </p>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex" style="height: calc(100vh - 60px);">
+            <div class="flex-grow-1 p-2">
+                <div id="calendario"></div>
 
-                <!-- acciones -->
-                <div class="col-6 text-end">
-                    <div id="acciones-cita" class="d-none">
-                        <label id="fecha-seleccionada" class="fw-bold d-block mb-2"></label>
-                        <button id="btn-crear-cita" class="btn btn-sm btn-success">➕ Generar cita</button>
-                        <button id="btn-cancelar-seleccion" class="btn btn-sm btn-outline-light">Cancelar</button>
+                <!-- referencias + acciones -->
+                <div id="calendario-footer" class="mt-3 p-2 border border-dark rounded bg-dark text-light">
+                    <div class="row">
+                        <!-- referencias -->
+                        <div class="col-6">
+                            <h6>📌 Referencias</h6>
+                            <ul class="list-unstyled">
+                                <li><span class="badge bg-danger">&nbsp;&nbsp;</span> En espera</li>
+                                <li><span class="badge bg-success">&nbsp;&nbsp;</span> Finalizada</li>
+                                <li><span class="badge bg-primary">&nbsp;&nbsp;</span> Aceptada</li>
+                                <li><span class="badge bg-secondary">&nbsp;&nbsp;</span> Cancelada / Rechazada</li>
+                            </ul>
+                        </div>
+
+                        <!-- acciones -->
+                        <div class="col-6 text-end">
+                            <div id="acciones-cita" class="d-none">
+                                <label id="fecha-seleccionada" class="fw-bold d-block mb-2"></label>
+                                <button id="btn-crear-cita" class="btn btn-sm btn-success">➕ Generar cita</button>
+                                <button id="btn-cancelar-seleccion" class="btn btn-sm btn-outline-light">Cancelar</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div id="panel-derecho" class="text-white p-3" style="width: 350px; overflow-y:auto;">
+            </div>
         </div>
-    </div>
 
-    <div id="panel-derecho" class="text-white p-3" style="width: 350px; overflow-y:auto;">
-    </div>
-</div>
-
-<script>
-          inicializarCalendario(
-        '/Profesional/ObtenerCitas?profesionalId=@Model.FirstOrDefault()?.ProfesionalId',
-        [
-    @foreach (var agenda in Model.FirstOrDefault()?.Profesional.Agendas ?? new List<AgendaProfesional>())
-    {
-        <text>{
-                daysOfWeek: [@(((int)agenda.Dia + 1) % 7)],
-                startTime: "@agenda.HoraInicio.ToString("hh\\:mm")",
-                endTime: "@agenda.HoraFin.ToString("hh\\:mm")"
-            },</text>
+        <script>
+            inicializarCalendario(
+                '/Profesional/ObtenerCitas?profesionalId=@(Model.citas.FirstOrDefault()?.ProfesionalId ?? 0)',
+                [
+            @foreach (var agenda in Model.agendas)
+            {
+                <text>{
+                    daysOfWeek: [@(((int)agenda.Dia + 1) % 7)],
+                    startTime: "@agenda.HoraInicio.ToString("hh\\:mm")",
+                    endTime: "@agenda.HoraFin.ToString("hh\\:mm")"
+                },</text>
+            }
+                ]
+            );
+        </script>
     }
-        ]
-    );
-</script>
+</div>

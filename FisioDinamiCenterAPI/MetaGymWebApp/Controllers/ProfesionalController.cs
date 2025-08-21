@@ -1149,11 +1149,16 @@ namespace MetaGymWebApp.Controllers
         public IActionResult Calendario(int profesionalId)
         {
             int proId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            List<Cita> citas = citaServicio.SolicitarProximasProfesional(proId);
-            return View(citas);
+            Profesional pro = profesionalServicio.ObtenerProfesional(proId);
+            CargaCalendarioModelo modelo = new CargaCalendarioModelo
+            {
+                citas = citaServicio.SolicitarHistorialProfesional(proId),
+                agendas = pro.Agendas
+            };
+
+        return View(modelo);
         }
 
-        // Endpoint para alimentar FullCalendar con JSON
         public IActionResult ObtenerCitas(int profesionalId)
         {
             profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);

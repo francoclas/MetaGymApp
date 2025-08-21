@@ -75,6 +75,7 @@ namespace LogicaDatos.Repositorio
                 .Include(p => p.Rutinas)
                 .Include(p => p.FotosPerfil)
                 .Include(p => p.Publicaciones)
+                .Include(p => p.Agendas)
                 .FirstOrDefault(C => C.Id == id)
 
                 ;
