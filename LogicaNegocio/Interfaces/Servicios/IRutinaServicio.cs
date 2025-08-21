@@ -15,6 +15,7 @@ namespace LogicaNegocio.Interfaces.Servicios
         Rutina GenerarNuevaRutina(Rutina rutina);
         void ModificarRutina(Rutina rutina);
         Rutina ObtenerRutinaPorId(int id);
+        bool EliminarRutina(int rutinaId);
         List<SesionRutina> ObtenerSesionesPorAsignacion(int rutinaAsignadaId);
         // Ejercicios
         Ejercicio GenerarNuevoEjercicio(Ejercicio ejercicio);
@@ -23,7 +24,7 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<EjercicioDTO> ObtenerEjerciciosProfesional(int profesionalId);
         Ejercicio ObtenerEjercicioId(int id);
         EjercicioDTO ObtenerEjercicioDTOId(int id);
-
+        bool EliminarEjercicio(int ejercicioId);
         // Asignaciones
         void AsignarRutinaACliente(int clienteId, int rutinaId);
         List<RutinaAsignada> ObtenerRutinasAsignadasCliente(int clienteId);

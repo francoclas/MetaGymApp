@@ -67,3 +67,14 @@ function agregarCliente(id, nombre) {
 function quitarCliente(id, btn) {
     $(btn).closest("tr").remove();
 }
+document.addEventListener("DOMContentLoaded", () => {
+    const botonEliminar = document.querySelector("form[asp-action='EliminarRutina'] button[type='submit']");
+    if (botonEliminar) {
+        botonEliminar.addEventListener("click", (e) => {
+            const confirmado = confirm("⚠️ ¿Seguro que querés eliminar esta rutina? Esta acción no se puede deshacer.");
+            if (!confirmado) {
+                e.preventDefault(); // Cancela el envío del form
+            }
+        });
+    }
+});

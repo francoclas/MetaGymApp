@@ -768,6 +768,33 @@ namespace MetaGymWebApp.Controllers
             }
 
         }
+        [HttpPost]
+        public IActionResult EliminarEjercicio(int id)
+        {
+            try
+            {
+                // Buscar ejercicio
+                Ejercicio ejercicio = rutinaServicio.ObtenerEjercicioId(id);
+                if (ejercicio == null)
+                    throw new Exception("No se encontró ejercicio o no existe.");
+                if (ejercicio.ProfesionalId != GestionSesion.ObtenerUsuarioId(this.HttpContext))
+                    throw new Exception("No tiene permisos para eliminar este ejercicio.");
+
+                bool SeElimino = rutinaServicio.EliminarEjercicio(id);
+                if (!SeElimino)
+                    throw new Exception("No se pudo eliminar el ejercicio.");
+
+                TempData["Mensaje"] = "Ejercicio eliminado correctamente.";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("GestionEjercicios");
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionEjercicios");
+            }
+        }
 
         [HttpGet]
         public IActionResult RegistrarRutina()
@@ -929,6 +956,37 @@ namespace MetaGymWebApp.Controllers
                 rutinaServicio.ModificarRutina(rutina);
 
                 TempData["Mensaje"] = "Rutina actualizada correctamente.";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("GestionRutinas");
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("GestionRutinas");
+            }
+        }
+        [HttpPost]
+        public IActionResult EliminarRutina(int id)
+        {
+            try
+            {
+                int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+
+                // Buscar la rutina
+                Rutina rutina = rutinaServicio.ObtenerRutinaPorId(id);
+                if (rutina == null)
+                    throw new Exception("No se encontró rutina o no existe.");
+                if (rutina.ProfesionalId != profesionalId)
+                    throw new Exception("No tiene permisos para eliminar esta rutina.");
+                if (rutina.Asignaciones.Any())
+                    throw new Exception("No se puede eliminar una rutina que tienen clientes asignados. Debe desasignarlos primero.");
+                // Eliminar
+                bool ok = rutinaServicio.EliminarRutina(id);
+                if (!ok)
+                    throw new Exception("No se pudo eliminar la rutina.");
+
+                TempData["Mensaje"] = "Rutina eliminada correctamente.";
                 TempData["TipoMensaje"] = "success";
                 return RedirectToAction("GestionRutinas");
             }

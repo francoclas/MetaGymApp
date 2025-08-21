@@ -6,6 +6,10 @@
 
 <div class="container text-light">
     <h2 class="mb-4">Editar Rutina</h2>
+    <form asp-action="EliminarRutina" method="post" onsubmit="return confirm('¿Seguro que querés eliminar esta rutina?');">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit" class="btn btn-danger mb-3">🗑️ Eliminar Rutina</button>
+    </form>
 
     <form asp-action="EditarRutina" method="post" class="bg-dark p-4 rounded shadow-sm">
         <input type="hidden" name="Id" value="@Model.Id" />

@@ -41,7 +41,18 @@ namespace LogicaDatos.Repositorio
 
         public void Eliminar(int id)
         {
-            throw new NotImplementedException();
+            Ejercicio ejercicio = _context.Ejercicios
+            .Include(e => e.RutinaEjercicios)
+            .FirstOrDefault(e => e.Id == id);
+
+            if (ejercicio != null)
+            {
+                if (ejercicio.RutinaEjercicios.Any())
+                    _context.RutinaEjercicios.RemoveRange(ejercicio.RutinaEjercicios);
+
+                _context.Ejercicios.Remove(ejercicio);
+                _context.SaveChanges();
+            }
         }
         public Ejercicio ObtenerPorId(int id)
         {

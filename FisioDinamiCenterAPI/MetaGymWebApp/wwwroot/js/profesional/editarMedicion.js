@@ -1,5 +1,15 @@
 ﻿let contadorMediciones = document.querySelectorAll("#contenedorMediciones .card").length || 0;
-
+document.addEventListener("DOMContentLoaded", () => {
+    const botonEliminar = document.getElementById("btnEliminarEjercicio");
+    if (botonEliminar) {
+        botonEliminar.addEventListener("click", (e) => {
+            const confirmado = confirm("⚠️ ¿Seguro que querés eliminar este ejercicio? Esta acción no se puede deshacer.");
+            if (!confirmado) {
+                e.preventDefault();
+            }
+        });
+    }
+});
 function agregarMedicion() {
     const contenedor = document.getElementById("contenedorMediciones");
 

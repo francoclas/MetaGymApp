@@ -95,13 +95,17 @@ namespace LogicaDatos.Repositorio
 
         public void Eliminar(int id)
         {
-            var rutina = _context.Rutinas.Find(id);
+            var rutina = _context.Rutinas
+            .Include(r => r.Ejercicios)
+            .FirstOrDefault(r => r.Id == id);
+
             if (rutina != null)
             {
                 _context.Rutinas.Remove(rutina);
                 _context.SaveChanges();
             }
         }
+        
 
         public List<RutinaAsignada> ObtenerAsignacionesPorCliente(int clienteId)
         {
@@ -115,6 +119,7 @@ namespace LogicaDatos.Repositorio
         public Rutina ObtenerPorId(int id)
         {
             return _context.Rutinas
+                .Include(r => r.Asignaciones)
          .Include(r => r.Ejercicios)
              .ThenInclude(re => re.Ejercicio)
             .ThenInclude(e => e.Mediciones)

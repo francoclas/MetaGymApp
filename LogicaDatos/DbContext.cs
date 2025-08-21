@@ -53,7 +53,6 @@ namespace LogicaDatos
             modelBuilder.Entity<Cita>()
            .Property(c => c.Estado)
            .HasConversion<string>();
-            //Enum de tipo multimedia y tipo entidad en multimedia
                 modelBuilder.Entity<Media>()
                 .Property(m => m.Tipo)
                 .HasConversion<string>();
@@ -61,13 +60,11 @@ namespace LogicaDatos
                 .Property(m => m.TipoEntidad)
                 .HasConversion<string>();
 
-            //Relacion profesionhales tienen sus ejercicios
                 modelBuilder.Entity<Ejercicio>()
                 .HasOne(e => e.Profesional)
                 .WithMany(p => p.Ejercicios)
                 .HasForeignKey(e => e.ProfesionalId)
                 .OnDelete(DeleteBehavior.Restrict);
-            //Relacion publicacion
             modelBuilder.Entity<Publicacion>()
                 .HasOne(p => p.AdminCreador)
                 .WithMany()
@@ -78,7 +75,6 @@ namespace LogicaDatos
                 .WithMany()
                 .HasForeignKey(p => p.AdminAprobadorId)
                 .OnDelete(DeleteBehavior.Restrict);
-            //Interacciones
             modelBuilder.Entity<LikePublicacion>()
                 .HasOne(lp => lp.Publicacion)
                 .WithMany(p => p.Likes)
@@ -93,7 +89,6 @@ namespace LogicaDatos
                 .WithMany()
                 .HasForeignKey(vm => vm.MedicionId)
                 .OnDelete(DeleteBehavior.Restrict); 
-            //Rutinas
             modelBuilder.Entity<ValorMedicion>()
                 .HasOne(vm => vm.EjercicioRealizado)
                 .WithMany(er => er.ValoresMediciones)
@@ -104,7 +99,6 @@ namespace LogicaDatos
                 .WithMany(c => c.Entrenamientos)
                 .HasForeignKey(sr => sr.ClienteId)
                 .OnDelete(DeleteBehavior.Restrict);
-            // Rutina -> RutinaEjercicio (join)
             modelBuilder.Entity<RutinaEjercicio>()
                 .HasOne(re => re.Rutina)
                 .WithMany(r => r.Ejercicios)
@@ -116,28 +110,23 @@ namespace LogicaDatos
                 .WithMany(e => e.RutinaEjercicios)
                 .HasForeignKey(re => re.EjercicioId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // Rutina -> Asignaciones
             modelBuilder.Entity<RutinaAsignada>()
                 .HasOne(ra => ra.Rutina)
                 .WithMany(r => r.Asignaciones)
                 .HasForeignKey(ra => ra.RutinaId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Asignacion -> Sesiones
             modelBuilder.Entity<SesionRutina>()
                 .HasOne(sr => sr.RutinaAsignada)
                 .WithMany(ra => ra.Sesiones)
                 .HasForeignKey(sr => sr.RutinaAsignadaId)
                 .OnDelete(DeleteBehavior.SetNull);
-            // Sesion -> EjerciciosRealizados (podés dejar Cascade dentro de la sesión)
             modelBuilder.Entity<EjercicioRealizado>()
                 .HasOne(er => er.SesionRutina)
                 .WithMany(sr => sr.EjerciciosRealizados)
                 .HasForeignKey(er => er.SesionRutinaId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // EjerciciosRealizados -> Series / Mediciones (cascada interna está OK)
             modelBuilder.Entity<SerieRealizada>()
                 .HasOne(s => s.EjercicioRealizado)
                 .WithMany(er => er.Series)
@@ -150,14 +139,12 @@ namespace LogicaDatos
                 .HasForeignKey(vm => vm.EjercicioRealizadoId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // MUY IMPORTANTE: No borrar históricos si eliminan un ejercicio del catálogo
             modelBuilder.Entity<EjercicioRealizado>()
                 .HasOne(er => er.Ejercicio)
-                .WithMany() // o .WithMany(e => e.EjerciciosRealizados) si tenés la nav
+                .WithMany()
                 .HasForeignKey(er => er.EjercicioId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Ya tenías esto, lo mantengo:
             modelBuilder.Entity<SesionRutina>()
                 .HasOne(sr => sr.Cliente)
                 .WithMany(c => c.Entrenamientos)

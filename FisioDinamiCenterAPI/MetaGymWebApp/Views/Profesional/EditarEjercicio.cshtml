@@ -5,7 +5,10 @@
 }
 <div class="container mt-4 text-white">
     <h2 class="mb-4">Editar ejercicio</h2>
-
+    <form asp-action="EliminarEjercicio" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit" id="btnEliminarEjercicio" class="btn btn-danger mb-3">🗑️ Eliminar Ejercicio</button>
+    </form>
     <form asp-action="EditarEjercicio" method="post" enctype="multipart/form-data" class="bg-dark p-4 rounded shadow-sm">
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="ProfesionalId" />

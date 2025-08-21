@@ -69,11 +69,26 @@ namespace LogicaApp.Servicios
                 notificacionServicio.NotificarRutinaAsignada(id, rutinaId);
             }
         }
+        public bool EliminarRutina(int rutinaId)
+        {
+            Rutina existe = repositorioRutina.ObtenerPorId(rutinaId); // o método similar que tengas
+            if (existe == null) return false;
+
+            repositorioRutina.Eliminar(rutinaId);
+            return true;
+        }
         public bool ClienteTieneRutinaAsignada(int clienteId, int rutinaId)
         {
             return repositorioRutina.ClienteTieneRutinaAsignada(clienteId, rutinaId);
         }
+        public bool EliminarEjercicio(int ejercicioId)
+        {
+            Ejercicio existe = repositorioEjercicio.ObtenerPorId(ejercicioId); // idem arriba
+            if (existe == null) return false;
 
+            repositorioEjercicio.Eliminar(ejercicioId);
+            return true;
+        }
         public void DesasignarRutina(Rutina rutina, Cliente cliente)
         {
             throw new NotImplementedException();
