@@ -44,6 +44,7 @@ else
                         <th>ID</th>
                         <th>Título</th>
                         <th>Fecha Creación</th>
+                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -54,6 +55,7 @@ else
                             <td>@pub.Id</td>
                             <td>@pub.Titulo</td>
                             <td>@pub.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                            <td>@pub.Estado</td>
                             <td>
                                 <a class="btn btn-sm btn-outline-light" asp-action="DetallePublicacion" asp-route-id="@pub.Id">Ver detalles</a>
                             </td>
@@ -78,6 +80,7 @@ else
                         <th>ID</th>
                         <th>Título</th>
                         <th>Fecha Creación</th>
+                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -88,6 +91,7 @@ else
                             <td>@pub.Id</td>
                             <td>@pub.Titulo</td>
                             <td>@pub.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                            <td>@pub.Estado</td>
                             <td>
                                 <a class="btn btn-sm btn-outline-light" asp-action="DetallePublicacion" asp-controller="Profesional" asp-route-id="@pub.Id">Ver detalles</a>
                                 <a class="btn btn-sm btn-outline-warning" asp-action="EditarPublicacion" asp-controller="Profesional" asp-route-id="@pub.Id">Editar</a>
@@ -113,6 +117,7 @@ else
                         <th>ID</th>
                         <th>Título</th>
                         <th>Fecha Creación</th>
+                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -123,6 +128,7 @@ else
                             <td>@pub.Id</td>
                             <td>@pub.Titulo</td>
                             <td>@pub.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                            <td>@pub.Estado</td>
                             <td>
                                 <a class="btn btn-sm btn-outline-light" asp-action="DetallePublicacion" asp-controller="Profesional" asp-route-id="@pub.Id">Ver detalles</a>
                             </td>

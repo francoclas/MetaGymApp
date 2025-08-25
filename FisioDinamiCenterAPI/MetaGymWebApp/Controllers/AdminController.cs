@@ -8,6 +8,7 @@ using LogicaNegocio.Interfaces.Servicios;
 using MetaGymWebApp.Filtros;
 using MetaGymWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -777,19 +778,28 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult EditarPublicacion(int id)
         {
-
-            //Obtengo publicacion desdde repo
             PublicacionDTO publicacion = _publicacionServicio.ObtenerPorId(id);
-            if (publicacion == null) {
-                TempData["Mensaje"] = "No se encontro publicacion";
+            if (publicacion == null)
+            {
+                TempData["Mensaje"] = "La publicación no existe.";
                 TempData["TipoMensaje"] = "danger";
-                return RedirectToAction("MisPublicaciones");
+                return RedirectToAction("ControlPublicaciones");
             }
+
+            // Cargo enum en ViewBag
+            ViewBag.Estados = Enum.GetValues(typeof(Enum_EstadoPublicacion))
+                                  .Cast<Enum_EstadoPublicacion>()
+                                  .Select(e => new SelectListItem
+                                  {
+                                      Value = ((int)e).ToString(),
+                                      Text = e.ToString()
+                                  }).ToList();
 
             return View(publicacion);
         }
+
         [HttpPost]
-        public IActionResult EditarPublicacion(int Id, string Titulo, string Descripcion, bool EsPrivada, bool MostrarEnNoticiasPublicas, List<IFormFile> archivos)
+        public IActionResult EditarPublicacion(int Id, string Titulo, string Descripcion, bool EsPrivada, int Estado, bool MostrarEnNoticiasPublicas, List<IFormFile> archivos)
         {
             try
             {
@@ -803,6 +813,7 @@ namespace MetaGymWebApp.Controllers
                 pub.Descripcion = Descripcion;
                 pub.EsPrivada = EsPrivada;
                 pub.MostrarEnNoticiasPublicas = MostrarEnNoticiasPublicas;
+                pub.Estado = (Enum_EstadoPublicacion)Estado;
                 //Actuaolizo en el repositori
                 _publicacionServicio.ActualizarPublicacion(pub);
 

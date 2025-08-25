@@ -164,7 +164,7 @@ namespace LogicaApp.Servicios
             original.EsPrivada = pubActualizada.EsPrivada;
             original.MostrarEnNoticiasPublicas = pubActualizada.MostrarEnNoticiasPublicas;
             original.FechaModificacion = DateTime.Now;
-
+            original.Estado = pubActualizada.Estado;
             _repo.Actualizar(original);
         }
 

@@ -108,7 +108,7 @@ namespace LogicaDatos.Repositorio
             return _context.Publicaciones
                 .Include(p => p.ListaMedia)
                 .Include(p => p.Profesional)
-                .Where(p => p.AdminAprobadorId == adminId && p.Estado == Enum_EstadoPublicacion.Aprobada)
+                .Where(p => p.AdminAprobadorId == adminId && p.Estado == Enum_EstadoPublicacion.Aprobada || p.Estado == Enum_EstadoPublicacion.Oculto)
                 .ToList();
         }
         public List<Publicacion> ObtenerRechazadasAdmin(int adminId)

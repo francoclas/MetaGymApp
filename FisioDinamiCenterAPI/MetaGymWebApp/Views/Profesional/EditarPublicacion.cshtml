@@ -6,7 +6,7 @@
 
 <h2 class="text-white">Editar publicación</h2>
 
-<form asp-action="EditarPublicacionProfesional" method="post" enctype="multipart/form-data">
+<form asp-action="EditarPublicacion" method="post" enctype="multipart/form-data">
     <input type="hidden" name="Id" value="@Model.Id" />
 
     <div class="mb-3">
@@ -18,7 +18,11 @@
         <label class="form-label text-white">Descripción</label>
         <textarea name="Descripcion" class="form-control" rows="4" required>@Model.Descripcion</textarea>
     </div>
-
+    <div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" id="estadoOculto" name="Ocultar"
+               value="true" @(Model.Estado == Enum_EstadoPublicacion.Oculto ? "checked" : "") />
+        <label class="form-check-label text-white" for="estadoOculto">Ocultar publicación</label>
+    </div>
     <h5 class="text-white mt-4">Archivos actuales</h5>
     @if (Model.Medias != null && Model.Medias.Any())
     {

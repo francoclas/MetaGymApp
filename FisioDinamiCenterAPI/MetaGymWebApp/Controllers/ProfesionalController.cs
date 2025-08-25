@@ -1075,7 +1075,6 @@ namespace MetaGymWebApp.Controllers
         }
         //Mis publicaciones
         [HttpGet]
-        [HttpGet]
         public IActionResult MisPublicaciones()
         {
             int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
@@ -1084,7 +1083,7 @@ namespace MetaGymWebApp.Controllers
             var modelo = new MisPublicacionesProfesional
             {
                 Pendientes = publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Pendiente).ToList(),
-                Aprobadas = publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Aprobada).ToList(),
+                Aprobadas = publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Aprobada || p.Estado == Enum_EstadoPublicacion.Oculto).ToList(),
                 Rechazadas = publicaciones.Where(p => p.Estado == Enum_EstadoPublicacion.Rechazada).ToList()
             };
 
@@ -1109,20 +1108,28 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult EditarPublicacion(int id)
         {
-            //Obtengo publicacion desde repo
-            PublicacionDTO publicacion = publicacionServicio.ObtenerPorId(id);
-            int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            //Verifico que no sea null. Y que corresponda al autor que la solicita 
-            if (publicacion == null || publicacion.AutorId != profesionalId || publicacion.RolAutor != "Profesional")
+            var publicacion = publicacionServicio.ObtenerPorId(id);
+            if (publicacion == null)
             {
-                TempData["Mensaje"] = "No tenés permiso para editar esta publicación.";
+                TempData["Mensaje"] = "La publicación no existe.";
                 TempData["TipoMensaje"] = "danger";
-                return RedirectToAction("MisPublicaciones");
+                return RedirectToAction("ControlPublicaciones");
             }
+
+            // Cargo enum en ViewBag
+            ViewBag.Estados = Enum.GetValues(typeof(Enum_EstadoPublicacion))
+                                  .Cast<Enum_EstadoPublicacion>()
+                                  .Select(e => new SelectListItem
+                                  {
+                                      Value = ((int)e).ToString(),
+                                      Text = e.ToString()
+                                  }).ToList();
+
             return View(publicacion);
         }
+
         [HttpPost]
-        public IActionResult EditarPublicacion(int Id, string Titulo, string Descripcion, List<IFormFile> archivos)
+        public IActionResult EditarPublicacion(int Id, string Titulo, string Descripcion, List<IFormFile> archivos, bool Ocultar = false)
         {
             try
             {
@@ -1138,8 +1145,10 @@ namespace MetaGymWebApp.Controllers
                 pub.Titulo = Titulo;
                 pub.Descripcion = Descripcion;
                 pub.FechaProgramada = DateTime.Now;
-                //Queda pendiente de ser aprobada
-                pub.Estado = Enum_EstadoPublicacion.Pendiente;
+                // Solo visible u oculto
+                pub.Estado = Ocultar ? Enum_EstadoPublicacion.Oculto
+                                     : Enum_EstadoPublicacion.Aprobada;
+
                 pub.MotivoRechazo = null;
                 //Mando al repo
                 publicacionServicio.ActualizarPublicacion(pub);

@@ -31,7 +31,7 @@
                         <th>ID</th>
                         <th>Título</th>
                         <th>Fecha creación</th>
-                        <th>Autor</th>
+                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -42,7 +42,7 @@
                             <td>@pub.Id</td>
                             <td>@pub.Titulo</td>
                             <td>@pub.FechaCreacion.ToString("g")</td>
-                            <td>@pub.NombreAutor</td>
+                            <td>@pub.Estado</td>
                             <td>
                                 <a href="@Url.Action("DetallesPublicacion", "Admin", new { id = pub.Id })"
                                    class="btn btn-outline-light btn-sm">Ver</a>
@@ -70,6 +70,7 @@
                         <th>Título</th>
                         <th>Fecha creación</th>
                         <th>Autor</th>
+                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -81,6 +82,7 @@
                             <td>@pub.Titulo</td>
                             <td>@pub.FechaCreacion.ToString("g")</td>
                             <td>@pub.NombreAutor</td>
+                            <td>@pub.Estado</td>
                             <td>
                                 <a href="@Url.Action("DetallesPublicacion", "Admin", new { id = pub.Id })"
                                    class="btn btn-outline-light btn-sm">Ver</a>
