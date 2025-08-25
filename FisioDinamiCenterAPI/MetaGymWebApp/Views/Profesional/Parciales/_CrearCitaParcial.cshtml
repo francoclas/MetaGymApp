@@ -1,57 +1,72 @@
 ﻿@model RegistroCitaModelo
+@{
+    Layout = null;
+}
 
-<div class="container mt-3 bg-dark text-white border rounded p-3">
-    <h4>➕ Crear nueva cita</h4>
-    <button type="button" class="btn btn-sm btn-outline-light mb-3" onclick="cerrarPanelDerecho()">✖ Cerrar</button>
+<div class="bg-dark text-white p-3 rounded">
+    <h4 class="mb-3">Nueva Cita</h4>
 
-    <form asp-action="CrearCitaParcial" method="post" id="form-crear-cita">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <form asp-action="CrearCitaParcial" method="post">
 
         <!-- Cliente -->
         <div class="mb-3">
-            <label asp-for="Cita.ClienteId" class="form-label">Cliente</label>
-            <select asp-for="Cita.ClienteId" class="form-select">
-                <option value="">Seleccione un cliente</option>
-                @foreach (var cliente in Model.Clientes)
-                {
-                    <option value="@cliente.Id">
-                        @cliente.NombreCompleto - @cliente.Ci - @cliente.Correo
-                    </option>
-                }
-            </select>
-            <span asp-validation-for="Cita.ClienteId" class="text-danger"></span>
-        </div>
+            <label class="form-label">Cliente</label>
+            <input type="hidden" asp-for="Cita.ClienteId" id="clienteIdParcial" />
+            <input type="text" id="clienteNombreParcial" class="form-control mb-2" placeholder="Cliente seleccionado" readonly />
 
-        <!-- Descripción -->
-        <div class="mb-3">
-            <label asp-for="Cita.Descripcion" class="form-label">Descripción</label>
-            <input asp-for="Cita.Descripcion" type="text" class="form-control" />
-            <span asp-validation-for="Cita.Descripcion" class="text-danger"></span>
+            <input type="text" id="buscadorClienteParcial" class="form-control mb-2" placeholder="Buscar cliente..." />
+
+            <table id="tablaClientesParcial" class="table table-dark table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>CI</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cliente in Model.Clientes)
+                    {
+                        <tr>
+                            <td>@cliente.NombreCompleto</td>
+                            <td>@cliente.Ci</td>
+                            <td>
+                                <button type="button"
+                                        class="btn btn-sm btn-success seleccionar-cliente-parcial"
+                                        data-id="@cliente.Id"
+                                        data-nombre="@cliente.NombreCompleto">
+                                    ✔
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <span asp-validation-for="Cita.ClienteId" class="text-danger"></span>
         </div>
 
         <!-- Especialidad -->
         <div class="mb-3">
             <label asp-for="Cita.EspecialidadId" class="form-label">Especialidad</label>
-            <select asp-for="Cita.EspecialidadId" class="form-select">
+            <select asp-for="Cita.EspecialidadId" class="form-select" id="selectEspecialidadParcial">
                 <option value="">Seleccione una especialidad</option>
                 @foreach (var esp in Model.Especialidades)
                 {
                     <option value="@esp.Id">@esp.NombreEspecialidad</option>
                 }
             </select>
-            <span asp-validation-for="Cita.EspecialidadId" class="text-danger"></span>
         </div>
+
+        <!-- Tipo de atención -->
         <div class="mb-3">
-            <label asp-for="Cita.TipoAtencionId" class="form-label">Tipo de atención</label>
-            <select asp-for="Cita.TipoAtencionId" class="form-select">
-                <option value="">Seleccione un tipo de atención</option>
-                @foreach (var tipo in Model.TiposAtencion)
-                {
-                    <option value="@tipo.Id">@tipo.Nombre</option>
-                }
+            <label asp-for="Cita.TipoAtencionId" class="form-label">Tipo de Atención</label>
+            <select asp-for="Cita.TipoAtencionId" class="form-select" id="selectTipoAtencionParcial">
+                <option value="">Seleccione un tipo</option>
             </select>
-            <span asp-validation-for="Cita.TipoAtencionId" class="text-danger"></span>
+            <div id="descripcionTipoParcial" class="text-light mt-1 fst-italic"></div>
         </div>
+
+        <!-- Establecimiento -->
         <div class="mb-3">
             <label asp-for="Cita.EstablecimientoId" class="form-label">Establecimiento</label>
             <select asp-for="Cita.EstablecimientoId" class="form-select">
@@ -61,17 +76,26 @@
                     <option value="@est.Id">@est.Nombre</option>
                 }
             </select>
-            <span asp-validation-for="Cita.EstablecimientoId" class="text-danger"></span>
-        </div>
-        <div class="mb-3">
-            <label asp-for="Cita.FechaAsistencia" class="form-label">Fecha y Hora</label>
-            <input asp-for="Cita.FechaAsistencia" type="datetime-local" class="form-control" />
-            <span asp-validation-for="Cita.FechaAsistencia" class="text-danger"></span>
         </div>
 
-        <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-success">💾 Guardar</button>
-            <button type="button" class="btn btn-outline-light" onclick="cerrarPanelDerecho()">Cancelar</button>
+        <!-- Fecha -->
+        <div class="mb-3">
+            <label asp-for="Cita.FechaAsistencia" class="form-label">Fecha y Hora</label>
+            <input asp-for="Cita.FechaAsistencia" type="datetime-local" class="form-control"
+                   value="@Model.Cita.FechaAsistencia.ToString("yyyy-MM-ddTHH:mm")" />
         </div>
+
+        <!-- Descripción -->
+        <div class="mb-3">
+            <label asp-for="Cita.Descripcion" class="form-label">Descripción</label>
+            <textarea asp-for="Cita.Descripcion" class="form-control" rows="2"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-sm">Guardar</button>
+        <button type="button" class="btn btn-outline-light btn-sm" onclick="cerrarPanelDerecho()">Cancelar</button>
     </form>
 </div>
+
+<script>
+    const especialidades = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Especialidades));
+</script>

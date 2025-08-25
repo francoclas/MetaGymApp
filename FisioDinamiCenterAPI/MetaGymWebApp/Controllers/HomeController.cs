@@ -115,8 +115,20 @@ namespace MetaGymWebApp.Controllers
         [HttpPost]
         public IActionResult GuardarCambiosPerfil(UsuarioGenericoDTO dto)
         {
-            _usuarioServicio.GuardarCambiosGenerales(dto);
-            return RedirectToAction("EditarPerfil");
+            try
+            {
+                _usuarioServicio.GuardarCambiosGenerales(dto);
+                TempData["Mensaje"] = "Se modificaron datos correctamente.";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("EditarPerfil");
+
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("EditarPerfil");
+            }
         }
         [HttpPost]
         public IActionResult EliminarMediaPerfil(int mediaId)
@@ -171,7 +183,7 @@ namespace MetaGymWebApp.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"No se pudo deshabilitar la cuenta: {ex.Message}";
+                TempData["Mensaje"] = $"No se pudo deshabilitar la cuenta: {ex.Message}";
                 return RedirectToAction("EditarPerfil");
             }
         }

@@ -25,7 +25,7 @@
     <div id="creadas" class="tab-content">
         @if (Model.PublicacionesCreadas.Any())
         {
-            <table class="table table-dark table-bordered datatable">
+            <table id="tablaCreadas" class="table table-dark table-bordered datatable">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -63,7 +63,7 @@
     <div id="aprobadas" class="tab-content d-none">
         @if (Model.PublicacionesAutorizadas.Any())
         {
-            <table class="table table-dark table-bordered datatable">
+            <table id="tablaAprobadas" class="table table-dark table-bordered datatable">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -101,7 +101,7 @@
     <div id="rechazadas" class="tab-content d-none">
         @if (Model.PublicacionesRechazadas.Any())
         {
-            <table class="table table-dark table-bordered datatable">
+            <table id="tablaRechazadas" class="table table-dark table-bordered datatable">
                 <thead>
                     <tr>
                         <th>ID</th>

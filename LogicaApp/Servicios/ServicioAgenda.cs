@@ -43,8 +43,6 @@ namespace LogicaApp.Servicios
 
         public void ActualizarAgenda(AgendaProfesional agenda)
         {
-            if (_repo.ExisteAgendaEnHorario(agenda.ProfesionalId, agenda.Dia, agenda.HoraInicio, agenda.HoraFin))
-                throw new Exception("Ya existe una agenda en ese horario para ese día.");
             _repo.ActualizarAgenda(agenda);
         }
 

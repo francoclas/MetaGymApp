@@ -12,20 +12,22 @@
         <h2 class="mb-2">¡Bienvenido a MetaGym!</h2>
         <p class="mb-0">Acá vas a encontrar las últimas novedades, tips, publicaciones de los profesionales y más. ¡Entrená motivado, informate y seguí progresando!</p>
     </div>
-    <!-- Publicaciones -->
-    @if (Model != null && Model.Any())
-    {
-        @foreach (var pub in Model.OrderByDescending(p => p.FechaCreacion))
+    <div class="container-publis">
+        <!-- Publicaciones -->
+        @if (Model != null && Model.Any())
         {
-            @Html.Partial("_VistaPublicacion", pub)
+            @foreach (var pub in Model.OrderByDescending(p => p.FechaCreacion))
+            {
+                @Html.Partial("_VistaPublicacion", pub)
+            }
         }
-    }
-    else
-    {
-        <div class="alert alert-info">
-            Todavía no hay publicaciones disponibles. ¡Pronto vas a ver novedades y consejos de tu equipo MetaGym!
-        </div>
-    }
+        else
+        {
+            <div class="alert alert-info">
+                Todavía no hay publicaciones disponibles. ¡Pronto vas a ver novedades y consejos de tu equipo MetaGym!
+            </div>
+        }
+    </div>
 </div>
 
 @section Scripts {

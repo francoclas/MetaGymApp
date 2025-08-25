@@ -7,9 +7,24 @@
         <h4>Editar Cita</h4>
         <button type="button" class="btn btn-sm btn-outline-light" onclick="cerrarPanelDerecho()">✖</button>
     </div>
+
+    <!-- Información general de la cita -->
+    <div class="mb-4 p-3 border rounded bg-secondary">
+        <h5 class="mb-3">📌 Información de la cita</h5>
+        <p><strong>Cliente:</strong> @Model.Cliente?.NombreCompleto</p>
+        <p><strong>Teléfono:</strong> @Model.Cliente?.Telefono</p>
+        <p><strong>Correo:</strong> @Model.Cliente?.Correo</p>
+        <hr class="border-light" />
+        <p><strong>Especialidad:</strong> @Model.Especialidad?.NombreEspecialidad</p>
+        <p><strong>Establecimiento:</strong> @Model.Establecimiento?.Direccion</p>
+    </div>
+
+    <!-- Formulario de edición -->
     <form asp-action="EditarCitaCalendario" method="post">
         <input type="hidden" asp-for="CitaId" />
         <input type="hidden" asp-for="EstablecimientoId" />
+        <input type="hidden" asp-for="ClienteId" />
+
         <div class="mb-3">
             <label class="form-label">📅 Fecha y hora:</label>
             <input asp-for="FechaAsistencia" type="datetime-local" class="form-control" />
@@ -27,7 +42,9 @@
             <select asp-for="TipoAtencionId" class="form-select" asp-items="ViewBag.TiposAtencion"></select>
             <span asp-validation-for="TipoAtencionId" class="text-danger"></span>
         </div>
+
         <hr />
+
         <div class="form-group mb-3">
             <label for="Estado">📌 Estado de la cita:</label>
             <select asp-for="Estado" class="form-control">
@@ -38,11 +55,13 @@
                 <option value="@EstadoCita.Rechazada">Rechazada</option>
             </select>
         </div>
+
         <div class="form-group mb-3">
             <label for="Conclusion">🧾 Conclusión:</label>
             <textarea asp-for="Conclusion" class="form-control" rows="3"></textarea>
             <span asp-validation-for="Conclusion" class="text-danger"></span>
         </div>
+
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
         </div>

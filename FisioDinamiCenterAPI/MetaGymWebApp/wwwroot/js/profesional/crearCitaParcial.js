@@ -1,33 +1,39 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
-    // === Clientes con filtro simple ===
-    const buscador = document.getElementById("buscadorCliente");
-    const filas = document.querySelectorAll("#tablaClientes tbody tr");
+﻿function inicializarCrearCitaParcial() {
+    console.log("Inicializando CrearCitaParcial...");
 
-    if (buscador) {
+    // === Buscador de clientes ===
+    const buscador = document.getElementById("buscadorClienteParcial");
+    const tabla = document.getElementById("tablaClientesParcial");
+    if (buscador && tabla) {
+        const filas = tabla.querySelectorAll("tbody tr");
+
         buscador.addEventListener("keyup", function () {
             const filtro = buscador.value.toLowerCase();
             filas.forEach(fila => {
                 const celdas = fila.querySelectorAll("td");
-                const match = Array.from(celdas).some((c, i) => i < 3 && c.textContent.toLowerCase().includes(filtro));
+                const match = Array.from(celdas).some((c, i) => i < 2 && c.textContent.toLowerCase().includes(filtro));
                 fila.style.display = match ? "" : "none";
             });
         });
+
+        tabla.addEventListener("click", function (e) {
+            if (e.target.classList.contains("seleccionar-cliente-parcial")) {
+                const id = e.target.dataset.id;
+                const nombre = e.target.dataset.nombre;
+
+                document.getElementById("clienteIdParcial").value = id;
+                document.getElementById("clienteNombreParcial").value = nombre;
+            }
+        });
     }
 
-    document.querySelectorAll(".seleccionar-cliente").forEach(btn => {
-        btn.addEventListener("click", function () {
-            document.getElementById("clienteId").value = this.dataset.id;
-            document.getElementById("clienteNombre").value = this.dataset.nombre;
-        });
-    });
-
     // === Especialidad → TipoAtencion ===
-    const selectEspecialidad = document.getElementById("selectEspecialidad");
-    const selectTipoAtencion = document.getElementById("selectTipoAtencion");
-    const descripcionTipo = document.getElementById("descripcionTipo");
+    const selectEspecialidad = document.getElementById("selectEspecialidadParcial");
+    const selectTipoAtencion = document.getElementById("selectTipoAtencionParcial");
+    const descripcionTipo = document.getElementById("descripcionTipoParcial");
 
     if (selectEspecialidad && selectTipoAtencion) {
-        function cargarTiposPorEspecialidad() {
+        selectEspecialidad.addEventListener("change", function () {
             const especialidadId = selectEspecialidad.value;
             selectTipoAtencion.innerHTML = "<option value=''>Seleccione un tipo</option>";
             if (descripcionTipo) descripcionTipo.innerText = "";
@@ -45,14 +51,11 @@
                     });
                 }
             }
-        }
+        });
 
-        function mostrarDescripcionTipo() {
+        selectTipoAtencion.addEventListener("change", function () {
             const desc = selectTipoAtencion.selectedOptions[0]?.getAttribute("data-desc");
             if (descripcionTipo) descripcionTipo.innerText = desc || "";
-        }
-
-        selectEspecialidad.addEventListener("change", cargarTiposPorEspecialidad);
-        selectTipoAtencion.addEventListener("change", mostrarDescripcionTipo);
+        });
     }
-});
+}

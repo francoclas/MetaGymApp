@@ -21,6 +21,9 @@ public class NotificacionController : ControllerBase
         _notificacionServicio = notificacionServicio;
     }
 
+    /// <summary>
+    /// Obtiene todas las notificaciones no leídas del cliente.
+    /// </summary>
     [HttpGet("no-leidas")]
     [ProducesResponseType(typeof(RespuestaApi<List<NotificacionDTO>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]
@@ -32,6 +35,9 @@ public class NotificacionController : ControllerBase
         return Ok(RespuestaApi<List<NotificacionDTO>>.Ok(resultado));
     }
 
+    /// <summary>
+    /// Obtiene todas las notificaciones ya leídas del cliente.
+    /// </summary>
     [HttpGet("leidas")]
     [ProducesResponseType(typeof(RespuestaApi<List<NotificacionDTO>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]
@@ -43,6 +49,9 @@ public class NotificacionController : ControllerBase
         return Ok(RespuestaApi<List<NotificacionDTO>>.Ok(resultado));
     }
 
+    /// <summary>
+    /// Devuelve la cantidad de notificaciones no leídas del cliente.
+    /// </summary>
     [HttpGet("no-leidas/contar")]
     [ProducesResponseType(typeof(RespuestaApi<int>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]
@@ -54,6 +63,9 @@ public class NotificacionController : ControllerBase
         return Ok(RespuestaApi<int>.Ok(cantidad));
     }
 
+    /// <summary>
+    /// Marca una notificación específica como leída.
+    /// </summary>
     [HttpPatch("{id}/leer")]
     [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]
@@ -65,6 +77,9 @@ public class NotificacionController : ControllerBase
         return Ok(RespuestaApi<string>.NoContent("Notificación marcada como leída."));
     }
 
+    /// <summary>
+    /// Marca todas las notificaciones del cliente como leídas.
+    /// </summary>
     [HttpPatch("leer-todas")]
     [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]
@@ -76,6 +91,9 @@ public class NotificacionController : ControllerBase
         return Ok(RespuestaApi<string>.NoContent("Todas las notificaciones fueron marcadas como leídas."));
     }
 
+    /// <summary>
+    /// Obtiene las últimas notificaciones recibidas por el cliente.
+    /// </summary>
     [HttpGet("ultimas")]
     [ProducesResponseType(typeof(RespuestaApi<List<NotificacionDTO>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]

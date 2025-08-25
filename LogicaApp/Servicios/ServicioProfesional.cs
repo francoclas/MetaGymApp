@@ -134,12 +134,28 @@ namespace LogicaApp.Servicios
             List<EspecialidadDTO> salida = new List<EspecialidadDTO>();
             foreach (var item in profe.Especialidades)
             {
-                salida.Add(new EspecialidadDTO
+                EspecialidadDTO aux = new EspecialidadDTO
                 {
                     Id = item.Id,
                     DescripcionEspecialidad = item.DescripcionEspecialidad,
-                    NombreEspecialidad = item.NombreEspecialidad
-                });
+                    NombreEspecialidad = item.NombreEspecialidad,
+                    TipoAtenciones = new List<TipoAtencionDTO>()
+                };
+                if(item.TiposAtencion != null)
+                {
+                    foreach (TipoAtencion tp in item.TiposAtencion)
+                    {
+                        aux.TipoAtenciones.Add(new TipoAtencionDTO
+                        {
+                            EspecialidadId = aux.Id,
+                            Desc = tp.Descripcion,
+                            Nombre = tp.Nombre,
+                            Id = tp.Id
+                        });
+                    }
+                }
+                
+                salida.Add(aux);
             }
             return salida;
         }

@@ -52,6 +52,10 @@ builder.Services.AddScoped(typeof(Lazy<>), typeof(LazyResolver<>));
 
 
 builder.Services.AddSession();
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 209715200; //para 200 megas
+});
 var app = builder.Build();
 //Precarga
 //Migracion
@@ -62,6 +66,7 @@ using (var scope = app.Services.CreateScope())
 }
 CargaAdmin.CargarAdminBase(app.Services);
 // Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

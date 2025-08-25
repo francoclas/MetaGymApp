@@ -64,6 +64,29 @@ namespace MetaGymWebApp.Controllers
 
             return RedirectToAction("MisAgendas");
         }
+        [HttpPost]
+        public IActionResult MarcarActivo(int id, bool activo)
+        {
+            try
+            {
+                AgendaProfesional agenda = _agendaServicio.ObtenerPorId(id);
+                if (agenda == null)
+                    throw new Exception("No se encontró la agenda.");
+
+                agenda.Activo = activo;
+                _agendaServicio.ActualizarAgenda(agenda);
+
+                TempData["Mensaje"] = "Estado de la agenda actualizado.";
+                TempData["TipoMensaje"] = "success";
+            }
+            catch (Exception ex)
+            {
+                TempData["Mensaje"] = ex.Message;
+                TempData["TipoMensaje"] = "danger";
+            }
+
+            return RedirectToAction("MisAgendas");
+        }
 
     }
 }

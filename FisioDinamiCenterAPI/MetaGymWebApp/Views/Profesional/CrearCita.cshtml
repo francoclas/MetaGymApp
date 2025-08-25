@@ -2,72 +2,102 @@
 @{
     ViewData["Title"] = "Crear Cita";
 }
-
 <div class="container mt-4 bg-dark text-white p-4 rounded">
     <h2 class="mb-4">Crear nueva cita</h2>
 
-    <form asp-action="CrearCita" method="post">
+    <form asp-action="CrearCita" method="post" id="formCrearCita">
 
+        <!-- Cliente con buscador simple -->
         <div class="mb-3">
-            <label asp-for="Cita.ClienteId" class="form-label">Cliente</label>
-            <select asp-for="Cita.ClienteId" class="form-select">
-                <option value="">Seleccione un cliente</option>
-                @foreach (var cliente in Model.Clientes)
-                {
-                    <option value="@cliente.Id">
-                        @cliente.NombreCompleto - @cliente.Ci - @cliente.Correo
-                    </option>
-                }
-            </select>
+            <label class="form-label">Cliente</label>
+            <input type="hidden" asp-for="Cita.ClienteId" id="clienteId" />
+            <input type="text" id="clienteNombre" class="form-control mb-2" placeholder="Cliente seleccionado" readonly />
+
+            <input type="text" id="buscadorCliente" class="form-control mb-2" placeholder="Buscar cliente..." />
+
+            <table id="tablaClientes" class="table table-dark table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>CI</th>
+                        <th>Correo</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cliente in Model.Clientes)
+                    {
+                        <tr>
+                            <td>@cliente.NombreCompleto</td>
+                            <td>@cliente.Ci</td>
+                            <td>@cliente.Correo</td>
+                            <td>
+                                <button type="button"
+                                        class="btn btn-sm btn-success seleccionar-cliente"
+                                        data-id="@cliente.Id"
+                                        data-nombre="@cliente.NombreCompleto">
+                                    Seleccionar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
             <span asp-validation-for="Cita.ClienteId" class="text-danger"></span>
         </div>
-        <div class="mb-3">
-            <label asp-for="Cita.Descripcion" class="form-label">Descripcion</label>
-            <input asp-for="Cita.Descripcion" type="text" class="form-control" />
-            <span asp-validation-for="Cita.Descripcion" class="text-danger"></span>
-        </div>
+
+        <!-- Especialidad -->
         <div class="mb-3">
             <label asp-for="Cita.EspecialidadId" class="form-label">Especialidad</label>
-            <select asp-for="Cita.EspecialidadId" class="form-select">
+            <select asp-for="Cita.EspecialidadId" class="form-select" id="selectEspecialidad">
                 <option value="">Seleccione una especialidad</option>
                 @foreach (var esp in Model.Especialidades)
                 {
                     <option value="@esp.Id">@esp.NombreEspecialidad</option>
                 }
             </select>
-            <span asp-validation-for="Cita.EspecialidadId" class="text-danger"></span>
         </div>
 
+        <!-- Tipo de atención -->
         <div class="mb-3">
-            <label asp-for="Cita.TipoAtencionId" class="form-label">Tipo de atención</label>
-            <select asp-for="Cita.TipoAtencionId" class="form-select">
-                <option value="">Seleccione un tipo de atención</option>
-                @foreach (var tipo in Model.TiposAtencion)
-                {
-                    <option value="@tipo.Id">@tipo.Nombre</option>
-                }
+            <label asp-for="Cita.TipoAtencionId" class="form-label">Tipo de Atención</label>
+            <select asp-for="Cita.TipoAtencionId" class="form-select" id="selectTipoAtencion">
+                <option value="">Seleccione un tipo</option>
             </select>
-            <span asp-validation-for="Cita.TipoAtencionId" class="text-danger"></span>
+            <div id="descripcionTipo" class="text-light mt-2 fst-italic"></div>
         </div>
 
+        <!-- Establecimiento -->
         <div class="mb-3">
             <label asp-for="Cita.EstablecimientoId" class="form-label">Establecimiento</label>
-            <select asp-for="Cita.EstablecimientoId" class="form-select">
+            <select asp-for="Cita.EstablecimientoId" class="form-select" id="selectEstablecimiento">
                 <option value="">Seleccione un establecimiento</option>
                 @foreach (var est in Model.Establecimientos)
                 {
                     <option value="@est.Id">@est.Nombre</option>
                 }
             </select>
-            <span asp-validation-for="Cita.EstablecimientoId" class="text-danger"></span>
         </div>
 
+        <!-- Fecha -->
         <div class="mb-3">
             <label asp-for="Cita.FechaAsistencia" class="form-label">Fecha y Hora</label>
-            <input asp-for="Cita.FechaAsistencia" type="datetime-local" class="form-control" />
+            <input asp-for="Cita.FechaAsistencia" type="datetime-local" class="form-control"
+                   value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
             <span asp-validation-for="Cita.FechaAsistencia" class="text-danger"></span>
+        </div>
+
+        <!-- Descripción -->
+        <div class="mb-3">
+            <label asp-for="Cita.Descripcion" class="form-label">Descripción</label>
+            <textarea asp-for="Cita.Descripcion" class="form-control" rows="3"></textarea>
         </div>
 
         <button type="submit" class="btn btn-primary">Registrar Cita</button>
     </form>
 </div>
+
+<script>
+    const especialidades = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Especialidades));
+</script>
+<script src="~/js/profesional/crearCita.js"></script>

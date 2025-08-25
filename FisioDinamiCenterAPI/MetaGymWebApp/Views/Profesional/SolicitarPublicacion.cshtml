@@ -20,16 +20,6 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="FechaProgramada" class="form-label">Fecha de publicación <span class="text-muted small">(opcional)</span></label>
-        <input asp-for="FechaProgramada" type="datetime-local" class="form-control" />
-    </div>
-
-    <div class="form-check form-switch mb-3">
-        <input asp-for="EsPrivada" class="form-check-input" type="checkbox" role="switch" />
-        <label class="form-check-label" asp-for="EsPrivada">¿Publicación privada?</label>
-    </div>
-
-    <div class="mb-3">
         <label asp-for="ArchivosMedia" class="form-label">Subir imágenes o videos <span class="text-muted small">(opcional, múltiples)</span></label>
         <input asp-for="ArchivosMedia" type="file" class="form-control" multiple accept="image/*,video/*" onchange="previewArchivos()" />
         <div id="preview" class="mt-3 d-flex gap-3 flex-wrap"></div>

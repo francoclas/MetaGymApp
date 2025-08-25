@@ -1,4 +1,5 @@
-﻿function inicializarCalendario(urlEventos, businessHoursConfig) {
+﻿
+function inicializarCalendario(urlEventos, businessHoursConfig) {
     var calendarEl = document.getElementById('calendario');
     console.log("BusinessHoursConfig:", businessHoursConfig);
 
@@ -34,7 +35,7 @@
                     url = '/Profesional/VerCitaParcial'; 
                     break;
                 default:
-                    url = '/Profesional/EditarCitaParcial';
+                    url = '/Profesional/VerCitaParcial';
                     break;
             }
 
@@ -67,6 +68,9 @@
             $("#btn-crear-cita").off("click").on("click", function () {
                 $.get('/Profesional/CrearCitaParcial', { fecha: fecha }, function (html) {
                     $('#panel-derecho').html(html);
+                    if (typeof inicializarCrearCitaParcial === "function") {
+                        inicializarCrearCitaParcial();
+                    }
                 });
             });
 
@@ -83,3 +87,4 @@
 function cerrarPanelDerecho() {
     $("#panel-derecho").html(""); // vacía el panel
 }
+

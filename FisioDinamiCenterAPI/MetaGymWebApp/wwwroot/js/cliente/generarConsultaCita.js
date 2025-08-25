@@ -1,6 +1,4 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
-    console.log("JS cargado con paso a paso (todo en español)");
-
     const selectEspecialidad = document.getElementById("selectEspecialidad");
     const selectTipoAtencion = document.getElementById("selectTipoAtencion");
     const descripcionTipo = document.getElementById("descripcionTipo");

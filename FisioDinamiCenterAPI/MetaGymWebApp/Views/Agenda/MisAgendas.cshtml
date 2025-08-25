@@ -23,6 +23,7 @@
                             <th>Día</th>
                             <th>Hora de inicio</th>
                             <th>Hora de fin</th>
+                            <th>Activo</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -33,6 +34,15 @@
                                 <td>@agenda.Dia</td>
                                 <td>@agenda.HoraInicio.ToString(@"hh\:mm")</td>
                                 <td>@agenda.HoraFin.ToString(@"hh\:mm")</td>
+                                <td>
+                                <form asp-action="MarcarActivo" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@agenda.Id" />
+                                    <input type="hidden" name="activo" value="@(!agenda.Activo)" />
+                                    <input type="checkbox"
+                                           onchange="this.form.submit()"
+                                           @(agenda.Activo ? "checked" : "") />
+                                </form>
+                            </td>
                                 <td>
                                     <form asp-action="Eliminar" method="post" onsubmit="return confirm('¿Seguro que querés eliminar esta jornada?');">
                                         <input type="hidden" name="id" value="@agenda.Id" />

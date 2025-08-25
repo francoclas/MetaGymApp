@@ -17,15 +17,6 @@
         <textarea asp-for="Descripcion" class="form-control" rows="4" placeholder="Detalles, beneficios, tips..."></textarea>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="FechaProgramada" class="form-label">Fecha programada <span class="text-muted small">(opcional)</span></label>
-        <input asp-for="FechaProgramada" type="datetime-local" class="form-control" />
-    </div>
-
-    <div class="form-check form-switch mb-3">
-        <input asp-for="EsPrivada" class="form-check-input" type="checkbox" />
-        <label class="form-check-label" asp-for="EsPrivada">¿Publicación privada?</label>
-    </div>
 
     <div class="form-check form-switch mb-3">
         <input asp-for="MostrarEnNoticiasPublicas" class="form-check-input" type="checkbox" />

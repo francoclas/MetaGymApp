@@ -5,6 +5,7 @@ using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.Servicios;
 using MetaGymWebApp.Filtros;
 using MetaGymWebApp.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -224,7 +225,7 @@ namespace MetaGymWebApp.Controllers
         public IActionResult EditarCitaParcial(int citaId)
         {
             int ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var cita = citaServicio.ObtenerPorId(citaId);
+            Cita cita = citaServicio.ObtenerPorId(citaId);
 
             if (cita.ProfesionalId != ProfesionalId)
             {
@@ -239,6 +240,9 @@ namespace MetaGymWebApp.Controllers
                 FechaAsistencia = cita.FechaAsistencia ?? DateTime.Now,
                 EstablecimientoId = cita.EstablecimientoId,
                 ClienteId = cita.ClienteId,
+                Cliente = cita.Cliente,
+                Establecimiento = cita.Establecimiento,
+                Especialidad = cita.Especialidad,
                 ProfesionalId = cita.ProfesionalId,
                 EspecialidadId = cita.EspecialidadId,
                 Descripcion = cita.Descripcion,
@@ -355,23 +359,39 @@ namespace MetaGymWebApp.Controllers
 
                 citaServicio.ActualizarEntidad(cita);
 
-                return Json(new { success = true, message = "Cita actualizada correctamente." });
+                TempData["Mensaje"] = "Se actualizo cita";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("Calendario");
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                TempData["Mensaje"] = ex.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("Calendario");
             }
         }
         [HttpPost]
         public IActionResult ReprogramarCita(int citaId, DateTime nuevaFecha)
         {
-            Cita cita = citaServicio.ObtenerPorId(citaId);
-            if (cita == null) return NotFound();
-
-            cita.FechaAsistencia = nuevaFecha;
-            citaServicio.ActualizarEntidad(cita);
-
-            return Ok();
+            try
+            {
+                Cita cita = citaServicio.ObtenerPorId(citaId);
+                Profesional profesional = profesionalServicio.ObtenerProfesional(GestionSesion.ObtenerUsuarioId(HttpContext));
+                if (cita == null) throw new Exception("No se encontro cita.");
+                if (cita.Estado != EstadoCita.Aceptada) throw new Exception("Solo se puede reprogramar una cita Aceptada.");
+                bool dentroFranja = EstaDentroDeFranja(profesional.Agendas, nuevaFecha);
+                if (!dentroFranja) throw new Exception("No se puede reprogramar la cita a esa fecha, no hay jornada laboral en esa hora.");
+                    cita.FechaAsistencia = nuevaFecha;
+                citaServicio.ActualizarEntidad(cita);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return BadRequest();
+            }
+            
         }
         [HttpGet]
         public IActionResult HistorialClinicoCliente(int id)
@@ -459,8 +479,10 @@ namespace MetaGymWebApp.Controllers
             RegistroCitaModelo modelo = new RegistroCitaModelo
             {
                 Clientes = clienteServicio.ObtenerTodosDTO(),
+
+                // 🔹 Este ya trae los tipos de atención dentro de cada especialidad
                 Especialidades = profesionalServicio.ObtenerEspecialidadesProfesionalDTO(profesionalId),
-                TiposAtencion = extraServicio.ObtenerTiposAtencionPorProfesionalDTO(profesionalId),
+
                 Establecimientos = extraServicio.ObtenerEstablecimientosDTO(),
                 Cita = new CitaDTO()
             };
@@ -476,8 +498,9 @@ namespace MetaGymWebApp.Controllers
             RegistroCitaModelo modelo = new RegistroCitaModelo
             {
                 Clientes = clienteServicio.ObtenerTodosDTO(),
+
                 Especialidades = profesionalServicio.ObtenerEspecialidadesProfesionalDTO(profesionalId),
-                TiposAtencion = extraServicio.ObtenerTiposAtencionPorProfesionalDTO(profesionalId),
+
                 Establecimientos = extraServicio.ObtenerEstablecimientosDTO(),
                 Cita = new CitaDTO
                 {
@@ -487,6 +510,7 @@ namespace MetaGymWebApp.Controllers
 
             return PartialView("Parciales/_CrearCitaParcial", modelo);
         }
+
         [HttpPost]
         public IActionResult CrearCitaParcial(RegistroCitaModelo modelo)
         {
@@ -513,22 +537,20 @@ namespace MetaGymWebApp.Controllers
                 if (cita.FechaAsistencia == default || cita.FechaAsistencia < DateTime.Now)
                     throw new Exception("Debe ingresar una fecha y hora válida y futura.");
 
-                citaServicio.RegistrarCitaPorProfesional(cita);
                 bool dentroFranja = EstaDentroDeFranja(profesional.Agendas, cita.FechaAsistencia);
                 if (!dentroFranja)
                     throw new Exception("La fecha seleccionada no está dentro de la franja horaria asignada.");
+                citaServicio.RegistrarCitaPorProfesional(cita);
 
-                return Json(new { success = true, mensaje = "Cita registrada correctamente." });
+                TempData["Mensaje"] = "Se creo cita";
+                TempData["TipoMensaje"] = "success";
+                return RedirectToAction("Calendario");
             }
             catch (Exception ex)
             {
-                int profesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
-                modelo.Clientes = clienteServicio.ObtenerTodosDTO();
-                modelo.Especialidades = profesionalServicio.ObtenerEspecialidadesProfesionalDTO(profesionalId);
-                modelo.TiposAtencion = extraServicio.ObtenerTiposAtencionPorProfesionalDTO(profesionalId);
-                modelo.Establecimientos = extraServicio.ObtenerEstablecimientosDTO();
-
-                return PartialView("Parciales/_CrearCitaParcial", modelo);
+                TempData["Mensaje"] = ex.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("Calendario");
             }
         }
 
@@ -539,6 +561,7 @@ namespace MetaGymWebApp.Controllers
             {
                 CitaDTO cita = modelo.Cita;
                 cita.ProfesionalId = GestionSesion.ObtenerUsuarioId(HttpContext);
+                Profesional profesional = profesionalServicio.ObtenerProfesional(GestionSesion.ObtenerUsuarioId(HttpContext));
                 //Valido la info ingresada
                 if (cita.ClienteId <= 0)
                     throw new Exception("Debe seleccionar un cliente.");
@@ -558,8 +581,10 @@ namespace MetaGymWebApp.Controllers
                 if (cita.FechaAsistencia == default || cita.FechaAsistencia < DateTime.Now)
                     throw new Exception("Debe ingresar una fecha y hora válida y futura.");
                 //mando al repo
+                bool dentroFranja = EstaDentroDeFranja(profesional.Agendas, cita.FechaAsistencia);
+                if (!dentroFranja)
+                    throw new Exception("La fecha seleccionada no está dentro de la franja horaria asignada.");
                 citaServicio.RegistrarCitaPorProfesional(cita);
-
 
                 TempData["Mensaje"] = "Cita registrada correctamente.";
                 TempData["TipoMensaje"] = "success";
@@ -1207,16 +1232,12 @@ namespace MetaGymWebApp.Controllers
 
         private bool EstaDentroDeFranja(List<AgendaProfesional> agendas, DateTime fecha)
         {
-            foreach (var a in agendas)
-            {
-                if (a.Dia == ConvertirADiaSemana(fecha.DayOfWeek) &&
-                    fecha.TimeOfDay >= a.HoraInicio &&
-                    fecha.TimeOfDay < a.HoraFin)
-                {
-                    return true;
-                }
-            }
-            return false;
+            Enum_DiaSemana diaSemana = ConvertirADiaSemana(fecha.DayOfWeek);
+            var hora = fecha.TimeOfDay;
+
+            return agendas
+                .Where(a => a.Activo && a.Dia == diaSemana)
+                .Any(a => hora >= a.HoraInicio && hora <= a.HoraFin);
         }
         private Enum_DiaSemana ConvertirADiaSemana(DayOfWeek dayOfWeek)
         {
@@ -1229,7 +1250,7 @@ namespace MetaGymWebApp.Controllers
                 case DayOfWeek.Thursday: return Enum_DiaSemana.Jueves;
                 case DayOfWeek.Friday: return Enum_DiaSemana.Viernes;
                 case DayOfWeek.Saturday: return Enum_DiaSemana.Sabado;
-                default: throw new ArgumentOutOfRangeException();
+                default: throw new Exception("revisar valores ingresados!");
             }
         }
     }

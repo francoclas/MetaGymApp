@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\js\profesional\parciales\**" />
+    <Content Remove="wwwroot\js\profesional\parciales\**" />
+    <EmbeddedResource Remove="wwwroot\js\profesional\parciales\**" />
+    <None Remove="wwwroot\js\profesional\parciales\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -21,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\js\profesional\parciales\" />
     <Folder Include="wwwroot\MediaWeb\Default\iconos\" />
     <Folder Include="wwwroot\MediaWeb\Imagenes\Ejercicios\" />
     <Folder Include="wwwroot\MediaWeb\Imagenes\Establecimientos\" />

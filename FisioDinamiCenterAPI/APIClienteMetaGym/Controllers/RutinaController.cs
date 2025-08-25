@@ -53,7 +53,6 @@ namespace APIClienteMetaGym.Controllers
 
             return Ok(RespuestaApi<EjercicioVistaDTO>.Ok(MapearEjercicioDTO(ejercicio)));
         }
-
         /// <summary>
         /// Registra una nueva sesión de entrenamiento para una rutina asignada.
         /// </summary>
@@ -64,9 +63,6 @@ namespace APIClienteMetaGym.Controllers
             SesionRutina registrada = rutinaServicio.RegistrarSesion(nueva);
             return Ok(RespuestaApi<SesionRutinaDTO>.Ok(MapearSesionRutina(registrada)));
         }
-
-    
-
         /// <summary>
         /// Obtiene el historial de sesiones del cliente.
         /// </summary>

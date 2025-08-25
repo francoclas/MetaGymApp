@@ -324,6 +324,8 @@ namespace LogicaNegocio.Servicios
                     cliente.NombreCompleto = dto.Nombre;
                     cliente.Correo = dto.Correo;
                     cliente.Telefono = dto.Telefono;
+                    if (!string.IsNullOrWhiteSpace(dto.Pass))
+                        cliente.Pass = HashContrasena.Hashear(dto.Pass);
                     repoCliente.GuardarCambios();
                     break;
 
@@ -332,6 +334,8 @@ namespace LogicaNegocio.Servicios
                     profesional.NombreCompleto = dto.Nombre;
                     profesional.Correo = dto.Correo;
                     profesional.Telefono = dto.Telefono;
+                    if (!string.IsNullOrWhiteSpace(dto.Pass))
+                        profesional.Pass = HashContrasena.Hashear(dto.Pass);
                     repoProfesional.GuardarCambios();
                     break;
 
@@ -340,6 +344,8 @@ namespace LogicaNegocio.Servicios
                     admin.NombreCompleto = dto.Nombre;
                     admin.Correo = dto.Correo;
                     admin.Telefono = dto.Telefono;
+                    if (!string.IsNullOrWhiteSpace(dto.Pass))
+                        admin.Pass = HashContrasena.Hashear(dto.Pass);
                     repoAdmin.GuardarCambios();
                     break;
 

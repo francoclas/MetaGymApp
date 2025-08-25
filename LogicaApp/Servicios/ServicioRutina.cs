@@ -71,7 +71,7 @@ namespace LogicaApp.Servicios
         }
         public bool EliminarRutina(int rutinaId)
         {
-            Rutina existe = repositorioRutina.ObtenerPorId(rutinaId); // o método similar que tengas
+            Rutina existe = repositorioRutina.ObtenerPorId(rutinaId); 
             if (existe == null) return false;
 
             repositorioRutina.Eliminar(rutinaId);
@@ -83,10 +83,16 @@ namespace LogicaApp.Servicios
         }
         public bool EliminarEjercicio(int ejercicioId)
         {
-            Ejercicio existe = repositorioEjercicio.ObtenerPorId(ejercicioId); // idem arriba
+            Ejercicio existe = repositorioEjercicio.ObtenerPorId(ejercicioId); 
             if (existe == null) return false;
-
-            repositorioEjercicio.Eliminar(ejercicioId);
+            try
+            {
+                repositorioEjercicio.Eliminar(ejercicioId);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("No se puede eliminar ejercicio porque existen mediciones con sesiones de entrenamiento registradas.");
+            }
             return true;
         }
         public void DesasignarRutina(Rutina rutina, Cliente cliente)
@@ -108,7 +114,14 @@ namespace LogicaApp.Servicios
 
         public void ModificarEjercicio(Ejercicio ejercicio)
         {
-            repositorioEjercicio.Actualizar(ejercicio);
+            try
+            {
+                repositorioEjercicio.Actualizar(ejercicio);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("No se puede eliminar medicion, porque ya existen sesiones registradas.");
+            }
         }
 
         public void ModificarRutina(Rutina rutina)
