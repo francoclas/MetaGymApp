@@ -83,7 +83,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ClientePolicy", policy =>
     {
-        policy.AllowAnyOrigin() // SOLO para desarrollo
+        policy.AllowAnyOrigin() 
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -139,10 +139,13 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // ---------- Migración DB ----------
-using (var scope = app.Services.CreateScope())
+if (app.Environment.IsDevelopment())
 {
-    var context = scope.ServiceProvider.GetRequiredService<DbContextApp>();
-    context.Database.Migrate();
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<DbContextApp>();
+        context.Database.Migrate();
+    }
 }
 
 // ---------- Precarga ----------
