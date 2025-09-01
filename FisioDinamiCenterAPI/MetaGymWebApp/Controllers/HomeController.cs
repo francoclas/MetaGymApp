@@ -15,13 +15,13 @@ namespace MetaGymWebApp.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IUsuarioServicio _usuarioServicio;
         private readonly IMediaServicio _mediaServicio;
-        private readonly INotificacionServicio notificacionServicio;
+        private readonly INotificacionServicio _notificacionServicio;
         public HomeController(ILogger<HomeController> logger,IUsuarioServicio usuario, IMediaServicio mediaServicio,INotificacionServicio notificacion)
         {
             _logger = logger;
             _usuarioServicio = usuario;
             _mediaServicio = mediaServicio;
-            notificacionServicio = notificacion;
+            _notificacionServicio = notificacion;
 
         }
 
@@ -195,7 +195,7 @@ namespace MetaGymWebApp.Controllers
             string rol = GestionSesion.ObtenerRol(HttpContext);
 
             UsuarioGenericoDTO dto = _usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId, rol);
-            dto.Notificaciones = notificacionServicio.ObtenerPorUsuario(usuarioId,rol);
+            dto.Notificaciones = _notificacionServicio.ObtenerPorUsuario(usuarioId,rol);
             List<string> tipos = new List<string>();
             foreach (var item in Enum.GetValues(typeof(Enum_TipoNotificacion)))
             {

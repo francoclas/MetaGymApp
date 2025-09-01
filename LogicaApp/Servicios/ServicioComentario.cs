@@ -14,19 +14,19 @@ namespace LogicaApp.Servicios
 {
     public class ServicioComentario: IComentarioServicio
     {
-        private readonly IRepositorioComentario _repo;
-        private readonly Lazy<INotificacionServicio> notificacionServicio;
-        private readonly Lazy<IPublicacionServicio> publicacionServicio;
+        private readonly IRepositorioComentario _repositorioComentario;
+        private readonly Lazy<INotificacionServicio> _notificacionServicio;
+        private readonly Lazy<IPublicacionServicio> _publicacionServicio;
         public ServicioComentario(IRepositorioComentario repo, Lazy<INotificacionServicio> notificacionServicio, Lazy<IPublicacionServicio> publicacionServicio)
         {
-            _repo = repo;
-            this.notificacionServicio = notificacionServicio;
-            this.publicacionServicio = publicacionServicio;
+            _repositorioComentario = repo;
+            this._notificacionServicio = notificacionServicio;
+            this._publicacionServicio = publicacionServicio;
         }
 
         public List<ComentarioDTO> ObtenerPorPublicacion(int publicacionId)
         {
-            var comentarios = _repo.ObtenerPorPublicacion(publicacionId);
+            var comentarios = _repositorioComentario.ObtenerPorPublicacion(publicacionId);
             var result = new List<ComentarioDTO>();
 
             foreach (var c in comentarios)
@@ -50,24 +50,29 @@ namespace LogicaApp.Servicios
                 ClienteId = dto.RolAutor == "Cliente" ? dto.AutorId : null,
                 AdminId = dto.RolAutor == "Admin" ? dto.AutorId : null
             };
+            //valido que exista publi
+            PublicacionDTO publicacion = _publicacionServicio.Value.ObtenerPorId(dto.PublicacionId);
+            if(publicacion == null)
+            {
+                throw new Exception("No existe publicacion.");
+            }
             //Lo mando al repo
-            _repo.Agregar(nuevo);
+            _repositorioComentario.Agregar(nuevo);
 
             // Notificaciones
             if (dto.ComentarioPadreId == null)
             {
                 // Comentario sobre una publicación se notifica al autor de la publicación
-                PublicacionDTO publicacion = publicacionServicio.Value.ObtenerPorId(dto.PublicacionId);
 
                 if (publicacion != null)
                 {
-                    notificacionServicio.Value.NotificarComentario(publicacion.AutorId, publicacion.RolAutor, publicacion.Id, dto.Contenido);
+                    _notificacionServicio.Value.NotificarComentario(publicacion.AutorId, publicacion.RolAutor, publicacion.Id, dto.Contenido);
                 }
             }
             else
             {
                 // Respuesta a otro comentario para notificar al autor del comentario padre
-                var padre = _repo.ObtenerPorId((int)dto.ComentarioPadreId);
+                var padre = _repositorioComentario.ObtenerPorId((int)dto.ComentarioPadreId);
 
                 if (padre != null)
                 {
@@ -93,48 +98,65 @@ namespace LogicaApp.Servicios
                     //genero notificacion para el autor del comentario padre
                     if (receptorId != null && !(rolReceptor == dto.RolAutor && receptorId == dto.AutorId))
                     {
-                        notificacionServicio.Value.NotificarInteraccionComentario((int)receptorId, rolReceptor, padre.ComentarioId,"Comentaron: " + dto.Contenido);
+                        _notificacionServicio.Value.NotificarInteraccionComentario((int)receptorId, rolReceptor, padre.ComentarioId,"Comentaron: " + dto.Contenido);
                             };
                 }
             }
             return ConstruirDTO(ObtenerComentarioId(nuevo.ComentarioId));
             }
-
-        public void EditarComentario(int comentarioId, string nuevoContenido, int usuarioId)
+        //Se utiliza unicamente en webapi
+        public void EditarComentario(int comentarioId, string nuevoContenido, int usuarioId, string rol)
         {
             //valido datos
             if (String.IsNullOrEmpty(nuevoContenido)) throw new Exception("El comentario no puede estar vacio");
             //obtengo comentario
-            Comentario comentario = _repo.ObtenerPorId(comentarioId);
-            //verifico que existga
+            Comentario comentario = _repositorioComentario.ObtenerPorId(comentarioId);
+            //verifico que exista
             if (comentario == null) throw new Exception("El comentario no existe o fue eliminado");
+            //valido que sea el autor
+            switch (rol)
+            {
+                case "Cliente":
+                    if (comentario.ClienteId != usuarioId)
+                        throw new Exception("No es el autor del comentario");
+                    break;
+                case "Admin":
+                    if (comentario.AdminId != usuarioId)
+                        throw new Exception("No es el autor del comentario");
+                    break ;
+                case "Profesional":
+                    if (comentario.ProfesionalId != usuarioId)
+                        throw new Exception("No es el autor del comentario");
+                    break;
+                default:
+                    throw new Exception("Tipo de usuario no valido.");
+            }
             //valido si son diferentes lo actualizo
             if (!String.Equals(nuevoContenido, comentario.Contenido)) {
-                _repo.ActualizarContenido(comentarioId, nuevoContenido);
+                _repositorioComentario.ActualizarContenido(comentarioId, nuevoContenido);
             }
-
         }
 
         public void EliminarComentario(int comentarioId, int usuarioId, string rol)
         {
             //este metodo es solo para que se eliminen los comentarios de parte de su autor
             //obtengo comentario
-            Comentario comentario = _repo.ObtenerPorId(comentarioId);
-            _repo.Desactivar(comentarioId);
+            Comentario comentario = _repositorioComentario.ObtenerPorId(comentarioId);
+            _repositorioComentario.Desactivar(comentarioId);
         }
         public void DarLikeComentario(int comentarioId, int usuarioId, string rol)
         {
-            _repo.DarLike(comentarioId, usuarioId, rol);
+            _repositorioComentario.DarLike(comentarioId, usuarioId, rol);
         }
 
         public void QuitarLikeComentario(int comentarioId, int usuarioId, string rol)
         {
-            _repo.QuitarLike(comentarioId, usuarioId, rol);
+            _repositorioComentario.QuitarLike(comentarioId, usuarioId, rol);
         }
 
         public bool UsuarioYaDioLikeComentario(int comentarioId, int usuarioId, string rol)
         {
-            return _repo.UsuarioYaDioLike(comentarioId, usuarioId, rol);
+            return _repositorioComentario.UsuarioYaDioLike(comentarioId, usuarioId, rol);
         }
 
 
@@ -142,6 +164,7 @@ namespace LogicaApp.Servicios
         {
             ComentarioDTO aux = new ComentarioDTO
             {
+                PublicacionId = c.Publicacion.Id,
                 ComentarioId = c.ComentarioId,
                 Contenido = c.Contenido,
                 FechaCreacion = c.FechaCreacion,
@@ -172,15 +195,15 @@ namespace LogicaApp.Servicios
         }
         public int ContarLikesComentario(int id)
         {
-           return _repo.ContarLikes(id);    
+           return _repositorioComentario.ContarLikes(id);    
         }
         public Comentario ObtenerComentarioId(int ComentarioId)
         {
-            return _repo.ObtenerPorId(ComentarioId);
+            return _repositorioComentario.ObtenerPorId(ComentarioId);
         }
         public void Actualizar(Comentario comentario)
         {
-            _repo.Actualizar(comentario);
+            _repositorioComentario.Actualizar(comentario);
         }
     }
 }

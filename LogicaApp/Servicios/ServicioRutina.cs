@@ -17,15 +17,15 @@ namespace LogicaApp.Servicios
 {
     public class ServicioRutina : IRutinaServicio 
     {
-        private readonly IRepositorioRutina repositorioRutina;
-        private readonly IRepositorioEjercicio repositorioEjercicio;
-        private readonly INotificacionServicio notificacionServicio;
+        private readonly IRepositorioRutina _repositorioRutina;
+        private readonly IRepositorioEjercicio _repositorioEjercicio;
+        private readonly INotificacionServicio _notificacionServicio;
 
         public ServicioRutina(IRepositorioRutina repositorioRutina,IRepositorioEjercicio repositorio, INotificacionServicio inotificacionServicio)
         {
-            this.repositorioRutina = repositorioRutina;
-            this.repositorioEjercicio = repositorio;
-            this.notificacionServicio = inotificacionServicio;
+            this._repositorioRutina = repositorioRutina;
+            this._repositorioEjercicio = repositorio;
+            this._notificacionServicio = inotificacionServicio;
         }
 
         public void AsignarRutina(Rutina rutina, Cliente cliente)
@@ -43,51 +43,51 @@ namespace LogicaApp.Servicios
                     RutinaId = rutinaId,
                     FechaAsignacion = DateTime.Now
                 };
-                repositorioRutina.AsignarRutinaACliente(nuevaAsignacion);
-                notificacionServicio.NotificarRutinaAsignada(clienteId, rutinaId);
+                _repositorioRutina.AsignarRutinaACliente(nuevaAsignacion);
+                _notificacionServicio.NotificarRutinaAsignada(clienteId, rutinaId);
             }
         }
         public void ReemplazarAsignaciones(int rutinaId, List<int> nuevosClienteIds)
         {
-            var existentes = repositorioRutina.ObtenerAsignacionesPorRutina(rutinaId);
+            var existentes = _repositorioRutina.ObtenerAsignacionesPorRutina(rutinaId);
 
             // Remover todos los actuales
             foreach (var a in existentes)
             {
-                repositorioRutina.RemoverAsignacion(a.Id);
+                _repositorioRutina.RemoverAsignacion(a.Id);
             }
 
             // Asignar los nuevos
             foreach (var id in nuevosClienteIds)
             {
-                repositorioRutina.AsignarRutinaACliente(new RutinaAsignada
+                _repositorioRutina.AsignarRutinaACliente(new RutinaAsignada
                 {
                     ClienteId = id,
                     RutinaId = rutinaId,
                     FechaAsignacion = DateTime.Now
                 });
-                notificacionServicio.NotificarRutinaAsignada(id, rutinaId);
+                _notificacionServicio.NotificarRutinaAsignada(id, rutinaId);
             }
         }
         public bool EliminarRutina(int rutinaId)
         {
-            Rutina existe = repositorioRutina.ObtenerPorId(rutinaId); 
+            Rutina existe = _repositorioRutina.ObtenerPorId(rutinaId); 
             if (existe == null) return false;
 
-            repositorioRutina.Eliminar(rutinaId);
+            _repositorioRutina.Eliminar(rutinaId);
             return true;
         }
         public bool ClienteTieneRutinaAsignada(int clienteId, int rutinaId)
         {
-            return repositorioRutina.ClienteTieneRutinaAsignada(clienteId, rutinaId);
+            return _repositorioRutina.ClienteTieneRutinaAsignada(clienteId, rutinaId);
         }
         public bool EliminarEjercicio(int ejercicioId)
         {
-            Ejercicio existe = repositorioEjercicio.ObtenerPorId(ejercicioId); 
+            Ejercicio existe = _repositorioEjercicio.ObtenerPorId(ejercicioId); 
             if (existe == null) return false;
             try
             {
-                repositorioEjercicio.Eliminar(ejercicioId);
+                _repositorioEjercicio.Eliminar(ejercicioId);
             }
             catch (Exception e)
             {
@@ -102,13 +102,13 @@ namespace LogicaApp.Servicios
 
         public Rutina GenerarNuevaRutina(Rutina rutina)
         {
-            repositorioRutina.Agregar(rutina);
+            _repositorioRutina.Agregar(rutina);
             return rutina;
         }
 
         public Ejercicio GenerarNuevoEjercicio(Ejercicio ejercicio)
         {
-            repositorioEjercicio.Agregar(ejercicio);
+            _repositorioEjercicio.Agregar(ejercicio);
             return ejercicio ;
         }
 
@@ -116,7 +116,7 @@ namespace LogicaApp.Servicios
         {
             try
             {
-                repositorioEjercicio.Actualizar(ejercicio);
+                _repositorioEjercicio.Actualizar(ejercicio);
             }
             catch (Exception e)
             {
@@ -126,12 +126,12 @@ namespace LogicaApp.Servicios
 
         public void ModificarRutina(Rutina rutina)
         {
-            repositorioRutina.Actualizar(rutina);
+            _repositorioRutina.Actualizar(rutina);
         }
 
         public EjercicioDTO ObtenerEjercicioDTOId(int id)
         {
-            Ejercicio ejercicio = repositorioEjercicio.ObtenerPorId(id);
+            Ejercicio ejercicio = _repositorioEjercicio.ObtenerPorId(id);
             if (ejercicio == null) return null;
             EjercicioDTO e = new EjercicioDTO
             {
@@ -151,37 +151,37 @@ namespace LogicaApp.Servicios
 
         public Ejercicio ObtenerEjercicioId(int id)
         {
-            return repositorioEjercicio.ObtenerPorId(id);
+            return _repositorioEjercicio.ObtenerPorId(id);
         }
 
         public List<EjercicioDTO> ObtenerEjerciciosProfesional(int Id)
         {
-            return MapeoEjercicioDTO(repositorioEjercicio.ObtenerPorProfesional(Id));
+            return MapeoEjercicioDTO(_repositorioEjercicio.ObtenerPorProfesional(Id));
         }
 
         public List<RutinaAsignada> ObtenerRutinasAsignadasCliente(int clienteId)
         {
-            return repositorioRutina.ObtenerAsignacionesPorCliente(clienteId);
+            return _repositorioRutina.ObtenerAsignacionesPorCliente(clienteId);
         }
 
         public List<Rutina> ObtenerRutinasProfesional(int profesionalId)
         {
-           return repositorioRutina.ObtenerPorProfesional(profesionalId);
+           return _repositorioRutina.ObtenerPorProfesional(profesionalId);
         }
 
         public SesionRutina? ObtenerSesionPorId(int sesionId)
         {
-            return repositorioRutina.ObtenerSesionPorId(sesionId);
+            return _repositorioRutina.ObtenerSesionPorId(sesionId);
         }
 
         public List<Rutina> ObtenerTodasRutinas()
         {
-            return repositorioRutina.ObtenerTodos().ToList();
+            return _repositorioRutina.ObtenerTodos().ToList();
         }
 
         public List<EjercicioDTO> ObtenerTodosEjercicios()
         {
-            return MapeoEjercicioDTO(repositorioEjercicio.ObtenerTodos().ToList());
+            return MapeoEjercicioDTO(_repositorioEjercicio.ObtenerTodos().ToList());
         }
 
         public SesionRutina RegistrarSesion(SesionRutina sesion)
@@ -189,7 +189,7 @@ namespace LogicaApp.Servicios
             if (sesion == null)
                 throw new Exception("La sesión no puede ser nula");
 
-            var rutinaAsignada = repositorioRutina.ObtenerAsignacion((int)sesion.RutinaAsignadaId);
+            var rutinaAsignada = _repositorioRutina.ObtenerAsignacion((int)sesion.RutinaAsignadaId);
             if (rutinaAsignada == null)
                 throw new Exception("No se encontró la rutina asignada");
 
@@ -205,7 +205,7 @@ namespace LogicaApp.Servicios
 
             foreach (var ej in sesion.EjerciciosRealizados)
             {
-                var ejercicioOriginal = repositorioEjercicio.ObtenerPorId((int)ej.EjercicioId);
+                var ejercicioOriginal = _repositorioEjercicio.ObtenerPorId((int)ej.EjercicioId);
                 if (ejercicioOriginal == null)
                     throw new Exception($"No se encontró el ejercicio con ID {ej.EjercicioId}");
 
@@ -232,20 +232,20 @@ namespace LogicaApp.Servicios
             }
 
             sesion.FechaRealizada = DateTime.Now;
-            return repositorioRutina.RegistrarSesion(sesion);
+            return _repositorioRutina.RegistrarSesion(sesion);
         }
 
         public void ActualizarEjerciciosRutina(Rutina rutina, List<int> nuevosIds)
         {
-            repositorioRutina.ActualizarRutina(rutina, nuevosIds);
+            _repositorioRutina.ActualizarRutina(rutina, nuevosIds);
         }
         public List<SesionRutina> ObtenerSesionesPorAsignacion(int rutinaAsignadaId)
         {
-            return repositorioRutina.ObtenerSesionesPorAsignacion(rutinaAsignadaId);
+            return _repositorioRutina.ObtenerSesionesPorAsignacion(rutinaAsignadaId);
         }
         public void RemoverAsignacion(int rutinaAsignadaId)
         {
-            repositorioRutina.RemoverAsignacion(rutinaAsignadaId);
+            _repositorioRutina.RemoverAsignacion(rutinaAsignadaId);
         }
 
         private List<EjercicioDTO> MapeoEjercicioDTO(List<Ejercicio> Lista)
@@ -270,22 +270,22 @@ namespace LogicaApp.Servicios
 
         public Rutina ObtenerRutinaPorId(int id)
         {
-            return repositorioRutina.ObtenerPorId(id);
+            return _repositorioRutina.ObtenerPorId(id);
         }
 
         public List<RutinaAsignada> ObtenerAsignacionesPorRutina(int rutinaId)
         {
-            return repositorioRutina.ObtenerAsignacionesPorRutina(rutinaId);
+            return _repositorioRutina.ObtenerAsignacionesPorRutina(rutinaId);
         }
         public RutinaAsignadaDTO ObtenerDetalleRutinaAsignadaDTO(int rutinaAsignadaId, int clienteId)
         {
-            var asignacion = repositorioRutina.ObtenerAsignacionesPorCliente(clienteId)
+            var asignacion = _repositorioRutina.ObtenerAsignacionesPorCliente(clienteId)
                 .FirstOrDefault(a => a.Id == rutinaAsignadaId && a.ClienteId == clienteId);
 
             if (asignacion == null) return null;
 
-            var rutina = repositorioRutina.ObtenerPorId(asignacion.RutinaId);
-            var sesiones = repositorioRutina.ObtenerSesionesPorAsignacion(rutinaAsignadaId);
+            var rutina = _repositorioRutina.ObtenerPorId(asignacion.RutinaId);
+            var sesiones = _repositorioRutina.ObtenerSesionesPorAsignacion(rutinaAsignadaId);
 
             var dto = new RutinaAsignadaDTO
             {
@@ -314,7 +314,7 @@ namespace LogicaApp.Servicios
         public List<SesionEntrenadaDTO> ObtenerHistorialClienteDTO(int clienteId)
         {
             List<SesionEntrenadaDTO> salida = new List<SesionEntrenadaDTO>();
-            foreach (var sesion in repositorioRutina.ObtenerSesionesPorCliente(clienteId))
+            foreach (var sesion in _repositorioRutina.ObtenerSesionesPorCliente(clienteId))
             {
 
                 SesionEntrenadaDTO aux = new SesionEntrenadaDTO
@@ -337,21 +337,23 @@ namespace LogicaApp.Servicios
         }
         public string ObtenerNombreRutina(int idRutina)
         {
-            Rutina salida = repositorioRutina.ObtenerPorId(idRutina);
+            Rutina salida = _repositorioRutina.ObtenerPorId(idRutina);
 
             return salida.NombreRutina;
         }
 
         public List<SesionRutina> ObtenerSesionesCliente(int clienteId)
         {
-            return repositorioRutina.ObtenerSesionesPorCliente(clienteId);
+            return _repositorioRutina.ObtenerSesionesPorCliente(clienteId);
         }
 
         public SesionEntrenadaDTO ObtenerSesionEntrenamiento(int sesionId)
         {
-            SesionRutina sesion = repositorioRutina.ObtenerSesionPorId(sesionId);
+            SesionRutina sesion = _repositorioRutina.ObtenerSesionPorId(sesionId);
             SesionEntrenadaDTO dto = new SesionEntrenadaDTO
             {
+                SesionRutinaId = sesion.Id,
+                SeRealizo = true,
                 NombreRutina =  sesion.NombreRutinaHistorial,
                 FechaRealizada = sesion.FechaRealizada,
                 DuracionMin = sesion.DuracionMin,

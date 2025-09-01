@@ -27,6 +27,12 @@ body {
     color: #fff;
     font-family: 'Segoe UI', sans-serif;
 }
+aside {
+    position: sticky;
+    top: 70px;
+    height: calc(100vh - 70px);
+    overflow-y: auto;
+}
 
 /* ========== Fuentes ========== */
 h1, h2, h3, .titulo {

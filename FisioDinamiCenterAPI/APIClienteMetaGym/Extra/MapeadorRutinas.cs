@@ -30,7 +30,6 @@ namespace APIClienteMetaGym.Extra
             }
             return salida;
         }
-
         private List<string> DevolverURLS(List<Media> medias)
         {
             List<string> urls = new List<string>();

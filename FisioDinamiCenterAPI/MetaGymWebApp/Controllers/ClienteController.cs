@@ -15,17 +15,17 @@ namespace MetaGymWebApp.Controllers
     [AutorizacionRol("Admin", "Cliente","Profesional")]
     public class ClienteController : Controller
     {
-        private readonly IUsuarioServicio usuarioServicio;
-        private readonly ICitaServicio citaServicio;
-        private readonly IExtraServicio extraServicio;
-        private readonly IRutinaServicio rutinaServicio;
+        private readonly IUsuarioServicio _usuarioServicio;
+        private readonly ICitaServicio _citaServicio;
+        private readonly IExtraServicio _extraServicio;
+        private readonly IRutinaServicio _rutinaServicio;
 
         public ClienteController(IUsuarioServicio usuarioServicio, ICitaServicio citaServicio, IExtraServicio extraServicio, IRutinaServicio rutinaServicio)
         {
-            this.usuarioServicio = usuarioServicio;
-            this.citaServicio = citaServicio;
-            this.extraServicio = extraServicio;
-            this.rutinaServicio = rutinaServicio;
+            this._usuarioServicio = usuarioServicio;
+            this._citaServicio = citaServicio;
+            this._extraServicio = extraServicio;
+            this._rutinaServicio = rutinaServicio;
         }
 
         public IActionResult Index()
@@ -54,9 +54,9 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult GenerarConsultaCita()
         {
-            var especialidades = extraServicio.ObtenerEspecialidadesDTO(); // devuelve List<EspecialidadDTO>
-            var establecimientos = extraServicio.ObtenerEstablecimientosDTO(); // List<EstablecimientoDTO>
-            var tiposAtencion = extraServicio.ObtenerTiposAtencionDTO(); // List<TipoAtencionDTO>
+            var especialidades = _extraServicio.ObtenerEspecialidadesDTO(); // devuelve List<EspecialidadDTO>
+            var establecimientos = _extraServicio.ObtenerEstablecimientosDTO(); // List<EstablecimientoDTO>
+            var tiposAtencion = _extraServicio.ObtenerTiposAtencionDTO(); // List<TipoAtencionDTO>
 
             var modelo = new GenerarCitaModelo
             {
@@ -83,7 +83,7 @@ namespace MetaGymWebApp.Controllers
                 if (vm.Cita.FechaAsistencia < DateTime.Today) throw new Exception("La fecha deseada debe ser posterior a hoy.");
                 if (vm.Cita.TipoAtencionId == 0) throw new Exception("Debe seleccionar un tipo de atención.");
 
-                citaServicio.GenerarNuevaCita(vm.Cita);
+                _citaServicio.GenerarNuevaCita(vm.Cita);
                 return RedirectToAction("MisCitas");
             }
             catch (Exception e)
@@ -92,9 +92,9 @@ namespace MetaGymWebApp.Controllers
                 TempData["TipoMensaje"] = "danger";
 
                 // Recargo el modelo para la vista
-                vm.Especialidades = extraServicio.ObtenerEspecialidadesDTO();
-                vm.Establecimientos = extraServicio.ObtenerEstablecimientosDTO();
-                vm.TiposAtencion = extraServicio.ObtenerTiposAtencionDTO();
+                vm.Especialidades = _extraServicio.ObtenerEspecialidadesDTO();
+                vm.Establecimientos = _extraServicio.ObtenerEstablecimientosDTO();
+                vm.TiposAtencion = _extraServicio.ObtenerTiposAtencionDTO();
 
                 return View(vm);
             }
@@ -105,7 +105,7 @@ namespace MetaGymWebApp.Controllers
         {
             //Obtengo ID y Citas
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            var citas = citaServicio.SolicitarHistorialCliente(clienteId);
+            var citas = _citaServicio.SolicitarHistorialCliente(clienteId);
 
             //Mapeo a DTO
             var dtoList = citas.Select(c => new CitaDTO
@@ -131,7 +131,7 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult VerDetalleCita(int id)
         {
-            var cita = citaServicio.ObtenerPorId(id);
+            var cita = _citaServicio.ObtenerPorId(id);
 
             if (cita == null || cita.ClienteId != GestionSesion.ObtenerUsuarioId(HttpContext))
             {
@@ -178,7 +178,7 @@ namespace MetaGymWebApp.Controllers
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
             //Obtengo rutinas del cliente
-            List<RutinaAsignada> asignaciones = rutinaServicio.ObtenerRutinasAsignadasCliente(clienteId);
+            List<RutinaAsignada> asignaciones = _rutinaServicio.ObtenerRutinasAsignadasCliente(clienteId);
             return View(asignaciones);
         }
         [HttpGet]
@@ -186,7 +186,7 @@ namespace MetaGymWebApp.Controllers
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
             //OBtengo rutina del repo
-            var dto = rutinaServicio.ObtenerDetalleRutinaAsignadaDTO(id, clienteId);
+            var dto = _rutinaServicio.ObtenerDetalleRutinaAsignadaDTO(id, clienteId);
             //Devuelvo a menu si no existe
             if (dto == null)
             {
@@ -201,16 +201,14 @@ namespace MetaGymWebApp.Controllers
         public IActionResult SesionEntrenada(int id)
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            SesionRutina sesion = rutinaServicio.ObtenerSesionPorId(id);
+            SesionRutina sesion = _rutinaServicio.ObtenerSesionPorId(id);
 
-            // Si la rutina asignada existe, la traemos; si no, es snapshot
             Rutina rutina = sesion.RutinaAsignada != null
-                ? rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignada.RutinaId)
+                ? _rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignada.RutinaId)
                 : null;
 
             if (rutina != null)
             {
-                // Vincular ejercicios reales solo si la rutina original existe
                 foreach (var er in sesion.EjerciciosRealizados)
                 {
                     er.Ejercicio = rutina.Ejercicios
@@ -230,7 +228,7 @@ namespace MetaGymWebApp.Controllers
                     Nombre = er.NombreHistorial,
                     Tipo = er.TipoHistorial,
                     GrupoMuscular = er.GrupoMuscularHistorial,
-
+                    SeRealizo =er.SeRealizo,
                     ImagenURL = rutina != null
                         ? er.Ejercicio?.Medias.FirstOrDefault()?.Url
                         : er.ImagenUrlHistorial, // snapshot
@@ -259,7 +257,7 @@ namespace MetaGymWebApp.Controllers
         {
             int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
 
-            var sesiones = rutinaServicio.ObtenerHistorialClienteDTO(clienteId);
+            var sesiones = _rutinaServicio.ObtenerHistorialClienteDTO(clienteId);
 
             var modeloOrdenado = sesiones
                 .OrderByDescending(s => s.FechaRealizada)
@@ -278,7 +276,7 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult InformacionEjercicio(int id)
         {
-            var dto = rutinaServicio.ObtenerEjercicioDTOId(id);
+            var dto = _rutinaServicio.ObtenerEjercicioDTOId(id);
             if (dto == null)
             {
                 TempData["Mensaje"] = "El ejercicio no fue encontrado.";

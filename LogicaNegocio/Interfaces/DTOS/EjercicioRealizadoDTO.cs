@@ -9,6 +9,7 @@ namespace LogicaNegocio.Interfaces.DTOS
     public class EjercicioRealizadoDTO
     {
         public string Nombre { get; set; }
+        public bool SeRealizo { get; set; }
         public string Tipo { get; set; }
         public string GrupoMuscular { get; set; }
         public string? ImagenURL { get; set; }

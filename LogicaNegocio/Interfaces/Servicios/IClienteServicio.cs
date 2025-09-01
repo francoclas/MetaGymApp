@@ -12,9 +12,6 @@ namespace LogicaNegocio.Interfaces.Servicios
     {
         void ActualizarCliente(Cliente cliente);
         Cliente ObtenerPorId(int id);
-
-        //Datos personales
-
         List<Cliente> ObtenerTodos();
         List<ClienteDTO> ObtenerTodosDTO();
     }

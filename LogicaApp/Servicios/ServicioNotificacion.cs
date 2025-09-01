@@ -13,15 +13,15 @@ namespace LogicaApp.Servicios
 {
     public class ServicioNotificacion : INotificacionServicio
     {
-        private readonly IRepositorioNotificacion _repo;
+        private readonly IRepositorioNotificacion _repositorioNotificacion;
 
         public ServicioNotificacion(IRepositorioNotificacion repo)
         {
-            _repo = repo;
+            _repositorioNotificacion = repo;
         }
         public void NotificacionPersonalizada(int usuarioId, string rol, Notificacion nueva)
         {
-            _repo.Crear(nueva);
+            _repositorioNotificacion.Crear(nueva);
             AsignarUsuario(nueva, usuarioId,rol);
         }
 
@@ -37,7 +37,7 @@ namespace LogicaApp.Servicios
                 Fecha = DateTime.Now,
                 Leido = false
             };
-            _repo.Crear(noti);
+            _repositorioNotificacion.Crear(noti);
         }
 
         public void NotificarComentario(int usuarioId, string rol, int publicacionId, string mensaje)
@@ -53,7 +53,7 @@ namespace LogicaApp.Servicios
             };
 
             AsignarUsuario(noti, usuarioId, rol);
-            _repo.Crear(noti);
+            _repositorioNotificacion.Crear(noti);
         }
 
         public void NotificarInteraccionComentario(int usuarioId, string rol, int comentarioId, string mensaje)
@@ -69,7 +69,7 @@ namespace LogicaApp.Servicios
             };
 
             AsignarUsuario(noti, usuarioId, rol);
-            _repo.Crear(noti);
+            _repositorioNotificacion.Crear(noti);
         }
 
         public void NotificarCitaEstado(int usuarioId, string rol, int citaId, string nuevoEstado)
@@ -85,7 +85,7 @@ namespace LogicaApp.Servicios
             };
 
             AsignarUsuario(noti, usuarioId, rol);
-            _repo.Crear(noti);
+            _repositorioNotificacion.Crear(noti);
         }
         private void AsignarUsuario(Notificacion n, int id, string rol)
         {
@@ -105,20 +105,20 @@ namespace LogicaApp.Servicios
         }
         public void MarcarTodasComoLeidas(int usuarioId, string rol)
         {
-            var notis = _repo.ObtenerPorUsuario(usuarioId, rol);
+            var notis = _repositorioNotificacion.ObtenerPorUsuario(usuarioId, rol);
             foreach (var n in notis.Where(n => !n.Leido))
             {
-                _repo.MarcarComoLeida(n.Id);
+                _repositorioNotificacion.MarcarComoLeida(n.Id);
             }
         }
         public void MarcarComoLeida(int notificacionId)
         {
-            _repo.MarcarComoLeida(notificacionId);
+            _repositorioNotificacion.MarcarComoLeida(notificacionId);
         }
 
         public List<NotificacionDTO> ObtenerUltimas(int usuarioId, string rol, int cantidad = 5)
         {
-            var salida = _repo.ObtenerPorUsuario(usuarioId, rol)
+            var salida = _repositorioNotificacion.ObtenerPorUsuario(usuarioId, rol)
                 .OrderByDescending(n => n.Fecha)
                 .Take(cantidad)
                 .ToList();
@@ -139,7 +139,7 @@ namespace LogicaApp.Servicios
         }
         public List<NotificacionDTO> ObtenerPorUsuario(int usuarioId, string rol, Enum_TipoNotificacion? tipo = null)
         {
-            var notis = _repo.ObtenerPorUsuario(usuarioId, rol, tipo);
+            var notis = _repositorioNotificacion.ObtenerPorUsuario(usuarioId, rol, tipo);
             return notis.Select(n => new NotificacionDTO
             {
                 Id = n.Id,
@@ -157,13 +157,13 @@ namespace LogicaApp.Servicios
 
         public int ContarNoLeidas(int usuarioId, string rol, Enum_TipoNotificacion? tipo = null)
         {
-            var notis = _repo.ObtenerPorUsuario(usuarioId, rol, tipo);
+            var notis = _repositorioNotificacion.ObtenerPorUsuario(usuarioId, rol, tipo);
             return notis.Count(n => !n.Leido);
         }
 
         public List<NotificacionDTO> ObtenerLeidasUsuario(int usuarioId, string rolUsuario)
         {
-            var salida = _repo.ObtenerLeidasUsuario(usuarioId, rolUsuario)
+            var salida = _repositorioNotificacion.ObtenerLeidasUsuario(usuarioId, rolUsuario)
                 .OrderByDescending(n => n.Fecha).ToList();
 
             return salida.Select(n => new NotificacionDTO {
@@ -182,7 +182,7 @@ namespace LogicaApp.Servicios
 
         public List<NotificacionDTO> ObtenerNoLeidasUsuario(int usuarioId, string rolUsuario)
         {
-            var salida = _repo.ObtenerNoLeidasUsuario(usuarioId, rolUsuario)
+            var salida = _repositorioNotificacion.ObtenerNoLeidasUsuario(usuarioId, rolUsuario)
                .OrderByDescending(n => n.Fecha).ToList();
 
             return salida.Select(n => new NotificacionDTO

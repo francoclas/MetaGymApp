@@ -6,6 +6,7 @@ function inicializarCalendario(urlEventos, businessHoursConfig) {
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'timeGridWeek',
         locale: 'es',
+        timeZone: 'local',
         allDaySlot: false,
         slotDuration: '00:30:00',
         businessHours: businessHoursConfig,
@@ -47,7 +48,13 @@ function inicializarCalendario(urlEventos, businessHoursConfig) {
         // Drag para mover cita
         eventDrop: function (info) {
             if (confirm("¿Desea reprogramar esta cita a la nueva fecha y hora?")) {
-                var nuevaFecha = info.event.start.toISOString();
+                let fecha = info.event.start;
+                let nuevaFecha = fecha.getFullYear() + "-" +
+                    String(fecha.getMonth() + 1).padStart(2, '0') + "-" +
+                    String(fecha.getDate()).padStart(2, '0') + "T" +
+                    String(fecha.getHours()).padStart(2, '0') + ":" +
+                    String(fecha.getMinutes()).padStart(2, '0') + ":" +
+                    String(fecha.getSeconds()).padStart(2, '0');
                 $.post('/Profesional/ReprogramarCita', { citaId: info.event.id, nuevaFecha: nuevaFecha })
                     .done(() => alert("Cita reprogramada"))
                     .fail(() => {

@@ -8,14 +8,14 @@ namespace MetaGymWebApp.Controllers
 {
     public class PublicacionController : Controller
     {   
-        private readonly IPublicacionServicio publicacionServicio;
-        private readonly IUsuarioServicio usuarioServicio;
-        private readonly IComentarioServicio comentarioServicio;
+        private readonly IPublicacionServicio _publicacionServicio;
+        private readonly IUsuarioServicio _usuarioServicio;
+        private readonly IComentarioServicio _comentarioServicio;
         public PublicacionController(IPublicacionServicio publicacionServicio, IUsuarioServicio usuarioServicio, IComentarioServicio comentarioServicio)
         {
-            this.publicacionServicio = publicacionServicio;
-            this.usuarioServicio = usuarioServicio;
-            this.comentarioServicio = comentarioServicio;
+            this._publicacionServicio = publicacionServicio;
+            this._usuarioServicio = usuarioServicio;
+            this._comentarioServicio = comentarioServicio;
         }
 
         public IActionResult Index()
@@ -26,7 +26,7 @@ namespace MetaGymWebApp.Controllers
 
         public IActionResult Inicio()
         {
-            List<PublicacionDTO> publicaciones = publicacionServicio.ObtenerPublicacionesInicio();
+            List<PublicacionDTO> publicaciones = _publicacionServicio.ObtenerPublicacionesInicio();
             ViewBag.Rol = GestionSesion.ObtenerRol(HttpContext);
             return View("Inicio", publicaciones);
         }
@@ -38,7 +38,7 @@ namespace MetaGymWebApp.Controllers
             int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
             string rol = GestionSesion.ObtenerRol(HttpContext);
 
-            var dto = usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId, rol);
+            var dto = _usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId, rol);
             return View(dto);
         }
 
@@ -49,7 +49,7 @@ namespace MetaGymWebApp.Controllers
         {
             int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
             string rol = GestionSesion.ObtenerRol(HttpContext);
-            if (publicacionServicio.UsuarioYaDioLikePublicacion(id,usuarioId,rol))
+            if (_publicacionServicio.UsuarioYaDioLikePublicacion(id,usuarioId,rol))
             {
                 QuitarLike(id);
             }
@@ -64,14 +64,14 @@ namespace MetaGymWebApp.Controllers
                     int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
                     string rol = GestionSesion.ObtenerRol(HttpContext);
 
-                    publicacionServicio.DarLikePublicacion(id, usuarioId, rol);
+                    _publicacionServicio.DarLikePublicacion(id, usuarioId, rol);
                 }
         public void QuitarLike(int id)
         {
             int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
             string rol = GestionSesion.ObtenerRol(HttpContext);
 
-            publicacionServicio.QuitarLikePublicacion(id, usuarioId, rol);
+            _publicacionServicio.QuitarLikePublicacion(id, usuarioId, rol);
         }
         [AutorizacionRol("Admin","Profesional","Cliente")]
         [HttpPost]
@@ -80,7 +80,7 @@ namespace MetaGymWebApp.Controllers
             int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
             string rol = GestionSesion.ObtenerRol(HttpContext);
 
-            comentarioServicio.DarLikeComentario(id, usuarioId, rol);
+            _comentarioServicio.DarLikeComentario(id, usuarioId, rol);
             return Redirect(Request.Headers["Referer"].ToString());
         }
         [AutorizacionRol("Admin", "Profesional", "Cliente")]
@@ -91,7 +91,7 @@ namespace MetaGymWebApp.Controllers
             int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
             string rol = GestionSesion.ObtenerRol(HttpContext);
 
-            comentarioServicio.QuitarLikeComentario(id, usuarioId, rol);
+            _comentarioServicio.QuitarLikeComentario(id, usuarioId, rol);
             return Redirect(Request.Headers["Referer"].ToString());
         }
         [AutorizacionRol("Admin", "Profesional", "Cliente")]
@@ -111,7 +111,7 @@ namespace MetaGymWebApp.Controllers
                 ComentarioPadreId = comentarioPadreId
             };
 
-            comentarioServicio.AgregarComentario(comentario);
+            _comentarioServicio.AgregarComentario(comentario);
 
             return RedirectToAction("Inicio");
         }
@@ -119,14 +119,14 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult Novedades()
         {
-            List<PublicacionDTO> Publicaciones = publicacionServicio.ObtenerNovedades();
+            List<PublicacionDTO> Publicaciones = _publicacionServicio.ObtenerNovedades();
             return View(Publicaciones);
         }
         [AutorizacionRol("Admin")]
         [HttpPost]
         public IActionResult OcultarComentario(int comentarioId)
         {
-            publicacionServicio.OcultarComentario(comentarioId);
+            _publicacionServicio.OcultarComentario(comentarioId);
             TempData["Mensaje"] = "Se actualizo el comentario.";
             TempData["TipoMensaje"] = "danger";
             return RedirectToAction("Inicio");

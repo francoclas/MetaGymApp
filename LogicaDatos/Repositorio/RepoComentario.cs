@@ -33,13 +33,14 @@ namespace LogicaDatos.Repositorio
         public Comentario ObtenerPorId(int comentarioId)
         {
             return _context.Comentarios
+                .Include(c => c.Publicacion)
                 .Include(c => c.Profesional)
                     .ThenInclude(P => P.FotosPerfil)
                 .Include(c => c.Cliente)
                     .ThenInclude(C => C.FotosPerfil)
                 .Include(c => c.Admin)
                     .ThenInclude(A => A.FotosPerfil)
-
+                .Include(c => c.ComentarioPadre)
                 .Include(c => c.Respuestas)
                 .FirstOrDefault(c => c.ComentarioId == comentarioId);
         }

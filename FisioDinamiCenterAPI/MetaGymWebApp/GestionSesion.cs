@@ -6,7 +6,6 @@ namespace MetaGymWebApp
     public static class GestionSesion
     {
         private const string CLAVE_SESION = "SesionUsuario";
-
         public static void SetearSesion(HttpContext httpContext, SesionDTO sesion)
         {
             var json = JsonSerializer.Serialize(sesion);

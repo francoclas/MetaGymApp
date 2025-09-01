@@ -12,48 +12,48 @@ namespace LogicaApp.Servicios
 {
     public class ServicioAgenda : IAgendaServicio
     {
-        private readonly IRepositorioAgenda _repo;
+        private readonly IRepositorioAgenda _repositorioAgenda;
 
         public ServicioAgenda(IRepositorioAgenda repo)
         {
-            _repo = repo;
+            _repositorioAgenda = repo;
         }
 
         public void RegistrarAgenda(AgendaProfesional agenda)
         {
-            if (_repo.ExisteAgendaEnHorario(agenda.ProfesionalId, agenda.Dia, agenda.HoraInicio, agenda.HoraFin))
+            if (_repositorioAgenda.ExisteAgendaEnHorario(agenda.ProfesionalId, agenda.Dia, agenda.HoraInicio, agenda.HoraFin))
                 throw new Exception("Ya existe una agenda en ese horario para ese día.");
-            _repo.RegistrarAgenda(agenda);
+            _repositorioAgenda.RegistrarAgenda(agenda);
         }
 
         public List<AgendaProfesional> ObtenerAgendaDelProfesional(int profesionalId)
         {
-            return _repo.ObtenerAgendaDelProfesional(profesionalId);
+            return _repositorioAgenda.ObtenerAgendaDelProfesional(profesionalId);
         }
 
         public void EliminarAgenda(int agendaId)
         {
-            _repo.EliminarAgenda(agendaId);
+            _repositorioAgenda.EliminarAgenda(agendaId);
         }
 
         public AgendaProfesional ObtenerPorId(int id)
         {
-            return _repo.ObtenerPorId(id);
+            return _repositorioAgenda.ObtenerPorId(id);
         }
 
         public void ActualizarAgenda(AgendaProfesional agenda)
         {
-            _repo.ActualizarAgenda(agenda);
+            _repositorioAgenda.ActualizarAgenda(agenda);
         }
 
         public bool ExisteAgendaEnHorario(int profesionalId, Enum_DiaSemana dia, TimeSpan horaInicio, TimeSpan horaFin)
         {
-            return _repo.ExisteAgendaEnHorario(profesionalId, dia, horaInicio, horaFin);
+            return _repositorioAgenda.ExisteAgendaEnHorario(profesionalId, dia, horaInicio, horaFin);
         }
 
         public List<AgendaProfesional> BuscarAgendaPorDia(int profesionalId, Enum_DiaSemana dia)
         {
-            return _repo.BuscarAgendaPorDia(profesionalId, dia);
+            return _repositorioAgenda.BuscarAgendaPorDia(profesionalId, dia);
         }
     }
 

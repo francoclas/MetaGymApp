@@ -12,29 +12,29 @@ namespace LogicaApp.Servicios
 {
     public class ServicioCliente : IClienteServicio
     {
-        private readonly IRepositorioCliente _repoCliente;
+        private readonly IRepositorioCliente _repositorioCliente;
         public ServicioCliente(IRepositorioCliente repocli) {
-            _repoCliente = repocli;
+            _repositorioCliente = repocli;
         }
 
         public void ActualizarCliente(Cliente cliente)
         {
-            _repoCliente.Actualizar(cliente);
+            _repositorioCliente.Actualizar(cliente);
         }
 
         public Cliente ObtenerPorId(int id)
         {
-            return _repoCliente.ObtenerPorId(id);
+            return _repositorioCliente.ObtenerPorId(id);
         }
 
         public List<Cliente> ObtenerTodos()
         {
-            return _repoCliente.ObtenerTodos().ToList();
+            return _repositorioCliente.ObtenerTodos().ToList();
         }
 
         public List<ClienteDTO> ObtenerTodosDTO()
         {
-            return _repoCliente.ObtenerTodos()
+            return _repositorioCliente.ObtenerTodos()
         .Select(c => new ClienteDTO
         {
             Id = c.Id,

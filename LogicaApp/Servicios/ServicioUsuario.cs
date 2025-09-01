@@ -6,40 +6,40 @@ using LogicaNegocio.Interfaces.Servicios;
 using LogicaDatos.Interfaces.Repos;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Extra;
+using System.Text.RegularExpressions;
 namespace LogicaNegocio.Servicios
 {
     public class ServicioUsuario : IUsuarioServicio
     {
         //Acceso repo
-        private readonly IRepositorioCliente repoCliente;
-
-        private readonly IRepositorioProfesional repoProfesional;
-
-        private readonly IRepositorioAdmin repoAdmin;
-        private readonly IMediaServicio mediaServicio;
+        private readonly IRepositorioCliente _repositorioCliente;
+        private readonly IRepositorioProfesional _repositorioProfesional;
+        private readonly IRepositorioAdmin _repositorioAdmin;
+        private readonly IMediaServicio _mediaServicio;
 
         public ServicioUsuario(IRepositorioCliente rCli, IRepositorioAdmin rAdm,IRepositorioProfesional rPro, IMediaServicio mediaServicio)
         {
-            repoCliente = rCli;
-            repoAdmin = rAdm;
-            repoProfesional = rPro;
-            this.mediaServicio = mediaServicio;
+            _repositorioCliente = rCli;
+            _repositorioAdmin = rAdm;
+            _repositorioProfesional = rPro;
+            this._mediaServicio = mediaServicio;
         }
         public void CambiarTelefono(int IdCliente, string Usuario, string NumeroNuevo)
         {
-            Cliente cliente = repoCliente.ObtenerPorId(IdCliente);
-
+            Cliente cliente = _repositorioCliente.ObtenerPorId(IdCliente);
+            if (string.IsNullOrWhiteSpace(NumeroNuevo) ||
+            !Regex.IsMatch(NumeroNuevo.Replace(" ", "").Replace("-", ""), @"^\+?\d{8,15}$"))
+                throw new ArgumentException("Número de teléfono inválido.");
             if (cliente == null || cliente.NombreUsuario != Usuario)
                 throw new Exception("Cliente no encontrado o usuario inválido.");
-
             cliente.Telefono = NumeroNuevo;
-            repoCliente.Actualizar(cliente);
-            repoCliente.GuardarCambios();
+            _repositorioCliente.Actualizar(cliente);
+            _repositorioCliente.GuardarCambios();
         }
 
         public void CambiarCorreo(int IdCliente, string Usuario, string Correo)
         {
-            Cliente cliente = repoCliente.ObtenerPorId(IdCliente);
+            Cliente cliente = _repositorioCliente.ObtenerPorId(IdCliente);
 
             if (cliente == null || cliente.NombreUsuario != Usuario)
                 throw new Exception("Cliente no encontrado o usuario inválido.");
@@ -47,20 +47,20 @@ namespace LogicaNegocio.Servicios
                 throw new Exception("Verifique el correo ingresado.");
 
             cliente.Correo = Correo;
-            repoCliente.Actualizar(cliente);
-            repoCliente.GuardarCambios();
+            _repositorioCliente.Actualizar(cliente);
+            _repositorioCliente.GuardarCambios();
         }
 
         public void CambiarNombre(int IdCliente, string Usuario, string Nombre)
         {
-            Cliente cliente = repoCliente.ObtenerPorId(IdCliente);
+            Cliente cliente = _repositorioCliente.ObtenerPorId(IdCliente);
 
             if (cliente == null || cliente.NombreUsuario != Usuario)
                 throw new Exception("Cliente no encontrado o usuario inválido.");
 
             cliente.NombreCompleto = Nombre;
-            repoCliente.Actualizar(cliente);
-            repoCliente.GuardarCambios();
+            _repositorioCliente.Actualizar(cliente);
+            _repositorioCliente.GuardarCambios();
         }
 
         public void CambiarPass(int IdCliente, string Usuario, string NuevaPassword, string ConfPassword)
@@ -70,13 +70,13 @@ namespace LogicaNegocio.Servicios
             if (!FuncionesAuxiliares.EsContrasenaValida(NuevaPassword))
                 throw new Exception("Pruebe con otra contraseña");
 
-            Cliente cliente = repoCliente.ObtenerPorId(IdCliente);
+            Cliente cliente = _repositorioCliente.ObtenerPorId(IdCliente);
             if (cliente == null || cliente.NombreUsuario != Usuario)
                 throw new Exception("Cliente no encontrado o usuario inválido.");
 
             cliente.Pass = HashContrasena.Hashear(NuevaPassword);
-            repoCliente.Actualizar(cliente);
-            repoCliente.GuardarCambios();
+            _repositorioCliente.Actualizar(cliente);
+            _repositorioCliente.GuardarCambios();
         }
 
         public void CrearAdmin(string Ci, string Usuario,string NombreCompleto, string Correo,string Password, string Telefono)
@@ -89,7 +89,7 @@ namespace LogicaNegocio.Servicios
             VerificarUsuarioRepetido(Usuario, Correo);
             ExisteCI(Ci);
             //Cargo a repo
-            repoAdmin.Agregar(NuevoAdmin);
+            _repositorioAdmin.Agregar(NuevoAdmin);
         }
 
         public void CrearCliente(string Ci, string NombreUsuario, string NombreCompleto, string Correo, string Password, string Telefono)
@@ -107,7 +107,7 @@ namespace LogicaNegocio.Servicios
             VerificarUsuarioRepetido(NombreUsuario, Correo);
             ExisteCI(Ci);
             //Cargo en el sistema
-            repoCliente.Agregar(NuevoCliente);
+            _repositorioCliente.Agregar(NuevoCliente);
         }
 
         public void CrearProfesional(string Ci, string Usuario, string NombreCompleto, string Correo, string Password,string Telefono)
@@ -125,13 +125,13 @@ namespace LogicaNegocio.Servicios
             VerificarUsuarioRepetido(Usuario, Correo);
             ExisteCI(Ci);
             //Lo cargo al sistema
-            repoProfesional.Agregar(NuevoProfesional);
+            _repositorioProfesional.Agregar(NuevoProfesional);
         }
 
         public SesionDTO IniciarSesion(LoginDTO login)
         {
             // Reviso en Admin
-            var admin = repoAdmin.ObtenerPorUsuario(login.NombreUsuario);
+            var admin = _repositorioAdmin.ObtenerPorUsuario(login.NombreUsuario);
             if (admin != null && HashContrasena.Verificar(admin.Pass, login.Password))
             {
                 if (!admin.UsuarioActivo)
@@ -147,7 +147,7 @@ namespace LogicaNegocio.Servicios
             }
 
             // Reviso en Profesional
-            var profesional = repoProfesional.ObtenerPorUsuario(login.NombreUsuario);
+            var profesional = _repositorioProfesional.ObtenerPorUsuario(login.NombreUsuario);
             if (profesional != null && HashContrasena.Verificar(profesional.Pass, login.Password))
             {
                 if (!profesional.UsuarioActivo)
@@ -163,7 +163,7 @@ namespace LogicaNegocio.Servicios
             }
 
             // Reviso en Cliente
-            var cliente = repoCliente.ObtenerPorUsuario(login.NombreUsuario);
+            var cliente = _repositorioCliente.ObtenerPorUsuario(login.NombreUsuario);
             if (cliente != null && HashContrasena.Verificar(cliente.Pass, login.Password))
             {
                 if (!cliente.UsuarioActivo)
@@ -183,7 +183,7 @@ namespace LogicaNegocio.Servicios
 
         public SesionDTO IniciarSesionCliente(LoginDTO login)
         {
-            Cliente cliente = repoCliente.ObtenerPorUsuario(login.NombreUsuario);
+            Cliente cliente = _repositorioCliente.ObtenerPorUsuario(login.NombreUsuario);
 
             if (cliente != null && HashContrasena.Verificar(cliente.Pass, login.Password))
             {
@@ -208,14 +208,14 @@ namespace LogicaNegocio.Servicios
             switch (rol)
             {
                 case "Admin":
-                    return MapeoAdminUsuarioDTO(repoAdmin.ObtenerPorId(usuarioId));
+                    return MapeoAdminUsuarioDTO(_repositorioAdmin.ObtenerPorId(usuarioId));
                     break;
                 case "Cliente":
-                    return MapeoClienteUsuarioDTO(repoCliente.ObtenerPorId(usuarioId));
+                    return MapeoClienteUsuarioDTO(_repositorioCliente.ObtenerPorId(usuarioId));
                     break;
 
                 case "Profesional":
-                    return MapeoProfesionalUsuarioDTO(repoProfesional.ObtenerPorId(usuarioId));
+                    return MapeoProfesionalUsuarioDTO(_repositorioProfesional.ObtenerPorId(usuarioId));
                     break;
                 default:
                     return null;
@@ -239,30 +239,30 @@ namespace LogicaNegocio.Servicios
             //Valido
             Nuevo.Validar();
             //Agrego desde repositorio
-            repoCliente.Agregar(Nuevo);
+            _repositorioCliente.Agregar(Nuevo);
         }
         private void VerificarUsuarioRepetido(string NombreUsuario,string Correo)
         {
-            if (repoCliente.ExisteUsuario(NombreUsuario))
+            if (_repositorioCliente.ExisteUsuario(NombreUsuario))
                 throw new UsuarioException("Intente con otro usuario");
-            if (repoAdmin.ExisteUsuario(NombreUsuario))
+            if (_repositorioAdmin.ExisteUsuario(NombreUsuario))
                 throw new UsuarioException("Intente con otro usuario");
-            if (repoProfesional.ExisteUsuario(NombreUsuario))
+            if (_repositorioProfesional.ExisteUsuario(NombreUsuario))
                 throw new UsuarioException("Intente con otro usuario");
-            if (repoCliente.ExisteCorreo(Correo)) 
+            if (_repositorioCliente.ExisteCorreo(Correo)) 
                 throw new UsuarioException("Intente con otro correo");
-            if (repoAdmin.ExisteCorreo(Correo))
+            if (_repositorioAdmin.ExisteCorreo(Correo))
                 throw new UsuarioException("Intente con otro correo");
-            if (repoProfesional.ExisteCorreo(Correo))
+            if (_repositorioProfesional.ExisteCorreo(Correo))
                 throw new UsuarioException("Intente con otro correo");
         }
         private void ExisteCI(string CI)
         {
-            if(repoCliente.ExisteCI(CI))
+            if(_repositorioCliente.ExisteCI(CI))
                 throw new UsuarioException("Ya existe usuario con esa CI");
-            if (repoAdmin.ExisteCI(CI))
+            if (_repositorioAdmin.ExisteCI(CI))
                 throw new UsuarioException("Ya existe usuario con esa CI");
-            if (repoProfesional.ExisteCI(CI))
+            if (_repositorioProfesional.ExisteCI(CI))
                 throw new UsuarioException("Ya existe usuario con esa CI");
         }
         private UsuarioGenericoDTO MapeoClienteUsuarioDTO(Cliente cliente)
@@ -274,9 +274,9 @@ namespace LogicaNegocio.Servicios
                 Ci = cliente.CI,
                 Nombre = cliente.NombreCompleto,
                 Correo = cliente.Correo,
-                Medias = mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Cliente, cliente.Id),
+                Medias = _mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Cliente, cliente.Id),
                 Telefono = cliente.Telefono,
-                Perfil = mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Cliente, cliente.Id),
+                Perfil = _mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Cliente, cliente.Id),
                 UsuarioActivo = cliente.UsuarioActivo
             };
 
@@ -289,9 +289,9 @@ namespace LogicaNegocio.Servicios
                 Id = admin.Id,
                 Nombre = admin.NombreCompleto,
                 Correo = admin.Correo,
-                Medias = mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Admin, admin.Id),
+                Medias = _mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Admin, admin.Id),
                 Telefono = admin.Telefono,
-                Perfil = mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Admin, admin.Id),
+                Perfil = _mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Admin, admin.Id),
                 UsuarioActivo = admin.UsuarioActivo
             };
         }
@@ -303,16 +303,16 @@ namespace LogicaNegocio.Servicios
                 Id = profesional.Id,
                 Nombre = profesional.NombreCompleto,
                 Correo = profesional.Correo,
-                Medias = mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Profesional, profesional.Id),
+                Medias = _mediaServicio.ObtenerImagenesUsuario(Enum_TipoEntidad.Profesional, profesional.Id),
                 Telefono = profesional.Telefono,
-                Perfil = mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Profesional, profesional.Id),
+                Perfil = _mediaServicio.ObtenerImagenPerfil(Enum_TipoEntidad.Profesional, profesional.Id),
                 UsuarioActivo = profesional.UsuarioActivo
             };
         }
 
         public void AsignarFotoFavorita(int mediaId, Enum_TipoEntidad tipo, int entidadId)
         {
-            mediaServicio.AsignarFotoFavorita(mediaId, tipo, entidadId);
+            _mediaServicio.AsignarFotoFavorita(mediaId, tipo, entidadId);
         }
 
         public void GuardarCambiosGenerales(UsuarioGenericoDTO dto)
@@ -320,33 +320,33 @@ namespace LogicaNegocio.Servicios
             switch (dto.Rol)
             {
                 case "Cliente":
-                    Cliente cliente = repoCliente.ObtenerPorId(dto.Id);
+                    Cliente cliente = _repositorioCliente.ObtenerPorId(dto.Id);
                     cliente.NombreCompleto = dto.Nombre;
                     cliente.Correo = dto.Correo;
                     cliente.Telefono = dto.Telefono;
                     if (!string.IsNullOrWhiteSpace(dto.Pass))
                         cliente.Pass = HashContrasena.Hashear(dto.Pass);
-                    repoCliente.GuardarCambios();
+                    _repositorioCliente.GuardarCambios();
                     break;
 
                 case "Profesional":
-                    Profesional profesional = repoProfesional.ObtenerPorId(dto.Id);
+                    Profesional profesional = _repositorioProfesional.ObtenerPorId(dto.Id);
                     profesional.NombreCompleto = dto.Nombre;
                     profesional.Correo = dto.Correo;
                     profesional.Telefono = dto.Telefono;
                     if (!string.IsNullOrWhiteSpace(dto.Pass))
                         profesional.Pass = HashContrasena.Hashear(dto.Pass);
-                    repoProfesional.GuardarCambios();
+                    _repositorioProfesional.GuardarCambios();
                     break;
 
                 case "Admin":
-                    Admin admin = repoAdmin.ObtenerPorId(dto.Id);
+                    Admin admin = _repositorioAdmin.ObtenerPorId(dto.Id);
                     admin.NombreCompleto = dto.Nombre;
                     admin.Correo = dto.Correo;
                     admin.Telefono = dto.Telefono;
                     if (!string.IsNullOrWhiteSpace(dto.Pass))
                         admin.Pass = HashContrasena.Hashear(dto.Pass);
-                    repoAdmin.GuardarCambios();
+                    _repositorioAdmin.GuardarCambios();
                     break;
 
                 default:
@@ -360,11 +360,11 @@ namespace LogicaNegocio.Servicios
             switch (rol)
             {
                 case "Admin":
-                    Admin admin = repoAdmin.ObtenerPorId(usuarioId);
+                    Admin admin = _repositorioAdmin.ObtenerPorId(usuarioId);
                     if (admin != null && HashContrasena.Verificar(admin.Pass, password))
                     {
                         admin.UsuarioActivo = false;
-                        repoAdmin.GuardarCambios();
+                        _repositorioAdmin.GuardarCambios();
                     }
                     else
                     {
@@ -372,11 +372,11 @@ namespace LogicaNegocio.Servicios
                     }
                     break;
                 case "Profesional":
-                    Profesional profesional = repoProfesional.ObtenerPorId(usuarioId);
+                    Profesional profesional = _repositorioProfesional.ObtenerPorId(usuarioId);
                     if (profesional != null && HashContrasena.Verificar(profesional.Pass, password))
                     {
                         profesional.UsuarioActivo = false;
-                        repoProfesional.GuardarCambios();
+                        _repositorioProfesional.GuardarCambios();
                     }
                     else
                     {
@@ -384,11 +384,11 @@ namespace LogicaNegocio.Servicios
                     }
                     break;
                 case "Cliente":
-                    Cliente cliente = repoCliente.ObtenerPorId(usuarioId);
+                    Cliente cliente = _repositorioCliente.ObtenerPorId(usuarioId);
                     if (cliente != null && HashContrasena.Verificar(cliente.Pass, password))
                     {
                         cliente.UsuarioActivo = false;
-                        repoCliente.GuardarCambios();
+                        _repositorioCliente.GuardarCambios();
                     }
                     else
                     {

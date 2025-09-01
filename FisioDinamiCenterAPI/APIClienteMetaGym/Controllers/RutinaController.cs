@@ -16,10 +16,11 @@ namespace APIClienteMetaGym.Controllers
     public class RutinaController : Controller
     {
         private readonly IRutinaServicio rutinaServicio;
-
-        public RutinaController(IRutinaServicio rs)
+        private readonly IClienteServicio clienteServicio;
+        public RutinaController(IRutinaServicio rs, IClienteServicio cs)
         {
             rutinaServicio = rs;
+            clienteServicio = cs;
         }
         /// <summary>
         /// Obtiene las rutinas asignadas a un cliente.
@@ -27,6 +28,14 @@ namespace APIClienteMetaGym.Controllers
         [HttpGet("asignadas")]
         public IActionResult ObtenerRutinasAsignadas([FromQuery] int clienteId)
         {
+            try
+            {
+                Cliente aux = clienteServicio.ObtenerPorId(clienteId);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(RespuestaApi<string>.Unauthorized("El cliente no existe"));
+            }
             List<RutinaAsignada> rutinas = rutinaServicio.ObtenerRutinasAsignadasCliente(clienteId);
             return Ok(RespuestaApi<List<RutinaAsignada>>.Ok(rutinas));
         }
@@ -36,10 +45,18 @@ namespace APIClienteMetaGym.Controllers
         [HttpGet("informacionRutina")]
         public IActionResult ObtenerInformacionRutina([FromQuery] int rutinaId)
         {
-            Rutina rutina = rutinaServicio.ObtenerRutinaPorId(rutinaId);
-            return Ok(RespuestaApi<RutinaDTO>.Ok(new MapeadorRutinas().MapearRutinaDTO(rutina)));
+            try
+            {
+                Rutina rutina = rutinaServicio.ObtenerRutinaPorId(rutinaId);
+                if(rutina == null)
+                    return NotFound(RespuestaApi<string>.NotFound("La rutina no existe."));
+                return Ok(RespuestaApi<RutinaDTO>.Ok(new MapeadorRutinas().MapearRutinaDTO(rutina)));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(RespuestaApi<string>.Error(e.Message));
+            }
         }
-        
         /// <summary>
         /// Obtiene la información de un ejercicio por ID.
         /// </summary>
@@ -47,7 +64,6 @@ namespace APIClienteMetaGym.Controllers
         public IActionResult ObtenerEjercicio(int id)
         {
             var ejercicio = rutinaServicio.ObtenerEjercicioDTOId(id);
-            
             if (ejercicio == null)
                 return NotFound(RespuestaApi<string>.Error("Ejercicio no encontrado."));
 
@@ -60,8 +76,15 @@ namespace APIClienteMetaGym.Controllers
         public IActionResult RegistrarSesion([FromBody] SesionRutinaDTO sesion)
         {
             SesionRutina nueva = MapearSesionRutinaNueva(sesion);
-            SesionRutina registrada = rutinaServicio.RegistrarSesion(nueva);
-            return Ok(RespuestaApi<SesionRutinaDTO>.Ok(MapearSesionRutina(registrada)));
+            try
+            {
+                SesionRutina registrada = rutinaServicio.RegistrarSesion(nueva);
+                return Ok(RespuestaApi<SesionRutinaDTO>.Ok(MapearSesionRutina(registrada)));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(RespuestaApi<string>.Error(e.Message));
+            }
         }
         /// <summary>
         /// Obtiene el historial de sesiones del cliente.
@@ -69,6 +92,17 @@ namespace APIClienteMetaGym.Controllers
         [HttpGet("historial")]
         public IActionResult HistorialCliente([FromQuery] int clienteId)
         {
+            try
+            {
+                //valido cliente
+                Cliente aux = clienteServicio.ObtenerPorId(clienteId);
+                if (aux == null)
+                    throw new Exception("El usuario no se encontro, pruebe volviendo a iniciar sesion.");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(RespuestaApi<string>.Forbidden(e.Message));
+            }
             var sesiones = rutinaServicio.ObtenerHistorialClienteDTO(clienteId);
             return Ok(RespuestaApi<List<SesionEntrenadaDTO>>.Ok(sesiones));
         }
@@ -78,8 +112,16 @@ namespace APIClienteMetaGym.Controllers
         [HttpGet("sesionEntrenamiento")]
         public IActionResult sesionEntrenamiento([FromQuery] int sesionId)
         {
-            SesionEntrenadaDTO sesiones = rutinaServicio.ObtenerSesionEntrenamiento(sesionId);
-            return Ok(RespuestaApi<SesionEntrenadaDTO>.Ok(sesiones));
+            try
+            {
+                SesionEntrenadaDTO sesiones = rutinaServicio.ObtenerSesionEntrenamiento(sesionId);
+                return Ok(RespuestaApi<SesionEntrenadaDTO>.Ok(sesiones));
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(RespuestaApi<string>.Error("No se encontro sesion de entrenamiento."));
+            }
         }
         //Mapeos
         private EjercicioRealizadoDTOAPI MapearEjercicioRealizado(EjercicioRealizado er)

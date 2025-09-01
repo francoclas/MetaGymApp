@@ -14,10 +14,10 @@ namespace LogicaApp.Servicios
 {
     public class ServicioExtras : IExtraServicio
     {
-        private readonly IRepositorioExtra repoExtras;
+        private readonly IRepositorioExtra _repositorioExtras;
         public ServicioExtras(IRepositorioExtra repo)
         {
-            repoExtras = repo;
+            _repositorioExtras = repo;
         }
 
         public List<Especialidad> BuscarEspecialidad(string Nombre)
@@ -28,7 +28,7 @@ namespace LogicaApp.Servicios
                 throw new Exception("La especialidad a buscar no puede estar vacia.");
             }
             //Devuelvo desde repo
-            return repoExtras.BuscarEspecialidad(Nombre);
+            return _repositorioExtras.BuscarEspecialidad(Nombre);
         }
 
         public List<Establecimiento> BuscarEstablecimiento(string Nombre)
@@ -37,7 +37,7 @@ namespace LogicaApp.Servicios
             {
                 throw new Exception("El establecimiento abuscar no puede estar vacio.");
             }
-            return repoExtras.BuscarEstablecimiento(Nombre);
+            return _repositorioExtras.BuscarEstablecimiento(Nombre);
         }
 
         public void ModificarEspecialidad(Especialidad especialidad)
@@ -52,23 +52,23 @@ namespace LogicaApp.Servicios
 
         public Especialidad ObtenerEspecialidad(int Id)
         {
-            return repoExtras.ObtenerEspecialidadId(Id);
+            return _repositorioExtras.ObtenerEspecialidadId(Id);
         }
 
         public List<Especialidad> ObtenerEspecialidades()
         {
-            return repoExtras.ListarEspecialidades();
+            return _repositorioExtras.ListarEspecialidades();
         }
 
         public Establecimiento ObtenerEstablecimiento(int Id)
         {
             
-            return repoExtras.ObtenerEstablecimientoId(Id);
+            return _repositorioExtras.ObtenerEstablecimientoId(Id);
         }
 
         public List<Establecimiento> ObtenerEstablecimientos()
         {
-            return repoExtras.ListarEstablecimientos();
+            return _repositorioExtras.ListarEstablecimientos();
         }
 
         public void RegistrarMedia(Media media)
@@ -79,7 +79,7 @@ namespace LogicaApp.Servicios
                 throw new Exception("Debe cargar un archivo");
             }
             //Mando a sistema
-            repoExtras.AltaMedia(media);
+            _repositorioExtras.AltaMedia(media);
         }
 
         public void RegistrarNuevaEspecialidad(Especialidad especialidad)
@@ -94,7 +94,7 @@ namespace LogicaApp.Servicios
                 throw new Exception("Debe ingresar una descripcion de la especialidad.");
             }
             //Envio al repositorio
-            repoExtras.AltaEspecialidad(especialidad);
+            _repositorioExtras.AltaEspecialidad(especialidad);
         }
 
         public void RegistrarNuevoEstablecimiento(Establecimiento establecimiento)
@@ -109,7 +109,7 @@ namespace LogicaApp.Servicios
                 throw new Exception("Debe ingresar una direccion del establecimiento.");
             }
             //Envio al repositorio
-            repoExtras.AltaEstablecimiento(establecimiento);
+            _repositorioExtras.AltaEstablecimiento(establecimiento);
         }
         //registros solo con dtos
         public void RegistrarEspecialidad(EspecialidadDTO dto)
@@ -121,7 +121,7 @@ namespace LogicaApp.Servicios
                 DescripcionEspecialidad = dto.DescripcionEspecialidad
             };
             //Mando al repo
-            repoExtras.AltaEspecialidad(nueva);
+            _repositorioExtras.AltaEspecialidad(nueva);
          
         }
 
@@ -136,47 +136,47 @@ namespace LogicaApp.Servicios
                 Longitud = dto.Longitud,
             };
             //Mando al repo
-                repoExtras.AltaEstablecimiento(nuevo);
+                _repositorioExtras.AltaEstablecimiento(nuevo);
         }
 
         public void GuardarCambios()
         {
-            repoExtras.GuardarCambios();
+            _repositorioExtras.GuardarCambios();
         }
         public void CrearTipoAtencion(TipoAtencion tipo)
         {
-            repoExtras.CrearTipoAtencion(tipo);
+            _repositorioExtras.CrearTipoAtencion(tipo);
         }
         public TipoAtencion ObtenerTipoAtencion(int id)
         {
-            return repoExtras.ObtenerTipoPorId(id);
+            return _repositorioExtras.ObtenerTipoPorId(id);
         }
         public List<TipoAtencion> ObtenerTiposAtencionPorEspecialidad(int especialidadId)
         {
-            return repoExtras.ObtenerTiposAtencionPorEspecialidad(especialidadId);
+            return _repositorioExtras.ObtenerTiposAtencionPorEspecialidad(especialidadId);
         }
         public List<TipoAtencion> ObtenerTiposAtencionPorEspecialidades(List<int> especialidadIds)
         {
-            return repoExtras.ObtenerTiposAtencionPorEspecialidades(especialidadIds);
+            return _repositorioExtras.ObtenerTiposAtencionPorEspecialidades(especialidadIds);
         }
 
         public List<TipoAtencion> ObtenerTiposAtencionPorIds(List<int> ids)
         {
-            return repoExtras.ObtenerTiposAtencionPorIds(ids);
+            return _repositorioExtras.ObtenerTiposAtencionPorIds(ids);
         }
         public List<TipoAtencion> ObtenerTiposAtencionPorProfesional(int profesionalId)
         {
-            return repoExtras.ObtenerTiposAtencionPorProfesional(profesionalId);
+            return _repositorioExtras.ObtenerTiposAtencionPorProfesional(profesionalId);
         }
         public List<TipoAtencion> ObtenerTiposAtencion()
         {
-            return repoExtras.ObtenerTiposAtencionTodos();
+            return _repositorioExtras.ObtenerTiposAtencionTodos();
         }
 
         public List<TipoAtencionDTO> ObtenerTiposAtencionPorProfesionalDTO(int profesionalId)
         {
             List<TipoAtencionDTO> salida = new List<TipoAtencionDTO> ();
-            foreach (var item in repoExtras.ObtenerTiposAtencionPorProfesional(profesionalId))
+            foreach (var item in _repositorioExtras.ObtenerTiposAtencionPorProfesional(profesionalId))
             {
                 salida.Add(new TipoAtencionDTO
                 {
@@ -192,7 +192,7 @@ namespace LogicaApp.Servicios
         public List<EstablecimientoDTO> ObtenerEstablecimientosDTO()
         {
             List<EstablecimientoDTO> salida = new List<EstablecimientoDTO>();
-            foreach (var item in repoExtras.ListarEstablecimientos()) {
+            foreach (var item in _repositorioExtras.ListarEstablecimientos()) {
                 salida.Add(new EstablecimientoDTO
                 {
                     Id = item.Id,
@@ -209,7 +209,7 @@ namespace LogicaApp.Servicios
         public List<EspecialidadDTO> ObtenerEspecialidadesDTO()
         {
             List<EspecialidadDTO> salida = new List<EspecialidadDTO>();
-            foreach (var espe in repoExtras.ListarEspecialidades())
+            foreach (var espe in _repositorioExtras.ListarEspecialidades())
             {
                 EspecialidadDTO ax = new EspecialidadDTO
                 {
@@ -240,7 +240,7 @@ namespace LogicaApp.Servicios
         public List<TipoAtencionDTO> ObtenerTiposAtencionDTO()
         {
             List<TipoAtencionDTO> salida = new List<TipoAtencionDTO> ();
-            foreach (var tipo in repoExtras.ObtenerTiposAtencionTodos())
+            foreach (var tipo in _repositorioExtras.ObtenerTiposAtencionTodos())
             {
                 salida.Add(
                     new TipoAtencionDTO

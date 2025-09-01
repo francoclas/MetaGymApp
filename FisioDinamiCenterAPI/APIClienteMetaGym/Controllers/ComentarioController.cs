@@ -1,4 +1,5 @@
-﻿using APIClienteMetaGym.DTO;
+﻿using System.Security.Claims;
+using APIClienteMetaGym.DTO;
 using APIClienteMetaGym.DTO.PublicacionAPI;
 using APIClienteMetaGym.Extra;
 using LogicaNegocio.Interfaces.DTOS;
@@ -36,16 +37,20 @@ namespace APIClienteMetaGym.Controllers
 
             // Guardamos el comentario
             var nuevo = MapearCrearDTO(dto);
-            var comentarioCreado = _comentarioServicio.AgregarComentario(nuevo);
-
-            if (comentarioCreado == null)
-                return BadRequest(RespuestaApi<string>.Error("No se pudo crear el comentario."));
-
-            // Mapear al DTO de vista
-            var mapeador = new MapeadorPublicaciones();
-            var dtoVista = mapeador.MapearComentario(comentarioCreado);
-
-            return Ok(RespuestaApi<ComentarioVistaDTO>.Ok(dtoVista));
+            try
+            {
+                var comentarioCreado = _comentarioServicio.AgregarComentario(nuevo);
+                if (comentarioCreado == null)
+                    return BadRequest(RespuestaApi<string>.Error("No se pudo crear el comentario."));
+                // Mapear al DTO de vista
+                var mapeador = new MapeadorPublicaciones();
+                var dtoVista = mapeador.MapearComentario(comentarioCreado);
+                return Ok(RespuestaApi<ComentarioVistaDTO>.Ok(dtoVista));
+            }
+            catch (Exception e)
+            {
+                return NotFound(RespuestaApi<string>.NotFound(e.Message));
+            }
         }
 
 
@@ -54,13 +59,31 @@ namespace APIClienteMetaGym.Controllers
         /// </summary>
         [HttpPut("{comentarioId}")]
         [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status200OK)]
-        public IActionResult EditarComentario(int comentarioId, [FromQuery] string nuevoContenido, [FromQuery] int usuarioId)
+        [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]
+        public IActionResult EditarComentario(int comentarioId, [FromQuery] string nuevoContenido)
         {
             if (string.IsNullOrWhiteSpace(nuevoContenido))
                 return BadRequest(RespuestaApi<string>.Error("El contenido no puede estar vacío."));
 
-            _comentarioServicio.EditarComentario(comentarioId, nuevoContenido, usuarioId);
-            return Ok(RespuestaApi<string>.Ok("Comentario editado correctamente."));
+            // Obtener claims del token
+            var usuarioIdToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var rolToken = User.FindFirst(ClaimTypes.Role)?.Value ?? "Cliente";
+
+            if (usuarioIdToken == null || rolToken != "Cliente")
+                return StatusCode(403, RespuestaApi<string>.Forbidden("No autorizado."));
+
+            try
+            {
+                // Verificar que el comentario pertenece al usuario autenticado
+                int usuarioId = int.Parse(usuarioIdToken);
+                _comentarioServicio.EditarComentario(comentarioId, nuevoContenido, usuarioId, rolToken);
+
+                return Ok(RespuestaApi<string>.Ok("Comentario editado correctamente."));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(RespuestaApi<string>.Error(e.Message));
+            }
         }
 
         /// <summary>

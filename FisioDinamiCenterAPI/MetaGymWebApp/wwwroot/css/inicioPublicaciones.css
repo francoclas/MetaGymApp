@@ -1,9 +1,16 @@
 ﻿/* ===== Container General ===== */
+
 .container {
     margin: 0 auto;
     padding-left: 0;
     padding-right: 0;
 }
+.titular {
+    max-width:800px;
+    margin: 0 auto; 
+
+}
+
 .container-publis {
     max-width: 800px; 
     margin: 0 auto; 

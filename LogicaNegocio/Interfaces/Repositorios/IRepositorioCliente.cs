@@ -11,7 +11,6 @@ namespace LogicaDatos.Interfaces.Repos
     public interface IRepositorioCliente : IRepository<Cliente>
     {
         bool ExisteUsuario(string usuario);
-        
         Cliente VerificarCredenciales(string usuario,string pass);
         List<Cliente> BuscarClienteNombre(string Nombre);
         List<Cliente> BuscarClienteCI(string CI);

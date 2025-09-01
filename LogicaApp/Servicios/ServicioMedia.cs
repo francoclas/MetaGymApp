@@ -15,11 +15,11 @@ namespace LogicaApp.Servicios
 {
     public class ServicioMedia : IMediaServicio
     {
-        private readonly IRepositorioMedia _repositorio;
+        private readonly IRepositorioMedia _repositorioMedia;
 
         public ServicioMedia(IRepositorioMedia repositorio)
         {
-            _repositorio = repositorio;
+            _repositorioMedia = repositorio;
         }
         public Media GuardarArchivo(IFormFile archivo, Enum_TipoEntidad tipoEntidad, int idEntidad)
         {
@@ -92,7 +92,7 @@ namespace LogicaApp.Servicios
                     break;
             }
 
-            _repositorio.Agregar(media);
+            _repositorioMedia.Agregar(media);
             return media;
         }
 
@@ -118,12 +118,12 @@ namespace LogicaApp.Servicios
                 ProfesionalId = tipo == Enum_TipoEntidad.Profesional ? idEntidad : null
             };
 
-            _repositorio.Agregar(media);
-            _repositorio.Guardar();
+            _repositorioMedia.Agregar(media);
+            _repositorioMedia.Guardar();
         }
         public Media ObtenerMediaPorEntidad(Enum_TipoEntidad tipoEntidad, int idEntidad)
         {
-            return _repositorio.ObtenerPorEntidad(tipoEntidad, idEntidad);
+            return _repositorioMedia.ObtenerPorEntidad(tipoEntidad, idEntidad);
         }
         public void ReemplazarArchivo(IFormFile archivoNuevo, Enum_TipoEntidad tipoEntidad, int idEntidad)
         {
@@ -131,7 +131,7 @@ namespace LogicaApp.Servicios
                 throw new Exception("No se proporcionó un archivo válido.");
 
             // Busco la que hay que modificar
-            var mediaExistente = _repositorio.ObtenerPorEntidad(tipoEntidad, idEntidad);
+            var mediaExistente = _repositorioMedia.ObtenerPorEntidad(tipoEntidad, idEntidad);
             if (mediaExistente != null)
             {
                 //Verifico que se enceuntre la ruta
@@ -142,7 +142,7 @@ namespace LogicaApp.Servicios
                     File.Delete(rutaExistente);
                 }
                 //Se confirma el eliminar desde la BD
-                _repositorio.Eliminar(mediaExistente);
+                _repositorioMedia.Eliminar(mediaExistente);
             }
 
             // Mando la nueva modificada
@@ -150,38 +150,38 @@ namespace LogicaApp.Servicios
         }
         public void EliminarMedia(int mediaId)
         {
-            var media = _repositorio.ObtenerPorId(mediaId);
+            var media = _repositorioMedia.ObtenerPorId(mediaId);
             if (media != null)
             {
                 var rutaFisica = Path.Combine("wwwroot", media.Url.TrimStart('/'));
                 if (File.Exists(rutaFisica)) File.Delete(rutaFisica);
-                _repositorio.Eliminar(media);
+                _repositorioMedia.Eliminar(media);
             }
         }
         public Media? ObtenerFotoFavorita(Enum_TipoEntidad tipo, int idEntidad)
         {
-            return _repositorio.ObtenerFavorita(tipo, idEntidad);
+            return _repositorioMedia.ObtenerFavorita(tipo, idEntidad);
             
         }
 
         public void AsignarFotoFavorita(int mediaId, Enum_TipoEntidad tipo, int entidadId)
         {
-            _repositorio.AsignarFotoFavorita(mediaId, tipo, entidadId);
+            _repositorioMedia.AsignarFotoFavorita(mediaId, tipo, entidadId);
         }
         //Usuarios
         public List<Media> ObtenerImagenesUsuario(Enum_TipoEntidad tipo, int idEntidad)
         {
-            return _repositorio.ObtenerImagenesUsuario(tipo, idEntidad);
+            return _repositorioMedia.ObtenerImagenesUsuario(tipo, idEntidad);
         }
 
         public Media? ObtenerImagenPerfil(Enum_TipoEntidad tipo, int idEntidad)
         {
-            return _repositorio.ObtenerImagenPerfil(tipo, idEntidad);
+            return _repositorioMedia.ObtenerImagenPerfil(tipo, idEntidad);
         }
 
         public List<Media> ObtenerMediasPorEntidadGeneral(Enum_TipoEntidad tipo, int idEntidad)
         {
-            return _repositorio.ObtenerPorEntidadGeneral(tipo, idEntidad);
+            return _repositorioMedia.ObtenerPorEntidadGeneral(tipo, idEntidad);
         }
     }
 }

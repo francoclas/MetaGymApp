@@ -36,6 +36,7 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav">
+                 
                     @if (!estaLogueado)
                     {
                         <li class="nav-item">
@@ -47,6 +48,9 @@
                     }
                     else
                     {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Inicio", "Publicacion")">Inicio</a>
+                        </li>
                         <li class="nav-item">
                             <span class="nav-link">Hola, @sesion.Nombre</span>
                         </li>
@@ -69,13 +73,15 @@
             <div class="row">
                 @if (estaLogueado)
                 {
-                    <aside class="col-12 col-md-3 mb-4 mb-md-0">
+                    <aside class="col-12 col-md-3 mb-4 mb-md-0 @(ViewData["Title"]?.ToString() == "InicioBanner" ? "d-none" : "")">
                         @Html.Partial("_MenuLateral", sesion)
                     </aside>
-                    <section class="col-12 col-md-7">
+
+                    <section class="@(ViewData["Title"]?.ToString() == "InicioBanner" ? "col-12" : "col-12 col-md-7")">
                         @Html.Partial("_MensajeTemporal")
                         @RenderBody()
                     </section>
+
                     <div id="zonaNotificaciones" class="position-fixed end-0 top-25 me-4 mt-4" style="z-index: 1050;"></div>
                 }
                 else

@@ -13,7 +13,7 @@ namespace LogicaNegocio.Interfaces.Servicios
     {
             List<ComentarioDTO> ObtenerPorPublicacion(int publicacionId);
             ComentarioDTO AgregarComentario(ComentarioDTO dto);
-            void EditarComentario(int comentarioId, string nuevoContenido, int usuarioId);
+            void EditarComentario(int comentarioId, string nuevoContenido, int usuarioId,string rol);
             void EliminarComentario(int comentarioId, int usuarioId, string rol);
             void DarLikeComentario(int comentarioId, int usuarioId, string rol);
             void QuitarLikeComentario(int comentarioId, int usuarioId, string rol);

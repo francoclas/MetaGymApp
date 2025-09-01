@@ -1,4 +1,5 @@
-﻿using APIClienteMetaGym.DTO;
+﻿using System.Security.Claims;
+using APIClienteMetaGym.DTO;
 using APIClienteMetaGym.Extra;
 using LogicaNegocio.Interfaces.DTOS;
 using LogicaNegocio.Interfaces.DTOS.API;
@@ -17,7 +18,6 @@ public class UsuarioController : ControllerBase
 {
     private readonly IUsuarioServicio _usuarioServicio;
     private readonly IConfiguration _configuration;
-
     public UsuarioController(IUsuarioServicio usuarioServicio, IConfiguration configuration)
     {
         _usuarioServicio = usuarioServicio;
@@ -53,8 +53,6 @@ public class UsuarioController : ControllerBase
         }
         
     }
-
-
     private bool EsCliente(string rol) =>
         string.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase);
 
@@ -69,7 +67,6 @@ public class UsuarioController : ControllerBase
     {
         if (!EsCliente(rol))
             return StatusCode(403, RespuestaApi<string>.Forbidden());
-
         try
         {
             var dto = _usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId,"Cliente");
@@ -77,25 +74,26 @@ public class UsuarioController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(RespuestaApi<string>.BadRequest(ex.Message));
+            return BadRequest(RespuestaApi<string>.BadRequest("Usuario no existe."));
         }
     }
-
     /// <summary>
     /// Cambia el teléfono del cliente.
     /// </summary>
     [Authorize]
     [HttpPatch("{id}/telefono")]
-    [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(RespuestaApi<string>), StatusCodes.Status403Forbidden)]
-    public IActionResult CambiarTelefono(int id, string usuario, string telefonoNuevo, string rol)
+    public IActionResult CambiarTelefono(int id, string telefonoNuevo)
     {
-        if (!EsCliente(rol))
-            return StatusCode(403, RespuestaApi<string>.Forbidden());
+        // Usuario autenticado desde el JWT
+        var usuarioIdToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var nombreUsuarioToken = User.FindFirst(ClaimTypes.Name)?.Value;
+
+        if (usuarioIdToken == null || usuarioIdToken != id.ToString())
+            return StatusCode(403, RespuestaApi<string>.Forbidden("No puede modificar datos de otro usuario."));
 
         try
         {
-            _usuarioServicio.CambiarTelefono(id, usuario, telefonoNuevo);
+            _usuarioServicio.CambiarTelefono(id, nombreUsuarioToken, telefonoNuevo);
             return Ok(RespuestaApi<string>.Ok("Teléfono actualizado correctamente."));
         }
         catch (Exception ex)
@@ -109,14 +107,17 @@ public class UsuarioController : ControllerBase
     /// </summary>
     [Authorize]
     [HttpPatch("{id}/correo")]
-    public IActionResult CambiarCorreo(int id, string usuario, string correoNuevo, string rol)
+    public IActionResult CambiarCorreo(int id, string correoNuevo)
     {
-        if (!EsCliente(rol))
-            return StatusCode(403, RespuestaApi<string>.Forbidden());
+        var usuarioIdToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var nombreUsuarioToken = User.FindFirst(ClaimTypes.Name)?.Value;
+
+        if (usuarioIdToken == null || usuarioIdToken != id.ToString())
+            return StatusCode(403, RespuestaApi<string>.Forbidden("No puede modificar datos de otro usuario."));
 
         try
         {
-            _usuarioServicio.CambiarCorreo(id, usuario, correoNuevo);
+            _usuarioServicio.CambiarCorreo(id, nombreUsuarioToken, correoNuevo);
             return Ok(RespuestaApi<string>.Ok("Correo actualizado correctamente."));
         }
         catch (Exception ex)
@@ -130,14 +131,17 @@ public class UsuarioController : ControllerBase
     /// </summary>
     [Authorize]
     [HttpPatch("{id}/nombre")]
-    public IActionResult CambiarNombre(int id, string usuario, string nombreNuevo, string rol)
+    public IActionResult CambiarNombre(int id, string nombreNuevo)
     {
-        if (!EsCliente(rol))
-            return StatusCode(403, RespuestaApi<string>.Forbidden());
+        var usuarioIdToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var nombreUsuarioToken = User.FindFirst(ClaimTypes.Name)?.Value;
+
+        if (usuarioIdToken == null || usuarioIdToken != id.ToString())
+            return StatusCode(403, RespuestaApi<string>.Forbidden("No puede modificar datos de otro usuario."));
 
         try
         {
-            _usuarioServicio.CambiarNombre(id, usuario, nombreNuevo);
+            _usuarioServicio.CambiarNombre(id, nombreUsuarioToken, nombreNuevo);
             return Ok(RespuestaApi<string>.Ok("Nombre actualizado correctamente."));
         }
         catch (Exception ex)
@@ -151,14 +155,17 @@ public class UsuarioController : ControllerBase
     /// </summary>
     [Authorize]
     [HttpPatch("{id}/password")]
-    public IActionResult CambiarPass(int id, string usuario, string nuevaPassword, string confPassword, string rol)
+    public IActionResult CambiarPass(int id, string nuevaPassword, string confPassword)
     {
-        if (!EsCliente(rol))
-            return StatusCode(403, RespuestaApi<string>.Forbidden());
+        var usuarioIdToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var nombreUsuarioToken = User.FindFirst(ClaimTypes.Name)?.Value;
+
+        if (usuarioIdToken == null || usuarioIdToken != id.ToString())
+            return StatusCode(403, RespuestaApi<string>.Forbidden("No puede modificar datos de otro usuario."));
 
         try
         {
-            _usuarioServicio.CambiarPass(id, usuario, nuevaPassword, confPassword);
+            _usuarioServicio.CambiarPass(id, nombreUsuarioToken, nuevaPassword, confPassword);
             return Ok(RespuestaApi<string>.Ok("Contraseña actualizada correctamente."));
         }
         catch (Exception ex)
@@ -166,4 +173,5 @@ public class UsuarioController : ControllerBase
             return BadRequest(RespuestaApi<string>.BadRequest(ex.Message));
         }
     }
+
 }

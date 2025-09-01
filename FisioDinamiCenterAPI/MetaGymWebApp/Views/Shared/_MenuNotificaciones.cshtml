@@ -31,9 +31,9 @@
         <ul class="noti-list">
             @foreach (var n in Model)
             {
-                <li class="noti-item d-flex align-items-center gap-2 no-leido">
+                <li class="noti-item d-flex align-items-center gap-2 no-leido my-2">
                     <img src="@ObtenerIcono(n.Tipo)" alt="icono" class="noti-icon" />
-                    <div class="text-truncate" style="min-width: 0;">
+                    <div class="flex-grow-1" style="min-width: 0;">
                         <span class="d-block text-white noti-titulo">@n.Titulo</span>
                         <span class="d-block text-muted noti-mensaje">@n.Mensaje</span>
                         <small class="text-secondary noti-fecha">@n.Fecha.ToString("g")</small>

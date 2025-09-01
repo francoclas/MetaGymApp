@@ -15,21 +15,21 @@ namespace LogicaApp.Servicios
 {
     public class ServicioPublicacion : IPublicacionServicio
     {
-        private readonly IRepositorioPublicacion _repo;
-        private readonly IMediaServicio mediaServicio;
-        private readonly IComentarioServicio comentarioServicio;
-        private readonly INotificacionServicio notificacionServicio;
+        private readonly IRepositorioPublicacion _repositorioPublicacion;
+        private readonly IMediaServicio _mediaServicio;
+        private readonly IComentarioServicio _comentarioServicio;
+        private readonly INotificacionServicio _notificacionServicio;
         public ServicioPublicacion(IRepositorioPublicacion repo, IMediaServicio mediaServicio, IComentarioServicio comentarioServicio,INotificacionServicio notificacion)
         {
-            _repo = repo;
-            this.mediaServicio = mediaServicio;
-            this.comentarioServicio = comentarioServicio;
-            notificacionServicio = notificacion;    
+            _repositorioPublicacion = repo;
+            this._mediaServicio = mediaServicio;
+            this._comentarioServicio = comentarioServicio;
+            _notificacionServicio = notificacion;    
         }
 
         public List<PublicacionDTO> ObtenerPublicaciones()
         {
-            var lista = _repo.ObtenerAprobadasPublicas();
+            var lista = _repositorioPublicacion.ObtenerAprobadasPublicas();
 
             var result = new List<PublicacionDTO>();
             foreach (var pub in lista)
@@ -41,7 +41,7 @@ namespace LogicaApp.Servicios
 
         public PublicacionDTO ObtenerPorId(int id)
         {
-            var pub = _repo.ObtenerPorId(id);
+            var pub = _repositorioPublicacion.ObtenerPorId(id);
             if (pub == null) return null;
 
             return ConvertirAPublicacionDTO(pub);
@@ -59,21 +59,21 @@ namespace LogicaApp.Servicios
                 ListaMedia = new List<Media>() // de momento vacía
             };
 
-            _repo.Crear(nueva);
+            _repositorioPublicacion.Crear(nueva);
         }
         public void CrearPublicacionAdmin(Publicacion publicacion)
         {
-            _repo.Crear(publicacion);
+            _repositorioPublicacion.Crear(publicacion);
         }
         public void ModerarPublicacion(ModerarPublicacionDTO dto)
         {
             var nuevoEstado = dto.Aprobar ? Enum_EstadoPublicacion.Aprobada : Enum_EstadoPublicacion.Rechazada;
-            _repo.ActualizarEstado(dto.PublicacionId, nuevoEstado, dto.AdminId, dto.MotivoRechazo);
+            _repositorioPublicacion.ActualizarEstado(dto.PublicacionId, nuevoEstado, dto.AdminId, dto.MotivoRechazo);
         }
 
         public List<PublicacionDTO> ObtenerPendientes()
         {
-            var lista = _repo.ObtenerPendientes();
+            var lista = _repositorioPublicacion.ObtenerPendientes();
             var result = new List<PublicacionDTO>();
 
             foreach (var pub in lista)
@@ -85,7 +85,7 @@ namespace LogicaApp.Servicios
         public List<PublicacionDTO> ObtenerTodas()
         {
             List<PublicacionDTO> salida = new List<PublicacionDTO>();
-            var lista = _repo.ObtenerTodas();
+            var lista = _repositorioPublicacion.ObtenerTodas();
             foreach (var o in lista)
             {
                 salida.Add(ConvertirAPublicacionDTO(o));
@@ -95,7 +95,7 @@ namespace LogicaApp.Servicios
 
         public List<PublicacionDTO> ObtenerPorProfesionalId(int profesionalId)
         {
-            var publicaciones = _repo.ObtenerTodas()
+            var publicaciones = _repositorioPublicacion.ObtenerTodas()
             .Where(p => p.ProfesionalId == profesionalId)
             .ToList();
 
@@ -110,13 +110,13 @@ namespace LogicaApp.Servicios
 
         public void CrearPublicacionImagenes(Publicacion publicacion)
         {
-            _repo.Crear(publicacion);
+            _repositorioPublicacion.Crear(publicacion);
         }
 
         public List<PublicacionDTO> ObtenerCreadasPorAdmin(int adminId)
         {
             List<PublicacionDTO> salida = new List<PublicacionDTO>();
-            List<Publicacion> lista = _repo.ObtenerCreadasAdmin(adminId);
+            List<Publicacion> lista = _repositorioPublicacion.ObtenerCreadasAdmin(adminId);
             foreach (var o in lista)
             {
                 salida.Add(ConvertirAPublicacionDTO(o));
@@ -126,7 +126,7 @@ namespace LogicaApp.Servicios
         public List<PublicacionDTO> ObtenerNovedades()
         {
             List<PublicacionDTO> salida = new List<PublicacionDTO>();
-            List<Publicacion> lista = _repo.ObtenerNovedades();
+            List<Publicacion> lista = _repositorioPublicacion.ObtenerNovedades();
             foreach (Publicacion item in lista)
             {
                 salida.Add(ConvertirNoticia(item));
@@ -137,7 +137,7 @@ namespace LogicaApp.Servicios
         public List<PublicacionDTO> ObtenerAutorizadasPorAdmin(int adminId)
         {
             List<PublicacionDTO> salida = new List<PublicacionDTO>();
-            List<Publicacion> lista = _repo.ObtenerAprobadasAdmin(adminId);
+            List<Publicacion> lista = _repositorioPublicacion.ObtenerAprobadasAdmin(adminId);
             foreach (var o in lista)
             {
                 salida.Add(ConvertirAPublicacionDTO(o));
@@ -147,7 +147,7 @@ namespace LogicaApp.Servicios
         public List<PublicacionDTO> ObtenerRechazadasPorAdmin(int adminId)
         {
             List<PublicacionDTO> salida = new List<PublicacionDTO>();
-            List<Publicacion> lista = _repo.ObtenerRechazadasAdmin(adminId);
+            List<Publicacion> lista = _repositorioPublicacion.ObtenerRechazadasAdmin(adminId);
             foreach (var o in lista)
             {
                 salida.Add(ConvertirAPublicacionDTO(o));
@@ -156,7 +156,7 @@ namespace LogicaApp.Servicios
         }
         public void ActualizarPublicacion(PublicacionDTO pubActualizada)
         {
-            Publicacion original = _repo.ObtenerPorId(pubActualizada.Id);
+            Publicacion original = _repositorioPublicacion.ObtenerPorId(pubActualizada.Id);
             if (original == null) throw new Exception("La publicación no existe.");
 
             original.Titulo = pubActualizada.Titulo;
@@ -165,12 +165,12 @@ namespace LogicaApp.Servicios
             original.MostrarEnNoticiasPublicas = pubActualizada.MostrarEnNoticiasPublicas;
             original.FechaModificacion = DateTime.Now;
             original.Estado = pubActualizada.Estado;
-            _repo.Actualizar(original);
+            _repositorioPublicacion.Actualizar(original);
         }
 
         public void AprobarPublicacion(int publicacionId, int adminId)
         {
-            Publicacion publicacion = _repo.ObtenerPorId(publicacionId);
+            Publicacion publicacion = _repositorioPublicacion.ObtenerPorId(publicacionId);
 
             if (publicacion == null || publicacion.Estado != Enum_EstadoPublicacion.Pendiente)
                 throw new Exception("La publicación no existe o ya fue revisada.");
@@ -178,8 +178,8 @@ namespace LogicaApp.Servicios
             publicacion.Estado = Enum_EstadoPublicacion.Aprobada;
             publicacion.FechaModificacion = DateTime.Now;
             publicacion.AdminAprobadorId = adminId;
-            _repo.Actualizar(publicacion);
-            notificacionServicio.NotificacionPersonalizada((int)publicacion.ProfesionalId, "Profesional", 
+            _repositorioPublicacion.Actualizar(publicacion);
+            _notificacionServicio.NotificacionPersonalizada((int)publicacion.ProfesionalId, "Profesional", 
                 new Notificacion {
                     ProfesionalId = (int)publicacion.ProfesionalId,
                     Titulo = "Se aprobo tu publicacion!",
@@ -193,7 +193,7 @@ namespace LogicaApp.Servicios
 
         public void RechazarPublicacion(int publicacionId, string motivoRechazo, int adminId)
         {
-            Publicacion publicacion = _repo.ObtenerPorId(publicacionId);
+            Publicacion publicacion = _repositorioPublicacion.ObtenerPorId(publicacionId);
 
             if (publicacion == null || publicacion.Estado != Enum_EstadoPublicacion.Pendiente)
                 throw new Exception("La publicación no existe o ya fue revisada.");
@@ -203,8 +203,8 @@ namespace LogicaApp.Servicios
             publicacion.FechaModificacion = DateTime.Now;
             publicacion.AdminAprobadorId = adminId;
 
-            _repo.Actualizar(publicacion);
-            notificacionServicio.NotificacionPersonalizada((int)publicacion.ProfesionalId, "Profesional",
+            _repositorioPublicacion.Actualizar(publicacion);
+            _notificacionServicio.NotificacionPersonalizada((int)publicacion.ProfesionalId, "Profesional",
                 new Notificacion
                 {
                     ProfesionalId = (int)publicacion.ProfesionalId,
@@ -220,7 +220,7 @@ namespace LogicaApp.Servicios
         public List<PublicacionDTO> ObtenerPublicacionesInicio()
         {
             List<PublicacionDTO> salida = new List<PublicacionDTO>();
-            List<Publicacion> list = _repo.ObtenerAprobadasPublicas().OrderByDescending(p => p.FechaCreacion).ToList();
+            List<Publicacion> list = _repositorioPublicacion.ObtenerAprobadasPublicas().OrderByDescending(p => p.FechaCreacion).ToList();
 
             foreach (var item in list)
             {
@@ -231,7 +231,7 @@ namespace LogicaApp.Servicios
         public List<PublicacionDTO> ObtenerPublicacionesInicioAPI()
         {
             List<PublicacionDTO> salida = new List<PublicacionDTO>();
-            List<Publicacion> list = _repo.ObtenerAprobadasPublicas().OrderByDescending(p => p.FechaCreacion).ToList();
+            List<Publicacion> list = _repositorioPublicacion.ObtenerAprobadasPublicas().OrderByDescending(p => p.FechaCreacion).ToList();
 
             foreach (var item in list)
             {
@@ -241,21 +241,21 @@ namespace LogicaApp.Servicios
         }
         public void DarLikePublicacion(int publicacionId, int usuarioId, string rol)
         {
-            _repo.DarLike(publicacionId, usuarioId, rol);
+            _repositorioPublicacion.DarLike(publicacionId, usuarioId, rol);
         }
 
         public void QuitarLikePublicacion(int publicacionId, int usuarioId, string rol)
         {
-            _repo.QuitarLike(publicacionId, usuarioId, rol);
+            _repositorioPublicacion.QuitarLike(publicacionId, usuarioId, rol);
         }
 
         public bool UsuarioYaDioLikePublicacion(int publicacionId, int usuarioId, string rol)
         {
-            return _repo.UsuarioYaDioLike(publicacionId, usuarioId, rol);
+            return _repositorioPublicacion.UsuarioYaDioLike(publicacionId, usuarioId, rol);
         }
         public int ContarLikesPublicacion(int id)
         {
-            return _repo.ContarLikes(id);
+            return _repositorioPublicacion.ContarLikes(id);
         }
 
         // Método privado para convertir
@@ -277,10 +277,10 @@ namespace LogicaApp.Servicios
                 AutorId = autorId,
                 RolAutor = rolAutor.ToString(),
                 NombreAutor = pub.Profesional?.NombreCompleto ?? pub.AdminCreador?.NombreCompleto ?? "Desconocido",
-                ImagenAutorURL = mediaServicio.ObtenerFotoFavorita(rolAutor, autorId)?.Url,
+                ImagenAutorURL = _mediaServicio.ObtenerFotoFavorita(rolAutor, autorId)?.Url,
                 UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new(),
                 Medias = pub.ListaMedia,
-                CantLikes = _repo.ContarLikes(pub.Id),
+                CantLikes = _repositorioPublicacion.ContarLikes(pub.Id),
                 Comentarios = pub.Comentarios?
                     .Where(c => c.ComentarioPadreId == null)
                     .Select(c => MapearComentario(c))
@@ -308,10 +308,10 @@ namespace LogicaApp.Servicios
                 AutorId = autorId,
                 RolAutor = rolAutor.ToString(),
                 NombreAutor = pub.Profesional?.NombreCompleto ?? pub.AdminCreador?.NombreCompleto ?? "Desconocido",
-                ImagenAutorURL = mediaServicio.ObtenerFotoFavorita(rolAutor, autorId)?.Url,
+                ImagenAutorURL = _mediaServicio.ObtenerFotoFavorita(rolAutor, autorId)?.Url,
                 UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new(),
                 Medias = pub.ListaMedia,
-                CantLikes = _repo.ContarLikes(pub.Id),
+                CantLikes = _repositorioPublicacion.ContarLikes(pub.Id),
                 Comentarios = pub.Comentarios?
                     .Where(c => c.ComentarioPadreId == null && c.EstaActivo)
                     .Select(c => MapearComentario(c))
@@ -336,7 +336,7 @@ namespace LogicaApp.Servicios
                 EsPrivada = pub.EsPrivada,
                 Vistas = pub.Vistas,
                 NombreAutor = pub.Profesional?.NombreCompleto ?? pub.AdminCreador?.NombreCompleto ?? "Desconocido",
-                ImagenAutorURL = mediaServicio.ObtenerFotoFavorita(rolAutor, autorId)?.Url,
+                ImagenAutorURL = _mediaServicio.ObtenerFotoFavorita(rolAutor, autorId)?.Url,
                 UrlsMedia = pub.ListaMedia?.Select(m => m.Url).ToList() ?? new(),
                 Medias = pub.ListaMedia
             };
@@ -359,9 +359,9 @@ namespace LogicaApp.Servicios
                 AutorId = autorId,
                 AutorNombre = c.Profesional?.NombreCompleto ?? c.Cliente?.NombreCompleto ?? c.Admin?.NombreCompleto ?? "Desconocido",
                 RolAutor = tipo.ToString(),
-                ImagenAutor = mediaServicio.ObtenerFotoFavorita(tipo, autorId),
+                ImagenAutor = _mediaServicio.ObtenerFotoFavorita(tipo, autorId),
                 ComentarioPadreId = c.ComentarioPadreId,
-                CantLikes = comentarioServicio.ContarLikesComentario(c.ComentarioId),
+                CantLikes = _comentarioServicio.ContarLikesComentario(c.ComentarioId),
                 Respuestas = c.Respuestas?
                     .Where(r => r.EstaActivo)
                     .Select(r => MapearComentario(r))
@@ -377,7 +377,7 @@ namespace LogicaApp.Servicios
         public void OcultarComentario(int comentarioId)
         {
             //obtengo comentario
-            Comentario comentario = comentarioServicio.ObtenerComentarioId(comentarioId);
+            Comentario comentario = _comentarioServicio.ObtenerComentarioId(comentarioId);
             if (comentario.EstaActivo)
             {
                 comentario.EstaActivo = false;
@@ -386,7 +386,7 @@ namespace LogicaApp.Servicios
             {
                 comentario.EstaActivo = true;
             }
-            comentarioServicio.Actualizar(comentario);
+            _comentarioServicio.Actualizar(comentario);
         }
 
        

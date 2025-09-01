@@ -5,7 +5,6 @@ namespace LogicaDatos.Interfaces.Repos
 {
     public interface IRepositorioCita : IRepository<Cita>
     {
-        
         public bool ExisteCita(Cita cita);
         //Consultas
         public List<Cita> ObtenerPorCliente(int clienteId);
@@ -18,6 +17,5 @@ namespace LogicaDatos.Interfaces.Repos
         public List<Cita> BuscarPorTextoDescripcion(string texto);
         public List<Cita> BuscarPorTextoConclusion(string texto);
         public List<Cita> BuscarPorEstado(EstadoCita estado);
-
     }
 }

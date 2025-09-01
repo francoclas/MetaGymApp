@@ -16,8 +16,6 @@ namespace LogicaNegocio.Interfaces.Servicios
         void ModerarPublicacion(ModerarPublicacionDTO dto);
         void CrearPublicacionImagenes(Publicacion publicacion);
         void ActualizarPublicacion(PublicacionDTO pub);
-
-
         //Listar
         List<PublicacionDTO> ObtenerPublicaciones();
         PublicacionDTO ObtenerPorId(int id);
@@ -31,7 +29,6 @@ namespace LogicaNegocio.Interfaces.Servicios
         List<PublicacionDTO> ObtenerRechazadasPorAdmin(int adminId);
         List<PublicacionDTO> ObtenerPublicacionesInicio();
         List<PublicacionDTO> ObtenerPublicacionesInicioAPI();
-
         List<PublicacionDTO> ObtenerNovedades();
         //Interacciones
         void DarLikePublicacion(int publicacionId, int usuarioId, string rol);
@@ -39,6 +36,5 @@ namespace LogicaNegocio.Interfaces.Servicios
         bool UsuarioYaDioLikePublicacion(int publicacionId, int usuarioId, string rol);
         int ContarLikesPublicacion(int publicacionId);
         void OcultarComentario(int comentarioId);
-
     }
 }

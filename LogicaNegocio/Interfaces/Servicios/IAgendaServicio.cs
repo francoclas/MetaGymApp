@@ -17,6 +17,5 @@ namespace LogicaNegocio.Interfaces.Servicios
         void ActualizarAgenda(AgendaProfesional agenda);
         bool ExisteAgendaEnHorario(int profesionalId, Enum_DiaSemana dia, TimeSpan horaInicio, TimeSpan horaFin);
         List<AgendaProfesional> BuscarAgendaPorDia(int profesionalId, Enum_DiaSemana dia);
-
     }
 }

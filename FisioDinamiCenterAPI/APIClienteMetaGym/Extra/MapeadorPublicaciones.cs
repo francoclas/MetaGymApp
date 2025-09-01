@@ -26,7 +26,7 @@ namespace APIClienteMetaGym.Extra
         {
             if (dto == null) return null;
 
-            return new ComentarioVistaDTO
+            ComentarioVistaDTO aux = new ComentarioVistaDTO
             {
                 ComentarioId = dto.ComentarioId,
                 Contenido = dto.Contenido,
@@ -37,8 +37,10 @@ namespace APIClienteMetaGym.Extra
                 PublicacionId = dto.PublicacionId,
                 Respuestas = dto.Respuestas?.Select(MapearComentarioRecursivo).ToList() ?? new()
             };
+            if (dto.ComentarioPadreId != null)
+                aux.ComentarioPadreId = dto.ComentarioPadreId;
+            return aux;
         }
-
         private List<ComentarioVistaDTO> MapearComentariosJerarquicos(List<ComentarioDTO> todos)
         {
             var comentariosRaiz = todos
@@ -48,7 +50,6 @@ namespace APIClienteMetaGym.Extra
 
             return comentariosRaiz.Select(MapearComentarioRecursivo).ToList();
         }
-
         private ComentarioVistaDTO MapearComentarioRecursivo(ComentarioDTO dto)
         {
             return new ComentarioVistaDTO

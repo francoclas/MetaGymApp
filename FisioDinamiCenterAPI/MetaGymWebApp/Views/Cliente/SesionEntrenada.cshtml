@@ -21,51 +21,64 @@
                 </div>
             </div>
             <div class="card-body">
-                <h6>Series realizadas</h6>
-                <table class="table table-dark table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Repeticiones</th>
-                            <th>Peso utilizado (kg)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var serie in ejercicio.Series)
-                        {
-                            <tr>
-                                <td>@serie.Repeticiones</td>
-                                <td>@(serie.PesoUtilizado ?? 0)</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
 
-                @if (ejercicio.Mediciones.Any())
+                @if (!ejercicio.SeRealizo || (!ejercicio.Series.Any() && !ejercicio.Mediciones.Any()))
                 {
-                    <h6 class="mt-3">Mediciones</h6>
+                    <div>
+                        <h5 class="alert-heading">Ejercicio no realizado</h5>
+                        <p>
+                            Este ejercicio no cuenta con series ni mediciones registradas en la sesión.
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <h6>Series realizadas</h6>
                     <table class="table table-dark table-bordered">
                         <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th>Unidad</th>
-                                <th>Valor</th>
+                                <th>Repeticiones</th>
+                                <th>Peso utilizado (kg)</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var med in ejercicio.Mediciones)
+                            @foreach (var serie in ejercicio.Series)
                             {
                                 <tr>
-                                    <td>@med.Nombre</td>
-                                    <td>@med.Unidad</td>
-                                    <td>@med.Valor</td>
+                                    <td>@serie.Repeticiones</td>
+                                    <td>@(serie.PesoUtilizado ?? 0)</td>
                                 </tr>
                             }
                         </tbody>
                     </table>
-                }
-                else
-                {
-                    <p class="text-muted fst-italic">Sin mediciones registradas.</p>
+
+                    @if (ejercicio.Mediciones.Any())
+                    {
+                        <h6 class="mt-3">Mediciones</h6>
+                        <table class="table table-dark table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Unidad</th>
+                                    <th>Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var med in ejercicio.Mediciones)
+                                {
+                                    <tr>
+                                        <td>@med.Nombre</td>
+                                        <td>@med.Unidad</td>
+                                        <td>@med.Valor</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic">Sin mediciones registradas.</p>
+                    }
                 }
             </div>
         </div>
