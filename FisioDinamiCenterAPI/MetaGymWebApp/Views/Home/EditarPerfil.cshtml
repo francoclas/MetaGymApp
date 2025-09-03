@@ -22,20 +22,23 @@
         <label>Teléfono</label>
         <input name="Telefono" value="@Model.Telefono" class="form-control" />
     </div>
-    <hr />
-    <h4>Cambiar contraseña</h4>
+    <button class="btn btn-primary mt-2">Guardar Datos</button>
+</form>
+<hr />
+<form asp-action="CambiarPassword" method="post">
+    <input type="hidden" name="Id" value="@Model.Id" />
+    <input type="hidden" name="Rol" value="@Model.Rol" />
 
     <div class="mb-3">
         <label>Nueva contraseña</label>
-        <input type="password" id="nuevaPass" name="Pass" class="form-control" required />
+        <input type="password" id="nuevaPass" name="NuevaPass" class="form-control" required />
     </div>
     <div class="mb-3">
         <label>Confirmar contraseña</label>
-        <input type="password" id="confirmarPass" class="form-control" required />
+        <input type="password" id="confirmarPass" name="ConfirmarPass" class="form-control" required />
         <span id="errorPass" class="text-danger" style="display:none;">Las contraseñas no coinciden.</span>
     </div>
-    <button class="btn btn-primary mt-2">Guardar Cambios</button>
-
+    <button class="btn btn-primary mt-2">Cambiar Contraseña</button>
 </form>
 
 <hr />

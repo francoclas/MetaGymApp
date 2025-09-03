@@ -15,12 +15,16 @@ namespace LogicaNegocio.Interfaces.Servicios
         SesionDTO IniciarSesionCliente(LoginDTO login);
         //Registro usuario
         void RegistrarCliente(ClienteDTO cliente);
+        //Cambio de contraseña general
+        public void CambiarPassword(int id, string rol, string nuevaPass);
         //Cambio de contraseña
         void CambiarPass(int IdCliente, string NombreUsuario, string NuevaPassword,string ConfPassword);
         //Modificar datos
         void CambiarTelefono(int IdCliente,string NombreUsuario, string NumeroNuevo);
         void CambiarNombre(int IdCliente, string NombreUsuario, string Nombre);
         void CambiarCorreo(int IdCliente, string NombreUsuario, string Correo);
+        void VerificarUsuarioRepetido(string NombreUsuario, string Correo);
+        void VerificarCorreoUnico(string correo);
         void AsignarFotoFavorita(int mediaId, Extra.Enum_TipoEntidad tipo, int entidadId);
         void DeshabilitarUsuario(int usuarioId, string rol, string password);
         //Acceso administrador

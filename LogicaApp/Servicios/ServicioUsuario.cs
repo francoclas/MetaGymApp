@@ -241,7 +241,7 @@ namespace LogicaNegocio.Servicios
             //Agrego desde repositorio
             _repositorioCliente.Agregar(Nuevo);
         }
-        private void VerificarUsuarioRepetido(string NombreUsuario,string Correo)
+        public void VerificarUsuarioRepetido(string NombreUsuario,string Correo)
         {
             if (_repositorioCliente.ExisteUsuario(NombreUsuario))
                 throw new UsuarioException("Intente con otro usuario");
@@ -254,6 +254,17 @@ namespace LogicaNegocio.Servicios
             if (_repositorioAdmin.ExisteCorreo(Correo))
                 throw new UsuarioException("Intente con otro correo");
             if (_repositorioProfesional.ExisteCorreo(Correo))
+                throw new UsuarioException("Intente con otro correo");
+        }
+        public void VerificarCorreoUnico(string correo)
+        {
+            if (_repositorioCliente.ExisteCorreo(correo))
+                throw new UsuarioException("Intente con otro correo");
+
+            if (_repositorioAdmin.ExisteCorreo(correo))
+                throw new UsuarioException("Intente con otro correo");
+
+            if (_repositorioProfesional.ExisteCorreo(correo))
                 throw new UsuarioException("Intente con otro correo");
         }
         private void ExisteCI(string CI)
@@ -321,31 +332,43 @@ namespace LogicaNegocio.Servicios
             {
                 case "Cliente":
                     Cliente cliente = _repositorioCliente.ObtenerPorId(dto.Id);
+
+                    if (!string.Equals(cliente.Correo, dto.Correo, StringComparison.OrdinalIgnoreCase))
+                    {
+                        VerificarCorreoUnico(dto.Correo);
+                    }
+
                     cliente.NombreCompleto = dto.Nombre;
                     cliente.Correo = dto.Correo;
                     cliente.Telefono = dto.Telefono;
-                    if (!string.IsNullOrWhiteSpace(dto.Pass))
-                        cliente.Pass = HashContrasena.Hashear(dto.Pass);
                     _repositorioCliente.GuardarCambios();
                     break;
 
                 case "Profesional":
                     Profesional profesional = _repositorioProfesional.ObtenerPorId(dto.Id);
+
+                    if (!string.Equals(profesional.Correo, dto.Correo, StringComparison.OrdinalIgnoreCase))
+                    {
+                        VerificarCorreoUnico(dto.Correo);
+                    }
+
                     profesional.NombreCompleto = dto.Nombre;
                     profesional.Correo = dto.Correo;
                     profesional.Telefono = dto.Telefono;
-                    if (!string.IsNullOrWhiteSpace(dto.Pass))
-                        profesional.Pass = HashContrasena.Hashear(dto.Pass);
                     _repositorioProfesional.GuardarCambios();
                     break;
 
                 case "Admin":
                     Admin admin = _repositorioAdmin.ObtenerPorId(dto.Id);
+
+                    if (!string.Equals(admin.Correo, dto.Correo, StringComparison.OrdinalIgnoreCase))
+                    {
+                        VerificarCorreoUnico(dto.Correo);
+                    }
+
                     admin.NombreCompleto = dto.Nombre;
                     admin.Correo = dto.Correo;
                     admin.Telefono = dto.Telefono;
-                    if (!string.IsNullOrWhiteSpace(dto.Pass))
-                        admin.Pass = HashContrasena.Hashear(dto.Pass);
                     _repositorioAdmin.GuardarCambios();
                     break;
 
@@ -353,7 +376,35 @@ namespace LogicaNegocio.Servicios
                     throw new Exception("Rol desconocido.");
             }
         }
- 
+        public void CambiarPassword(int id, string rol, string nuevaPass)
+        {
+            string hash = HashContrasena.Hashear(nuevaPass);
+
+            switch (rol)
+            {
+                case "Cliente":
+                    Cliente cliente = _repositorioCliente.ObtenerPorId(id);
+                    cliente.Pass = hash;
+                    _repositorioCliente.GuardarCambios();
+                    break;
+
+                case "Profesional":
+                    Profesional profesional = _repositorioProfesional.ObtenerPorId(id);
+                    profesional.Pass = hash;
+                    _repositorioProfesional.GuardarCambios();
+                    break;
+
+                case "Admin":
+                    Admin admin = _repositorioAdmin.ObtenerPorId(id);
+                    admin.Pass = hash;
+                    _repositorioAdmin.GuardarCambios();
+                    break;
+
+                default:
+                    throw new Exception("Rol desconocido.");
+            }
+        }
+
 
         public void DeshabilitarUsuario(int usuarioId, string rol, string password)
         {

@@ -139,6 +139,32 @@ namespace MetaGymWebApp.Controllers
         [HttpPost]
         public IActionResult ActualizarFotoPerfil(IFormFile archivo)
         {
+            if(archivo == null)
+            {
+                TempData["Mensaje"] = "Debe seleccionar una imagen a cargar.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("EditarPerfil");
+
+            }
+            string[] tiposValidos = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
+            string contentType = archivo.ContentType;
+
+            if (!tiposValidos.Contains(contentType))
+            {
+                TempData["Mensaje"] = "El archivo debe ser una imagen (jpg, png, gif, webp).";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("EditarPerfil");
+            }
+
+            string[] extensionesValidas = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            string extension = Path.GetExtension(archivo.FileName).ToLowerInvariant();
+
+            if (!extensionesValidas.Contains(extension))
+            {
+                TempData["Mensaje"] = "Extensión de archivo inválida. Solo se permiten imágenes.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("EditarPerfil");
+            }
             int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
             var rol = GestionSesion.ObtenerRol(HttpContext);
 

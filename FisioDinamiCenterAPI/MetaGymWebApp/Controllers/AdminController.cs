@@ -57,6 +57,7 @@ namespace MetaGymWebApp.Controllers
 
             try
             {
+                _usuarioServicio.VerificarUsuarioRepetido(dto.Usuario, dto.Correo);
                 switch (dto.Rol)
                 {
                     case "Admin":
@@ -159,7 +160,10 @@ namespace MetaGymWebApp.Controllers
                 if (!string.Equals(cliente.NombreCompleto, dto.Nombre))
                     cliente.NombreCompleto = dto.Nombre;
                 if (!string.Equals(cliente.Correo, dto.Correo))
+                {
+                    _usuarioServicio.VerificarCorreoUnico(dto.Correo);
                     cliente.Correo = dto.Correo;
+                }
                 if (!string.Equals(cliente.Telefono, dto.Telefono))
                     cliente.Telefono = dto.Telefono;
                 if (!string.IsNullOrEmpty(dto.Pass))
@@ -225,62 +229,85 @@ namespace MetaGymWebApp.Controllers
         [HttpPost]
         public IActionResult GuardarEdicionProfesional(UsuarioGenericoDTO dto, int especialidadId)
         {
-            if (dto.Rol != "Profesional")
+
+            try
             {
-                TempData["Mensaje"] = "Vuelva a intentarlo más tarde.";
-                TempData["TipoMensaje"] = "danger";
+                if (dto.Rol != "Profesional")
+                {
+                    TempData["Mensaje"] = "Vuelva a intentarlo más tarde.";
+                    TempData["TipoMensaje"] = "danger";
+                    return RedirectToAction("GestionUsuarios");
+                }
+
+                Profesional profesional = _profesionalServicio.ObtenerProfesional(dto.Id);
+
+                if (profesional == null)
+                {
+                    TempData["Mensaje"] = "Profesional no encontrado.";
+                    TempData["TipoMensaje"] = "danger";
+                    return RedirectToAction("GestionUsuarios");
+                }
+
+                if (!string.Equals(profesional.NombreCompleto, dto.Nombre))
+                    profesional.NombreCompleto = dto.Nombre;
+                if (!string.Equals(profesional.Correo, dto.Correo))
+                {
+                    _usuarioServicio.VerificarCorreoUnico(dto.Correo);
+                    profesional.Correo = dto.Correo;
+                }
+                if (!string.IsNullOrEmpty(dto.Pass))
+                    profesional.Pass = HashContrasena.Hashear(dto.Pass);
+                if (!string.Equals(profesional.Telefono, dto.Telefono))
+                    profesional.Telefono = dto.Telefono;
+                profesional.UsuarioActivo = dto.UsuarioActivo;
+                if (especialidadId != 0)
+                {
+                    var especialidad = _extraServicio.ObtenerEspecialidad(especialidadId);
+                    _profesionalServicio.AgregarEspecialidad(especialidad, profesional);
+                }
+
+                _profesionalServicio.ActualizarProfesional(profesional);
+
+                TempData["Mensaje"] = "Se actualizó el profesional correctamente.";
+                TempData["TipoMensaje"] = "success";
                 return RedirectToAction("GestionUsuarios");
             }
-
-            Profesional profesional = _profesionalServicio.ObtenerProfesional(dto.Id);
-
-            if (profesional == null)
+            catch (Exception e)
             {
-                TempData["Mensaje"] = "Profesional no encontrado.";
+                TempData["Mensaje"] = e.Message;
                 TempData["TipoMensaje"] = "danger";
-                return RedirectToAction("GestionUsuarios");
+                return RedirectToAction("EditarProfesional", new { dto.Id });
             }
-
-            if (!string.Equals(profesional.NombreCompleto, dto.Nombre))
-                profesional.NombreCompleto = dto.Nombre;
-            if (!string.Equals(profesional.Correo, dto.Correo))
-                profesional.Correo = dto.Correo;
-            if (!string.IsNullOrEmpty(dto.Pass))
-                profesional.Pass = HashContrasena.Hashear(dto.Pass);
-            if (!string.Equals(profesional.Telefono, dto.Telefono))
-                profesional.Telefono = dto.Telefono;
-            profesional.UsuarioActivo = dto.UsuarioActivo;
-            if (especialidadId != 0)
-            {
-                var especialidad = _extraServicio.ObtenerEspecialidad(especialidadId);
-                _profesionalServicio.AgregarEspecialidad(especialidad, profesional);
-            }
-
-            _profesionalServicio.ActualizarProfesional(profesional);
-
-            TempData["Mensaje"] = "Se actualizó el profesional correctamente.";
-            TempData["TipoMensaje"] = "success";
-            return RedirectToAction("GestionUsuarios");
+           
         }
         [HttpPost]
         public IActionResult GuardarTiposAtencionProfesional(int profesionalId, List<int> tiposSeleccionados)
         {
-            if (tiposSeleccionados == null || !tiposSeleccionados.Any())
+            try
             {
-                TempData["Mensaje"] = "No seleccionaste ningún tipo de atención.";
-                TempData["TipoMensaje"] = "warning";
+                if (tiposSeleccionados == null || !tiposSeleccionados.Any())
+                {
+                    TempData["Mensaje"] = "No seleccionaste ningún tipo de atención.";
+                    TempData["TipoMensaje"] = "warning";
+                    return RedirectToAction("EditarProfesional", new { id = profesionalId });
+                }
+
+                var profesional = _profesionalServicio.ObtenerProfesional(profesionalId);
+                foreach (var tipoId in tiposSeleccionados)
+                {
+                    var tipo = _extraServicio.ObtenerTipoAtencion(tipoId);
+                    _profesionalServicio.AgregarTipoAtencion(tipo, profesional);
+                }
+
+                TempData["Mensaje"] = "Tipos de atención asignados correctamente.";
                 return RedirectToAction("EditarProfesional", new { id = profesionalId });
             }
-
-            var profesional = _profesionalServicio.ObtenerProfesional(profesionalId);
-            foreach (var tipoId in tiposSeleccionados)
+            catch (Exception e)
             {
-                var tipo = _extraServicio.ObtenerTipoAtencion(tipoId);
-                _profesionalServicio.AgregarTipoAtencion(tipo, profesional);
+                TempData["Mensaje"] = e.Message;
+                return RedirectToAction("EditarProfesional", new { id = profesionalId });
             }
-
-            TempData["Mensaje"] = "Tipos de atención asignados correctamente.";
-            return RedirectToAction("EditarProfesional", new { id = profesionalId });
+            
         }
         [HttpPost]
         public IActionResult EliminarTipoAtencionProfesional(int profesionalId, int tipoAtencionId)
@@ -350,7 +377,10 @@ namespace MetaGymWebApp.Controllers
                 if (!string.Equals(admin.NombreCompleto, dto.Nombre))
                     admin.NombreCompleto = dto.Nombre;
                 if (!string.Equals(admin.Correo, dto.Correo))
+                {
+                    _usuarioServicio.VerificarCorreoUnico(dto.Correo);
                     admin.Correo = dto.Correo;
+                }
                 if (!string.Equals(admin.Telefono, dto.Telefono))
                     admin.Telefono = dto.Telefono;
                 if (!string.IsNullOrEmpty(dto.Pass))
@@ -368,7 +398,7 @@ namespace MetaGymWebApp.Controllers
             {
                 TempData["Mensaje"] = e.Message;
                 TempData["TipoMensaje"] = "danger";
-                return RedirectToAction("EditarAdmin",dto.Id);
+                return RedirectToAction("EditarAdmin",new { dto.Id });
             }
             
 
