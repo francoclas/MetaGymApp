@@ -15,24 +15,34 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LogicaApp.Servicios
 {
-    public class ServicioRutina : IRutinaServicio 
+    public class ServicioRutina : IRutinaServicio
     {
+        // Repositorios de acceso a datos
         private readonly IRepositorioRutina _repositorioRutina;
         private readonly IRepositorioEjercicio _repositorioEjercicio;
+
+        // Servicio de notificaciones para avisos al cliente
         private readonly INotificacionServicio _notificacionServicio;
 
-        public ServicioRutina(IRepositorioRutina repositorioRutina,IRepositorioEjercicio repositorio, INotificacionServicio inotificacionServicio)
+        // Inyección de dependencias
+        public ServicioRutina(IRepositorioRutina repositorioRutina, IRepositorioEjercicio repositorio, INotificacionServicio inotificacionServicio)
         {
             this._repositorioRutina = repositorioRutina;
             this._repositorioEjercicio = repositorio;
             this._notificacionServicio = inotificacionServicio;
         }
 
+        // =======================
+        // Asignaciones de rutinas
+        // =======================
+
         public void AsignarRutina(Rutina rutina, Cliente cliente)
         {
+            // Pendiente de implementación (no usado en web actual)
             throw new NotImplementedException();
         }
 
+        // Asigna una rutina a un cliente si aún no la tiene asignada
         public void AsignarRutinaACliente(int clienteId, int rutinaId)
         {
             if (!ClienteTieneRutinaAsignada(clienteId, rutinaId))
@@ -44,9 +54,13 @@ namespace LogicaApp.Servicios
                     FechaAsignacion = DateTime.Now
                 };
                 _repositorioRutina.AsignarRutinaACliente(nuevaAsignacion);
+
+                // Notifica al cliente sobre la nueva rutina
                 _notificacionServicio.NotificarRutinaAsignada(clienteId, rutinaId);
             }
         }
+
+        // Reemplaza todas las asignaciones de una rutina por un nuevo conjunto de clientes
         public void ReemplazarAsignaciones(int rutinaId, List<int> nuevosClienteIds)
         {
             var existentes = _repositorioRutina.ObtenerAsignacionesPorRutina(rutinaId);
@@ -57,7 +71,7 @@ namespace LogicaApp.Servicios
                 _repositorioRutina.RemoverAsignacion(a.Id);
             }
 
-            // Asignar los nuevos
+            // Asignar los nuevos (con notificación)
             foreach (var id in nuevosClienteIds)
             {
                 _repositorioRutina.AsignarRutinaACliente(new RutinaAsignada
@@ -69,21 +83,31 @@ namespace LogicaApp.Servicios
                 _notificacionServicio.NotificarRutinaAsignada(id, rutinaId);
             }
         }
+
+        // =======================
+        // Eliminaciones
+        // =======================
+
+        // Elimina una rutina si existe
         public bool EliminarRutina(int rutinaId)
         {
-            Rutina existe = _repositorioRutina.ObtenerPorId(rutinaId); 
+            Rutina existe = _repositorioRutina.ObtenerPorId(rutinaId);
             if (existe == null) return false;
 
             _repositorioRutina.Eliminar(rutinaId);
             return true;
         }
+
+        // Consulta si un cliente ya tiene asignada cierta rutina
         public bool ClienteTieneRutinaAsignada(int clienteId, int rutinaId)
         {
             return _repositorioRutina.ClienteTieneRutinaAsignada(clienteId, rutinaId);
         }
+
+        // Elimina un ejercicio si existe; captura excepción de integridad (sesiones/mediciones)
         public bool EliminarEjercicio(int ejercicioId)
         {
-            Ejercicio existe = _repositorioEjercicio.ObtenerPorId(ejercicioId); 
+            Ejercicio existe = _repositorioEjercicio.ObtenerPorId(ejercicioId);
             if (existe == null) return false;
             try
             {
@@ -95,10 +119,16 @@ namespace LogicaApp.Servicios
             }
             return true;
         }
+
+        //Sin implementar se realiza desde la misma edicio nde rutina
         public void DesasignarRutina(Rutina rutina, Cliente cliente)
         {
             throw new NotImplementedException();
         }
+
+        // =======================
+        // Altas / Modificaciones
+        // =======================
 
         public Rutina GenerarNuevaRutina(Rutina rutina)
         {
@@ -109,7 +139,7 @@ namespace LogicaApp.Servicios
         public Ejercicio GenerarNuevoEjercicio(Ejercicio ejercicio)
         {
             _repositorioEjercicio.Agregar(ejercicio);
-            return ejercicio ;
+            return ejercicio;
         }
 
         public void ModificarEjercicio(Ejercicio ejercicio)
@@ -129,10 +159,16 @@ namespace LogicaApp.Servicios
             _repositorioRutina.Actualizar(rutina);
         }
 
+        // =======================
+        // Consultas / DTOs
+        // =======================
+
+        // Obtiene un ejercicio y lo mapea a DTO
         public EjercicioDTO ObtenerEjercicioDTOId(int id)
         {
             Ejercicio ejercicio = _repositorioEjercicio.ObtenerPorId(id);
             if (ejercicio == null) return null;
+
             EjercicioDTO e = new EjercicioDTO
             {
                 Id = ejercicio.Id,
@@ -146,7 +182,6 @@ namespace LogicaApp.Servicios
                 Instrucciones = ejercicio.Instrucciones
             };
             return e;
-
         }
 
         public Ejercicio ObtenerEjercicioId(int id)
@@ -166,7 +201,7 @@ namespace LogicaApp.Servicios
 
         public List<Rutina> ObtenerRutinasProfesional(int profesionalId)
         {
-           return _repositorioRutina.ObtenerPorProfesional(profesionalId);
+            return _repositorioRutina.ObtenerPorProfesional(profesionalId);
         }
 
         public SesionRutina? ObtenerSesionPorId(int sesionId)
@@ -184,8 +219,13 @@ namespace LogicaApp.Servicios
             return MapeoEjercicioDTO(_repositorioEjercicio.ObtenerTodos().ToList());
         }
 
+        // =======================
+        // Registro de sesiones
+        // =======================
+
         public SesionRutina RegistrarSesion(SesionRutina sesion)
         {
+            // Validaciones básicas de entrada
             if (sesion == null)
                 throw new Exception("La sesión no puede ser nula");
 
@@ -199,17 +239,18 @@ namespace LogicaApp.Servicios
             if (sesion.EjerciciosRealizados == null || !sesion.EjerciciosRealizados.Any())
                 throw new Exception("Debe registrar al menos un ejercicio");
 
-            // Guardar snapshot de la rutina
+            // Snapshot de datos de la rutina (nombre y tipo) para historial
             sesion.NombreRutinaHistorial = rutinaAsignada.Rutina.NombreRutina;
             sesion.TipoRutinaHistorial = rutinaAsignada.Rutina.Tipo;
 
+            // Itera ejercicios realizados y valida/inyecta snapshot de cada ejercicio
             foreach (var ej in sesion.EjerciciosRealizados)
             {
                 var ejercicioOriginal = _repositorioEjercicio.ObtenerPorId((int)ej.EjercicioId);
                 if (ejercicioOriginal == null)
                     throw new Exception($"No se encontró el ejercicio con ID {ej.EjercicioId}");
 
-                // Copiar datos históricos del ejercicio
+                // Copia de campos históricos del ejercicio
                 ej.NombreHistorial = ejercicioOriginal.Nombre;
                 ej.TipoHistorial = ejercicioOriginal.Tipo;
                 ej.GrupoMuscularHistorial = ejercicioOriginal.GrupoMuscular;
@@ -218,10 +259,11 @@ namespace LogicaApp.Servicios
 
                 if (ej.SeRealizo)
                 {
+                    // Si marcó como realizado debe tener series
                     if (ej.Series == null || !ej.Series.Any())
                         throw new Exception($"El ejercicio {ejercicioOriginal.Nombre} está marcado como realizado pero no tiene series");
 
-                    // Validación de mediciones obligatorias
+                    // Validación de mediciones obligatorias del ejercicio
                     var obligatorias = ejercicioOriginal.Mediciones.Where(m => m.EsObligatoria).ToList();
                     foreach (var ob in obligatorias)
                     {
@@ -231,22 +273,28 @@ namespace LogicaApp.Servicios
                 }
             }
 
+            // Marca fecha de realización y delega persistencia
             sesion.FechaRealizada = DateTime.Now;
             return _repositorioRutina.RegistrarSesion(sesion);
         }
 
+        // Reemplaza la lista de ejercicios de una rutina 
         public void ActualizarEjerciciosRutina(Rutina rutina, List<int> nuevosIds)
         {
             _repositorioRutina.ActualizarRutina(rutina, nuevosIds);
         }
+
         public List<SesionRutina> ObtenerSesionesPorAsignacion(int rutinaAsignadaId)
         {
             return _repositorioRutina.ObtenerSesionesPorAsignacion(rutinaAsignadaId);
         }
+
         public void RemoverAsignacion(int rutinaAsignadaId)
         {
             _repositorioRutina.RemoverAsignacion(rutinaAsignadaId);
         }
+
+        // Funciones de mapeo
 
         private List<EjercicioDTO> MapeoEjercicioDTO(List<Ejercicio> Lista)
         {
@@ -262,11 +310,14 @@ namespace LogicaApp.Servicios
                     Medias = item.Medias,
                     Media = item.Medias.FirstOrDefault(m => m.Tipo == Enum_TipoMedia.Imagen),
                     ProfesionalId = item.ProfesionalId
-                    
                 });
             }
             return salida;
         }
+
+        // =======================
+        // Más consultas
+        // =======================
 
         public Rutina ObtenerRutinaPorId(int id)
         {
@@ -277,6 +328,8 @@ namespace LogicaApp.Servicios
         {
             return _repositorioRutina.ObtenerAsignacionesPorRutina(rutinaId);
         }
+
+        // Detalle completo de una asignación para vistas (rutina + sesiones + ejercicios ordenados)
         public RutinaAsignadaDTO ObtenerDetalleRutinaAsignadaDTO(int rutinaAsignadaId, int clienteId)
         {
             var asignacion = _repositorioRutina.ObtenerAsignacionesPorCliente(clienteId)
@@ -311,12 +364,13 @@ namespace LogicaApp.Servicios
 
             return dto;
         }
+
+        // Historial (sesiones) resumido para cliente
         public List<SesionEntrenadaDTO> ObtenerHistorialClienteDTO(int clienteId)
         {
             List<SesionEntrenadaDTO> salida = new List<SesionEntrenadaDTO>();
             foreach (var sesion in _repositorioRutina.ObtenerSesionesPorCliente(clienteId))
             {
-
                 SesionEntrenadaDTO aux = new SesionEntrenadaDTO
                 {
                     SesionRutinaId = sesion.Id,
@@ -324,6 +378,7 @@ namespace LogicaApp.Servicios
                     FechaRealizada = sesion.FechaRealizada,
                     DuracionMin = sesion.DuracionMin,
                 };
+
                 if (sesion.RutinaAsignada != null)
                     aux.NombreRutina = sesion.RutinaAsignada.Rutina.NombreRutina;
 
@@ -335,26 +390,30 @@ namespace LogicaApp.Servicios
 
             return salida;
         }
+
+        // Devuelve el nombre de la rutina por Id 
         public string ObtenerNombreRutina(int idRutina)
         {
             Rutina salida = _repositorioRutina.ObtenerPorId(idRutina);
-
             return salida.NombreRutina;
         }
 
+        // Sesiones completas del cliente
         public List<SesionRutina> ObtenerSesionesCliente(int clienteId)
         {
             return _repositorioRutina.ObtenerSesionesPorCliente(clienteId);
         }
 
+        // Detalle completo de una sesión entrenada (incluye series y mediciones)
         public SesionEntrenadaDTO ObtenerSesionEntrenamiento(int sesionId)
         {
             SesionRutina sesion = _repositorioRutina.ObtenerSesionPorId(sesionId);
-            SesionEntrenadaDTO dto = new SesionEntrenadaDTO
+
+            var dto = new SesionEntrenadaDTO
             {
                 SesionRutinaId = sesion.Id,
                 SeRealizo = true,
-                NombreRutina =  sesion.NombreRutinaHistorial,
+                NombreRutina = sesion.NombreRutinaHistorial, // snapshot guardado en el registro
                 FechaRealizada = sesion.FechaRealizada,
                 DuracionMin = sesion.DuracionMin,
                 Ejercicios = sesion.EjerciciosRealizados.Select(er => new EjercicioRealizadoDTO
@@ -378,6 +437,7 @@ namespace LogicaApp.Servicios
                     }).ToList()
                 }).ToList()
             };
+
             return dto;
         }
     }

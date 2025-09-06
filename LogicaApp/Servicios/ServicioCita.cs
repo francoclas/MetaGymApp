@@ -19,6 +19,7 @@ namespace LogicaApp.Servicios
         private readonly IRepositorioCita _repositorioCita;
         private readonly IRepositorioExtra _repositorioExtra;
         private readonly IRepositorioProfesional _repositorioProfesional;
+
         public ServicioCita(IRepositorioCita repocita, IRepositorioExtra repoex, IRepositorioProfesional repopro)
         {
             _repositorioCita = repocita;
@@ -26,16 +27,22 @@ namespace LogicaApp.Servicios
             _repositorioProfesional = repopro;
         }
 
+        // =========================
+        // ABM de Cita
+        // =========================
 
-        //ABM Cita
+        // Marca una cita como FINALIZADA con su conclusión.
         public void FinalizarCita(CitaDTO cita)
         {
-            //Obtengo Cita 
+            // Busco la cita real
             Cita Actualizada = _repositorioCita.ObtenerPorId(cita.CitaId);
+            // Le digo a la entidad que se finalice (regla de dominio adentro)
             Actualizada.FinalizarCita(cita.Conclusion);
-            //Mando a sistema
+            // Persisto
             _repositorioCita.Actualizar(Actualizada);
         }
+
+        // Update puntuales sobre una cita
         public void ActualizarCita(CitaDTO cita)
         {
             Cita actual = _repositorioCita.ObtenerPorId(cita.CitaId);
@@ -57,17 +64,19 @@ namespace LogicaApp.Servicios
 
             _repositorioCita.Actualizar(actual);
         }
+
+        // Update completo de entidad.
         public void ActualizarEntidad(Cita cita)
         {
             if (cita == null)
                 throw new CitaException("No se recibió la cita a actualizar.");
 
-            // Validar que exista en el sistema
+            // Valido que exista
             Cita original = _repositorioCita.ObtenerPorId(cita.Id);
             if (original == null)
                 throw new CitaException("La cita no existe en el sistema.");
 
-            // Actualizar campos relevantes
+            // Copio campos
             original.Descripcion = cita.Descripcion;
             original.FechaAsistencia = cita.FechaAsistencia;
             original.EspecialidadId = cita.EspecialidadId;
@@ -75,7 +84,8 @@ namespace LogicaApp.Servicios
             original.EstablecimientoId = cita.EstablecimientoId;
             original.ProfesionalId = cita.ProfesionalId;
             original.Estado = cita.Estado;
-            //finalizado o cancelado
+
+            // Si terminó o se canceló, guardo fecha de cierre y conclusión
             if (cita.Estado == EstadoCita.Finalizada || EstadoCita.Cancelada == cita.Estado)
             {
                 original.FechaFinalizacion = cita.FechaFinalizacion;
@@ -83,38 +93,41 @@ namespace LogicaApp.Servicios
             }
             _repositorioCita.Actualizar(original);
         }
+
+        // Crea una nueva cita solicitada por CLIENTE (queda EnEspera y sin profesional).
         public void GenerarNuevaCita(CitaDTO cita)
         {
-            // Obtengo la especialidad, establecimiento y tipo de atención
+            // Traigo referencias necesarias
             Especialidad especialidadAux = _repositorioExtra.ObtenerEspecialidadId(cita.EspecialidadId);
             Establecimiento establecimientoAux = _repositorioExtra.ObtenerEstablecimientoId(cita.EstablecimientoId);
             TipoAtencion tipoAtencionAux = _repositorioExtra.ObtenerTipoAtencionId(cita.TipoAtencionId);
 
-            // Crea la nueva cita con estado EnEspera y sin profesional asignado
+            // Armo la cita
             Cita Nueva = new Cita
             {
                 ClienteId = cita.ClienteId,
                 Especialidad = especialidadAux,
-                Profesional = null,
+                Profesional = null, // sin asignar
                 Establecimiento = establecimientoAux,
                 Descripcion = cita.Descripcion,
                 FechaAsistencia = cita.FechaAsistencia,
                 TipoAtencion = tipoAtencionAux,
                 Estado = EstadoCita.EnEspera
             };
-
-            // Valido la información de la cita
+            //valido
             Nueva.Validar();
 
-            // Cargo al sistema
+            // Guardo
             _repositorioCita.Agregar(Nueva);
         }
+
+        // Crea cita directa.
         public void CrearCita(Cita cita)
         {
             if (cita == null)
                 throw new ArgumentNullException("La cita no puede ser nula.");
 
-            // Validaciones mínimas
+            // Valido datos base
             if (cita.ClienteId == 0 || cita.ProfesionalId == 0 || cita.FechaAsistencia == null)
                 throw new Exception("Faltan datos requeridos para registrar la cita.");
 
@@ -126,28 +139,27 @@ namespace LogicaApp.Servicios
             _repositorioCita.Agregar(cita);
         }
 
+        // Pone la cita en estado CANCELADA con una razón.
         public void CancelarCita(CitaDTO cita)
         {
-            //Obtengo cita
             Cita Cancelada = _repositorioCita.ObtenerPorId(cita.CitaId);
-            //Actualizo estado
             Cancelada.CancelarCita(cita.Conclusion);
-            //Mando a sistema
             _repositorioCita.Actualizar(Cancelada);
-
         }
 
+        // Marca que el cliente NO asistió.
         public void NoAsistioCita(CitaDTO cita)
         {
-            //Obtengo cita
             Cita Cancelada = _repositorioCita.ObtenerPorId(cita.CitaId);
-            //Actualizo
             Cancelada.ClienteNoAsiste();
-            //Mando a sistema
             _repositorioCita.Actualizar(Cancelada);
         }
-       
-        //Solicitud de listas
+
+        // =========================
+        // Consultas y listados
+        // =========================
+
+        // Historial completo del cliente (mapeado a DTO liviano para la vista).
         public List<CitaDTO> SolicitarHistorialCliente(int clienteID)
         {
             List<Cita> aux = _repositorioCita.ObtenerPorCliente(clienteID);
@@ -173,39 +185,50 @@ namespace LogicaApp.Servicios
             }
             return Salida;
         }
+
+        // Historial del profesional tal cual (entidades).
         public List<Cita> SolicitarHistorialProfesional(int profesionalID)
         {
             List<Cita> Salida = _repositorioCita.ObtenerPorProfesional(profesionalID);
             return Salida;
         }
+
+        // Próximas del cliente (estado Aceptada).
         public List<Cita> SolicitarProximasCliente(int clienteID)
         {
             List<Cita> Salida = _repositorioCita.ObtenerPorClienteYEstado(clienteID, EstadoCita.Aceptada);
             return Salida;
         }
+
+        // Próximas del profesional (estado Aceptada).
         public List<Cita> SolicitarProximasProfesional(int profesionalID)
         {
             List<Cita> Salida = _repositorioCita.ObtenerPorProfesionalYEstado(profesionalID, EstadoCita.Aceptada);
             return Salida;
         }
+
+        // Filtro de historial cliente por estado puntual.
         public List<Cita> BuscarPorClienteYEstado(int clienteID, EstadoCita estado)
         {
             List<Cita> Salida = _repositorioCita.ObtenerPorClienteYEstado(clienteID, estado);
             return Salida;
         }
 
+        // Citas por estado (cualquiera).
         public List<Cita> BuscarPorEstado(EstadoCita estado)
         {
             List<Cita> salida = _repositorioCita.BuscarPorEstado(estado);
             return salida;
         }
 
+        // Leer una cita por Id.
         public Cita ObtenerPorId(int citaId)
         {
             Cita salida = _repositorioCita.ObtenerPorId(citaId);
             return salida;
         }
 
+        // Solicitudes en espera que matchean por ESPECIALIDADES del profesional.
         public List<Cita> BuscarSolicitudesSegunEspecialidades(List<int> especialidadesId)
         {
             return _repositorioCita.BuscarPorEstado(EstadoCita.EnEspera)
@@ -213,6 +236,8 @@ namespace LogicaApp.Servicios
                                 .ToList();
         }
 
+        // Calcula slots de 30 minutos para la PRÓXIMA ocurrencia de cada agenda activa del profesional.
+        // Luego descarta los que se pisan con citas aceptadas.
         public List<HorarioDisponibleDTO> ObtenerHorariosDisponibles(int profesionalId)
         {
             List<HorarioDisponibleDTO> salida = new();
@@ -220,18 +245,19 @@ namespace LogicaApp.Servicios
 
             DateTime hoy = DateTime.Now.Date;
 
-            //recorro agenda del profesional
+            // 1) Recorro agendas activas
             foreach (var agenda in profesional.Agendas.Where(a => a.Activo))
             {
-                //por cada dia genero el sector
+                // 2) Busco la próxima fecha de ese día de la semana
                 int diff = ((int)agenda.Dia - (int)hoy.DayOfWeek + 7) % 7;
                 DateTime fechaAgenda = hoy.AddDays(diff);
 
+                // 3) Construyo franja [inicio, fin)
                 DateTime inicioFranja = fechaAgenda.Date + agenda.HoraInicio;
                 DateTime finFranja = fechaAgenda.Date + agenda.HoraFin;
 
+                // 4) Genero slots de 30 minutos
                 DateTime cursor = inicioFranja;
-
                 while (cursor.AddMinutes(30) <= finFranja)
                 {
                     var slot = new HorarioDisponibleDTO
@@ -245,12 +271,12 @@ namespace LogicaApp.Servicios
                 }
             }
 
-            // 4. Obtener citas aceptadas del profesional
+            // 5) Tomo citas aceptadas del pro (para filtrar solapes)
             var citas = profesional.Citas
                 .Where(c => c.Estado == EstadoCita.Aceptada && c.FechaAsistencia.HasValue)
                 .ToList();
 
-            // 5. Filtrar slots que se solapan con citas
+            // 6) Me quedo solo con slots libres (sin choque de horarios)
             salida = salida
                 .Where(slot => !citas.Any(c =>
                     slot.Inicio < c.FechaAsistencia.Value.AddMinutes(30) &&
@@ -260,6 +286,8 @@ namespace LogicaApp.Servicios
 
             return salida;
         }
+
+        // Solicitudes en espera que matchean por TIPOS DE ATENCIÓN del profesional.
         public List<Cita> BuscarSolicitudesSegunTiposAtencion(List<int> tiposAtencionId)
         {
             return _repositorioCita.BuscarPorEstado(EstadoCita.EnEspera)
@@ -267,9 +295,10 @@ namespace LogicaApp.Servicios
                                   .ToList();
         }
 
+        // Registrar cita creada por el profesional (se acepta directo).
         public void RegistrarCitaPorProfesional(CitaDTO cita)
         {
-            //mapeo
+            // mapeo DTO -> entidad
             Cita nueva = new Cita
             {
                 ProfesionalId = cita.ProfesionalId,
@@ -284,6 +313,7 @@ namespace LogicaApp.Servicios
             CrearCita(nueva);
         }
 
+        // Citas del cliente filtradas por estado (mapeo a DTO para la UI).
         public List<CitaDTO> ObtenerCitasClientes(int clienteId, int estadoCita)
         {
             List<Cita> aux = _repositorioCita.ObtenerPorCliente(clienteId);
@@ -312,47 +342,49 @@ namespace LogicaApp.Servicios
                     {
                         ux.TelefonoProfesional = cita.Profesional.Telefono;
                         ux.NombreProfesional = cita.Profesional.NombreCompleto;
-                    };
+                    }
+                    ;
                     Salida.Add(ux);
                 }
-
             }
             return Salida;
         }
+
+        // Todas las citas del cliente (sin filtrar) -> DTO para UI.
         public List<CitaDTO> ObtenerTodasCitasClientes(int clienteId)
         {
             List<Cita> aux = _repositorioCita.ObtenerPorCliente(clienteId);
             List<CitaDTO> Salida = new List<CitaDTO>();
             foreach (Cita cita in aux)
             {
-                    Salida.Add(new CitaDTO
-                    {
-                        CitaId = cita.Id,
-                        ClienteId = clienteId,
-                        Cliente = cita.Cliente,
-                        Estado = cita.Estado,
-                        EspecialidadId = cita.EspecialidadId,
-                        Especialidad = cita.Especialidad,
-                        TipoAtencion = cita.TipoAtencion,
-                        Establecimiento = cita.Establecimiento,
-                        Descripcion = cita.Descripcion,
-                        FechaAsistencia = (DateTime)cita.FechaAsistencia,
-                        FechaCreacion = cita.FechaCreacion,
-                        FechaFinalizacion = cita.FechaFinalizacion,
-                        Conclusion = cita.Conclusion,
-                        NombreProfesional = cita.Profesional.NombreCompleto,
-                        TelefonoProfesional = cita.Profesional.Telefono
-
-
-
-                    });
+                Salida.Add(new CitaDTO
+                {
+                    CitaId = cita.Id,
+                    ClienteId = clienteId,
+                    Cliente = cita.Cliente,
+                    Estado = cita.Estado,
+                    EspecialidadId = cita.EspecialidadId,
+                    Especialidad = cita.Especialidad,
+                    TipoAtencion = cita.TipoAtencion,
+                    Establecimiento = cita.Establecimiento,
+                    Descripcion = cita.Descripcion,
+                    FechaAsistencia = (DateTime)cita.FechaAsistencia,
+                    FechaCreacion = cita.FechaCreacion,
+                    FechaFinalizacion = cita.FechaFinalizacion,
+                    Conclusion = cita.Conclusion,
+                    NombreProfesional = cita.Profesional.NombreCompleto,
+                    TelefonoProfesional = cita.Profesional.Telefono
+                });
             }
             return Salida;
         }
+
+        // Detalle de una cita puntual para mostrar en pantalla.
         public CitaDTO ObtenerDetallesCita(int citaId)
         {
             Cita au = _repositorioCita.ObtenerPorId(citaId);
             if (au == null) { throw new Exception("La cita no existe o se elimino."); }
+
             CitaDTO salida = new CitaDTO
             {
                 CitaId = citaId,
@@ -364,9 +396,10 @@ namespace LogicaApp.Servicios
                 Descripcion = au.Descripcion,
                 FechaCreacion = (DateTime)au.FechaCreacion,
                 FechaAsistencia = (DateTime)au.FechaAsistencia,
-                
             };
-            if(au.Estado == EstadoCita.Finalizada)
+
+            // Datos extra si aplica
+            if (au.Estado == EstadoCita.Finalizada)
             {
                 salida.FechaFinalizacion = (DateTime)au.FechaFinalizacion;
                 salida.Conclusion = au.Conclusion;
@@ -384,7 +417,5 @@ namespace LogicaApp.Servicios
 
             return salida;
         }
-
-        
     }
 }

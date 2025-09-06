@@ -14,16 +14,20 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MetaGymWebApp.Controllers
 {
+    // Controlador para todo lo que maneja el admin en la web
     [AutorizacionRol("Admin")]
     public class AdminController : Controller
     {
+        // Servicios que usa el admin para trabajar (usuarios, extras, publicaciones, etc.)
         private readonly IUsuarioServicio _usuarioServicio;
         private readonly IExtraServicio _extraServicio;
         private readonly IAdminServicio _adminServicio;
         private readonly IProfesionalServicio _profesionalServicio;
         private readonly IClienteServicio _clienteServicio;
         private readonly IMediaServicio _mediaServicio;
-        private readonly IPublicacionServicio  _publicacionServicio;
+        private readonly IPublicacionServicio _publicacionServicio;
+
+        // Constructor: se inyectan todos los servicios necesarios
         public AdminController(IUsuarioServicio u, IExtraServicio extraServicio, IAdminServicio adminServicio, IProfesionalServicio profesionalServicio, IClienteServicio clienteServicio, IMediaServicio mediaServicio, IPublicacionServicio publicacionServicio)
         {
             _usuarioServicio = u;
@@ -34,22 +38,32 @@ namespace MetaGymWebApp.Controllers
             _mediaServicio = mediaServicio;
             _publicacionServicio = publicacionServicio;
         }
+
+        // Página de inicio del panel admin
         public IActionResult Index()
         {
             return View();
         }
 
-        //Creacion de usuarios
+        // =======================
+        // Creación de usuarios
+        // =======================
+
+        // Muestra el form para crear usuario
         [HttpGet]
         public IActionResult CrearUsuario()
         {
             return View(new CrearUsuarioDTO());
         }
+
+        // Recibe el form y crea el usuario según rol
         [HttpPost]
         public IActionResult CrearUsuario(CrearUsuarioDTO dto)
         {
-            if (!ModelState.IsValid) {
-                
+            // Si el form viene mal, vuelvo con mensaje
+            if (!ModelState.IsValid)
+            {
+
                 TempData["Mensaje"] = "Ingrese los correspondientes";
                 TempData["TipoMensaje"] = "danger";
                 return View(dto);
@@ -57,7 +71,9 @@ namespace MetaGymWebApp.Controllers
 
             try
             {
+                // Valido que no haya usuario/correo repetidos
                 _usuarioServicio.VerificarUsuarioRepetido(dto.Usuario, dto.Correo);
+                // Según el rol, llamo a la creación que corresponda
                 switch (dto.Rol)
                 {
                     case "Admin":
@@ -71,40 +87,54 @@ namespace MetaGymWebApp.Controllers
                         break;
                 }
 
+                // Feedback positivo
                 TempData["Mensaje"] = "Usuario creado correctamente.";
                 TempData["TipoMensaje"] = "success";
                 return RedirectToAction("CrearUsuario");
             }
             catch (Exception e)
             {
+                // Cualquier error se informa por TempData y se vuelve al form
                 TempData["Mensaje"] = e.Message;
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("CrearUsuario");
             }
         }
-        //Menu general
+
+        // =======================
+        // Menú general (dashboard)
+        // =======================
+
+        // Carga datos básicos para el panel (listas para mostrar)
         [HttpGet]
-        public IActionResult PanelControl() { 
+        public IActionResult PanelControl()
+        {
             PanelControlAdminModel model = new PanelControlAdminModel();
             model.Establecimientos = _extraServicio.ObtenerEstablecimientos();
-            model.Especialidades = _extraServicio.ObtenerEspecialidades();  
-            return View(model); 
-            
+            model.Especialidades = _extraServicio.ObtenerEspecialidades();
+            return View(model);
+
         }
-        
-        //Seccion usuarios
+
+        // =======================
+        // Gestión de usuarios
+        // =======================
+
+        // Pantalla que lista todos los usuarios (cliente/profesional/admin)
         [HttpGet]
         public IActionResult GestionUsuarios()
         {
-            //Obtengo lista
+            // Armo la lista combinada
             List<UsuarioGenericoDTO> salida = ObtenerUsuariosListado();
-            //Devuelvo
+            // Devuelvo la vista con el modelo
             return View(salida);
         }
+
+        // Redirecciona a la vista de edición según el rol elegido
         [HttpGet]
         public IActionResult EditarUsuario(int id, string rol)
         {
-            //Devuelvo vista de editar segun rol
+            // Redirijo a la acción concreta de edición
             return rol switch
             {
                 "Cliente" => RedirectToAction("EditarCliente", new { id }),
@@ -113,15 +143,19 @@ namespace MetaGymWebApp.Controllers
                 _ => RedirectToAction("GestionUsuarios")
             };
         }
-        //Editar cliente
+
+        // ---------- Clientes ----------
+
+        // Carga datos de un cliente para editar
         [HttpGet]
         public IActionResult EditarCliente(int id)
         {
             try
             {
-                //Instancio cliente desde el repo
+                // Busco cliente
                 Cliente cliente = _clienteServicio.ObtenerPorId(id);
                 if (cliente == null) throw new Exception("No se logro obtener el usuario");
+                // Mapeo a DTO genérico para la vista
                 UsuarioGenericoDTO dto = new UsuarioGenericoDTO
                 {
                     Id = id,
@@ -136,16 +170,20 @@ namespace MetaGymWebApp.Controllers
             }
             catch (Exception e)
             {
+                // Si falla, vuelvo a la lista con mensaje
                 TempData["Mensaje"] = e.Message;
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("GestionUsuarios");
             }
-            
+
         }
+
+        // Guarda cambios de un cliente
         [HttpPost]
         public IActionResult GuardarEdicionCliente(UsuarioGenericoDTO dto)
         {
-            if(dto.Rol != "Cliente")
+            // Seguridad básica: que no venga con rol cambiado
+            if (dto.Rol != "Cliente")
             {
                 TempData["Mensaje"] = "Vuelva a intentarlo mas tarde";
                 TempData["TipoMensaje"] = "danger";
@@ -153,26 +191,30 @@ namespace MetaGymWebApp.Controllers
             }
             try
             {
-                //Obtengo cliente
+                // Obtengo el cliente que se quiere editar
                 Cliente cliente = _clienteServicio.ObtenerPorId(dto.Id);
                 if (cliente == null) throw new Exception("No se logro obtener el usuario");
-                //Valido si hay cambios en la info, si hay seteo el valor nevo
+                // Actualizo solo si cambió algo, así evito escrituras innecesarias
                 if (!string.Equals(cliente.NombreCompleto, dto.Nombre))
                     cliente.NombreCompleto = dto.Nombre;
                 if (!string.Equals(cliente.Correo, dto.Correo))
                 {
+                    // Si cambia el correo, me aseguro que no esté repetido
                     _usuarioServicio.VerificarCorreoUnico(dto.Correo);
                     cliente.Correo = dto.Correo;
                 }
                 if (!string.Equals(cliente.Telefono, dto.Telefono))
                     cliente.Telefono = dto.Telefono;
+                // Cambio de contraseña (si se mandó algo)
                 if (!string.IsNullOrEmpty(dto.Pass))
                 {
                     cliente.Pass = HashContrasena.Hashear(dto.Pass);
                 }
+                // Activo/inactivo
                 cliente.UsuarioActivo = dto.UsuarioActivo;
-                //Actualizo en repo
+                // Persisto
                 _clienteServicio.ActualizarCliente(cliente);
+                // Feedback
                 TempData["Mensaje"] = "Se actualizo usuario: " + cliente.Correo;
                 TempData["TipoMensaje"] = "success";
                 return RedirectToAction("GestionUsuarios");
@@ -183,9 +225,12 @@ namespace MetaGymWebApp.Controllers
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("GestionUsuarios");
             }
-            
+
         }
-        //Editar profesional
+
+        // ---------- Profesionales ----------
+
+        // Carga datos de un profesional para editar (incluye especialidades y tipos de atención)
         [HttpGet]
         public IActionResult EditarProfesional(int id)
         {
@@ -195,13 +240,15 @@ namespace MetaGymWebApp.Controllers
                 if (profesional == null)
                     throw new Exception("Profesional no encontrado.");
 
+                // Listas para selects en la vista
                 var especialidades = _extraServicio.ObtenerEspecialidades();
                 ViewBag.EspecialidadesDisponibles = especialidades;
 
                 var especialidadIds = profesional.Especialidades.Select(e => e.Id).ToList();
-                 var tipos = _extraServicio.ObtenerTiposAtencionPorEspecialidades(especialidadIds);
+                var tipos = _extraServicio.ObtenerTiposAtencionPorEspecialidades(especialidadIds);
                 ViewBag.TiposAtencionDisponibles = tipos;
 
+                // Mapeo a DTO genérico para edición
                 UsuarioGenericoDTO dto = new UsuarioGenericoDTO
                 {
                     Id = profesional.Id,
@@ -226,12 +273,15 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("GestionUsuarios");
             }
         }
+
+        // Guarda cambios de un profesional (datos base + alta de especialidad puntual)
         [HttpPost]
         public IActionResult GuardarEdicionProfesional(UsuarioGenericoDTO dto, int especialidadId)
         {
 
             try
             {
+                // Seguridad: que sea profesional
                 if (dto.Rol != "Profesional")
                 {
                     TempData["Mensaje"] = "Vuelva a intentarlo más tarde.";
@@ -239,6 +289,7 @@ namespace MetaGymWebApp.Controllers
                     return RedirectToAction("GestionUsuarios");
                 }
 
+                // Busco el profesional
                 Profesional profesional = _profesionalServicio.ObtenerProfesional(dto.Id);
 
                 if (profesional == null)
@@ -248,6 +299,7 @@ namespace MetaGymWebApp.Controllers
                     return RedirectToAction("GestionUsuarios");
                 }
 
+                // Actualizo campos si cambiaron
                 if (!string.Equals(profesional.NombreCompleto, dto.Nombre))
                     profesional.NombreCompleto = dto.Nombre;
                 if (!string.Equals(profesional.Correo, dto.Correo))
@@ -259,13 +311,17 @@ namespace MetaGymWebApp.Controllers
                     profesional.Pass = HashContrasena.Hashear(dto.Pass);
                 if (!string.Equals(profesional.Telefono, dto.Telefono))
                     profesional.Telefono = dto.Telefono;
+
                 profesional.UsuarioActivo = dto.UsuarioActivo;
+
+                // Alta rápida de una especialidad (si vino una)
                 if (especialidadId != 0)
                 {
                     var especialidad = _extraServicio.ObtenerEspecialidad(especialidadId);
                     _profesionalServicio.AgregarEspecialidad(especialidad, profesional);
                 }
 
+                // Persisto cambios
                 _profesionalServicio.ActualizarProfesional(profesional);
 
                 TempData["Mensaje"] = "Se actualizó el profesional correctamente.";
@@ -278,13 +334,16 @@ namespace MetaGymWebApp.Controllers
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("EditarProfesional", new { dto.Id });
             }
-           
+
         }
+
+        // Asigna tipos de atención al profesional
         [HttpPost]
         public IActionResult GuardarTiposAtencionProfesional(int profesionalId, List<int> tiposSeleccionados)
         {
             try
             {
+                // Debe venir algo seleccionado
                 if (tiposSeleccionados == null || !tiposSeleccionados.Any())
                 {
                     TempData["Mensaje"] = "No seleccionaste ningún tipo de atención.";
@@ -293,6 +352,7 @@ namespace MetaGymWebApp.Controllers
                 }
 
                 var profesional = _profesionalServicio.ObtenerProfesional(profesionalId);
+                // Asigno cada tipo al profesional
                 foreach (var tipoId in tiposSeleccionados)
                 {
                     var tipo = _extraServicio.ObtenerTipoAtencion(tipoId);
@@ -307,8 +367,10 @@ namespace MetaGymWebApp.Controllers
                 TempData["Mensaje"] = e.Message;
                 return RedirectToAction("EditarProfesional", new { id = profesionalId });
             }
-            
+
         }
+
+        // Quita un tipo de atención del profesional
         [HttpPost]
         public IActionResult EliminarTipoAtencionProfesional(int profesionalId, int tipoAtencionId)
         {
@@ -326,17 +388,20 @@ namespace MetaGymWebApp.Controllers
 
             return RedirectToAction("EditarProfesional", new { id = profesionalId });
         }
-        //Editar admin
+
+        // ---------- Admins ----------
+
+        // Carga datos de un admin para editar
         [HttpGet]
         public IActionResult EditarAdmin(int id)
         {
             try
             {
-                //Obtengo instancia del admin desde repo
+                // Busco instancia del admin
                 Admin admin = _adminServicio.ObtenerPorId(id);
                 if (admin == null) throw new Exception("No se obtuvo el usuario");
 
-                //Mapeo a usuario generico
+                // Mapeo a DTO genérico
                 UsuarioGenericoDTO dto = new UsuarioGenericoDTO
                 {
                     Id = id,
@@ -346,9 +411,9 @@ namespace MetaGymWebApp.Controllers
                     Telefono = admin.Telefono,
                     UsuarioActivo = admin.UsuarioActivo,
                     Rol = "Admin"
-                    
+
                 };
-                //Devuelvo vista
+                // Devuelvo la vista
                 return View(dto);
             }
             catch (Exception e)
@@ -357,23 +422,25 @@ namespace MetaGymWebApp.Controllers
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("GestionUsuarios");
             }
-            
+
         }
+
+        // Guarda cambios de admin
         [HttpPost]
         public IActionResult GuardarEdicionAdmin(UsuarioGenericoDTO dto)
         {
             try
             {
-                //Verifico que sea admin
+                // Seguridad: que efectivamente sea admin
                 if (dto.Rol != "Admin")
                 {
                     TempData["Mensaje"] = "Vuelva a intentarlo mas tarde";
                     TempData["TipoMensaje"] = "danger";
                     return RedirectToAction("GestionUsuarios");
                 }
-                //Obtengo admin
+                // Busco admin
                 Admin admin = _adminServicio.ObtenerPorId(dto.Id);
-                //valido la info
+                // Actualizo campos si cambiaron
                 if (!string.Equals(admin.NombreCompleto, dto.Nombre))
                     admin.NombreCompleto = dto.Nombre;
                 if (!string.Equals(admin.Correo, dto.Correo))
@@ -388,7 +455,7 @@ namespace MetaGymWebApp.Controllers
                     admin.Pass = HashContrasena.Hashear(dto.Pass);
                 }
                 admin.UsuarioActivo = dto.UsuarioActivo;
-                //Actualizo
+                // Persisto cambios
                 _adminServicio.ActualizarAdmin(admin);
                 TempData["Mensaje"] = "Se actualizo usuario: " + admin.Correo;
                 TempData["TipoMensaje"] = "success";
@@ -398,27 +465,34 @@ namespace MetaGymWebApp.Controllers
             {
                 TempData["Mensaje"] = e.Message;
                 TempData["TipoMensaje"] = "danger";
-                return RedirectToAction("EditarAdmin",new { dto.Id });
+                return RedirectToAction("EditarAdmin", new { dto.Id });
             }
-            
+
 
         }
-        //Seccion extras
+
+        // =======================
+        // Sección: Extras
+        // =======================
+
+        // Vista para registrar una especialidad
         [HttpGet]
         public IActionResult RegistrarEspecialidad()
         {
             return View();
         }
 
+        // Alta de especialidad
         [HttpPost]
         public IActionResult RegistrarEspecialidad(EspecialidadDTO dto)
         {
             try
             {
+                // Validaciones básicas
                 if (string.IsNullOrEmpty(dto.NombreEspecialidad)) throw new Exception("Debe ingresar un nombre.");
                 if (string.IsNullOrEmpty(dto.DescripcionEspecialidad)) throw new Exception("Debe ingresar una descripcion.");
 
-                //Guardo en el repo
+                // Guardo en repo
                 _extraServicio.RegistrarEspecialidad(dto);
                 TempData["Mensaje"] = "Especialidad registrada correctamente.";
                 TempData["TipoMensaje"] = "success";
@@ -426,12 +500,16 @@ namespace MetaGymWebApp.Controllers
             }
             catch (Exception e)
             {
+                // OJO: acá se estaba guardando e (objeto) en TempData["Mensaje"].
+                // Mantengo tu lógica exacta, pero lo dejo comentado para revisar en el futuro.
                 TempData["Mensaje"] = e;
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("RegistrarEspecialidad", dto);
             }
-            
+
         }
+
+        // Cargar una especialidad para editar
         [HttpGet]
         public IActionResult EditarEspecialidad(int id)
         {
@@ -443,6 +521,7 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("PanelControl");
             }
 
+            // Mapeo a DTO
             EspecialidadDTO dto = new EspecialidadDTO
             {
                 Id = entidad.Id,
@@ -453,6 +532,7 @@ namespace MetaGymWebApp.Controllers
             return View(dto);
         }
 
+        // Guardar edición de especialidad
         [HttpPost]
         public IActionResult EditarEspecialidad(EspecialidadDTO dto)
         {
@@ -477,6 +557,7 @@ namespace MetaGymWebApp.Controllers
             }
         }
 
+        // Agregar un tipo de atención a una especialidad
         [HttpPost]
         public IActionResult AgregarTipoAtencion(int especialidadId, string nombre, string descripcion)
         {
@@ -488,6 +569,7 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("EditarEspecialidad", new { id = especialidadId });
             }
 
+            // Armo el tipo y lo creo
             TipoAtencion nuevo = new TipoAtencion
             {
                 Nombre = nombre,
@@ -499,18 +581,24 @@ namespace MetaGymWebApp.Controllers
             TempData["Mensaje"] = "Tipo de atención agregado.";
             return RedirectToAction("EditarEspecialidad", new { id = especialidadId });
         }
+
+        // =======================
+        // Sección: Establecimientos
+        // =======================
+
+        // Vista para registrar establecimiento
         [HttpGet]
         public IActionResult RegistrarEstablecimiento()
         {
             return View();
         }
 
-    
+        // Alta de establecimiento (+ opcional subir imagen)
         [HttpPost]
         public IActionResult RegistrarEstablecimiento(EstablecimientoDTO dto, IFormFile archivo)
         {
 
-            //Reviso que el modelo estebien
+            // Valido el modelo
             if (!ModelState.IsValid)
             {
                 TempData["Mensaje"] = "Datos inválidos.";
@@ -518,19 +606,19 @@ namespace MetaGymWebApp.Controllers
                 return View(dto);
             }
 
-            //Instancio nuevo establecimiento para mandar al sistema
+            // Instancia para persistir
             var nuevo = new Establecimiento
             {
                 Nombre = dto.Nombre,
                 Direccion = dto.Direccion,
                 Longitud = dto.Longitud,
                 Latitud = dto.Latitud,
-                
+
             };
 
-            //Envio a la bd
-            _extraServicio.RegistrarNuevoEstablecimiento(nuevo); 
-            //Verifico si cargaron imagen, si es asi, mando imagen al sistema
+            // Guardo establecimiento
+            _extraServicio.RegistrarNuevoEstablecimiento(nuevo);
+            // Si vino archivo, lo guardo asociado
             if (archivo != null && archivo.Length > 0)
             {
                 _mediaServicio.GuardarArchivo(archivo, Enum_TipoEntidad.Establecimiento, nuevo.Id);
@@ -539,13 +627,14 @@ namespace MetaGymWebApp.Controllers
             TempData["Mensaje"] = "Establecimiento registrado correctamente.";
             return RedirectToAction("PanelControl");
         }
-        //Ediciones
+
+        // Cargar establecimiento para editar
         [HttpGet]
         public IActionResult EditarEstablecimiento(int id)
         {
             try
             {
-                //Instancio desde repo
+                // Busco por id
                 Establecimiento entidad = _extraServicio.ObtenerEstablecimiento(id);
                 if (entidad == null)
                 {
@@ -554,8 +643,9 @@ namespace MetaGymWebApp.Controllers
                     return RedirectToAction("PanelControl");
                 }
 
+                // Foto por defecto si no hay media asociada
                 var mediaUrl = entidad.Media?.FirstOrDefault()?.Url ?? "/mediaweb/default/gym_default.jpg";
-                //Mapeo 
+                // Mapeo a DTO para la vista
                 EstablecimientoDTO dto = new EstablecimientoDTO
                 {
                     Id = entidad.Id,
@@ -574,25 +664,26 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("PanelControl");
             }
 
-            
+
         }
 
+        // Guardar edición de establecimiento (+ reemplazo de imagen si vino)
         [HttpPost]
         public IActionResult EditarEstablecimiento(EstablecimientoDTO dto, IFormFile archivo)
         {
             try
             {
-                //Instancio desde l repositorio
+                // Busco el que se quiere editar
                 Establecimiento establecimiento = _extraServicio.ObtenerEstablecimiento(dto.Id);
                 if (establecimiento == null) return NotFound();
-                //Mapeo cambios y guardo
+                // Actualizo campos
                 establecimiento.Nombre = dto.Nombre;
                 establecimiento.Direccion = dto.Direccion;
                 establecimiento.Longitud = dto.Longitud;
                 establecimiento.Latitud = dto.Latitud;
                 _extraServicio.GuardarCambios();
 
-                //reviso archivos y actualizo
+                // Si vino archivo, reemplazo el existente
                 if (archivo != null && archivo.Length > 0)
                 {
                     _mediaServicio.ReemplazarArchivo(archivo, Enum_TipoEntidad.Establecimiento, establecimiento.Id);
@@ -607,10 +698,10 @@ namespace MetaGymWebApp.Controllers
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("PanelControl");
             }
-            
+
         }
 
-        //Eliminar especialidades
+        // Quitar una especialidad de un profesional (atajo desde admin)
         [HttpPost]
         public IActionResult EliminarEspecialidadProfesional(int profesionalId, int especialidadId)
         {
@@ -621,10 +712,11 @@ namespace MetaGymWebApp.Controllers
 
             return RedirectToAction("EditarUsuario", new { id = profesionalId, rol = "Profesional" });
         }
-        //Obtener la lista de usuarios para el menu de control usuarios y poder acceder a editarlos
+
+        // Helper: arma lista unificada de usuarios para la vista de gestión
         private List<UsuarioGenericoDTO> ObtenerUsuariosListado()
         {
-            //Se mapea de cada lista a usuario generico
+            // Mapeo de cada tipo a un DTO genérico
             var clientes = _clienteServicio.ObtenerTodos()
             .Select(c => new UsuarioGenericoDTO { Id = c.Id, Usuario = c.NombreUsuario, Nombre = c.NombreCompleto, Correo = c.Correo, Rol = "Cliente" });
 
@@ -633,19 +725,24 @@ namespace MetaGymWebApp.Controllers
 
             var admins = _adminServicio.ObtenerTodos()
                 .Select(a => new UsuarioGenericoDTO { Id = a.Id, Usuario = a.NombreUsuario, Nombre = a.NombreUsuario, Correo = a.Correo, Rol = "Admin" });
-            //Se devuelve como lista concatenada
+            // Devuelvo concatenado
             var modelo = clientes.Concat(profesionales).Concat(admins).ToList();
             return modelo;
         }
-        //Publicaciones
+
+        // =======================
+        // Sección: Publicaciones
+        // =======================
+
+        // Vista principal para revisar solicitudes pendientes
         [HttpGet]
         public IActionResult ControlPublicaciones()
         {
 
-            //Obtnego publicaciones con estado= "Pendiente" ya mapeadas al DTO
+            // Pido al servicio las publicaciones en estado "Pendiente"
             List<PublicacionDTO> solicitudes = _publicacionServicio.ObtenerPendientes();
 
-            //Mapeo al modelo de la vista
+            // Armo el modelo de la vista
             ControlPublicacionesModelo modelo = new ControlPublicacionesModelo
             {
                 PublicacionesPendientes = solicitudes
@@ -653,6 +750,8 @@ namespace MetaGymWebApp.Controllers
 
             return View(modelo);
         }
+
+        // Historial propio del admin (lo que creó, autorizó o rechazó)
         [HttpGet]
 
         public IActionResult MisPublicaciones()
@@ -661,7 +760,7 @@ namespace MetaGymWebApp.Controllers
 
             MisPublicacionesAdminModelo modelo = new MisPublicacionesAdminModelo
             {
-                //Obtengo historial del admin y mapeo al modelo
+                // Cargo listas desde el servicio
                 PublicacionesCreadas = _publicacionServicio.ObtenerCreadasPorAdmin(adminId),
                 PublicacionesAutorizadas = _publicacionServicio.ObtenerAutorizadasPorAdmin(adminId),
                 PublicacionesRechazadas = _publicacionServicio.ObtenerRechazadasPorAdmin(adminId)
@@ -670,18 +769,20 @@ namespace MetaGymWebApp.Controllers
             return View(modelo);
         }
 
+        // Form para crear una publicación como admin
         [HttpGet]
         public IActionResult CrearPublicacion()
         {
             return View();
         }
 
+        // Procesa el alta de publicación del admin (con media opcional)
         [HttpPost]
         public IActionResult CrearPublicacion(CrearPublicacionDTO dto)
         {
             try
             {
-                //Verifico los datos ingresados
+                // Validaciones básicas de contenido
                 if (string.IsNullOrWhiteSpace(dto.Titulo))
                     throw new Exception("El título es obligatorio.");
 
@@ -695,7 +796,7 @@ namespace MetaGymWebApp.Controllers
                     throw new Exception("La descripción no puede superar los 1000 caracteres.");
                 var archivos = dto.ArchivosMedia;
                 int adminId = GestionSesion.ObtenerUsuarioId(HttpContext);
-                //Mapeo a nueva publicacion
+                // Armo la publicación
                 Publicacion publicacion = new Publicacion
                 {
                     Titulo = dto.Titulo,
@@ -707,12 +808,12 @@ namespace MetaGymWebApp.Controllers
                     AdminCreadorId = adminId,
                     Estado = Enum_EstadoPublicacion.Aprobada,
                     ListaMedia = new List<Media>(),
-                    
+
                 };
-                //Envio a repo
+                // Persisto
                 _publicacionServicio.CrearPublicacionAdmin(publicacion);
 
-                //Recorro si tiene archivos y guardo
+                // Si vinieron archivos, los guardo asociados
                 if (archivos != null && archivos.Any())
                 {
                     foreach (var archivo in archivos)
@@ -737,12 +838,13 @@ namespace MetaGymWebApp.Controllers
 
         }
 
+        // Detalles de una publicación específica
         [HttpGet]
         public IActionResult DetallesPublicacion(int id)
         {
-            //Obtengo publicacion desde repo
+            // Busco la publicación
             PublicacionDTO publicacion = _publicacionServicio.ObtenerPorId(id);
-            //Envio a menu si no existe
+            // Si no existe, vuelvo
             if (publicacion == null)
             {
                 TempData["Mensaje"] = "No se encontro la publicacion o no existe.";
@@ -752,13 +854,14 @@ namespace MetaGymWebApp.Controllers
             ;
             return View(publicacion);
         }
-        //Revision de publicacion
+
+        // Vista de revisión (cuando está Pendiente)
         [HttpGet]
         public IActionResult RevisionPublicacion(int id)
         {
-            //Instancio publicacion
+            // Busco publicación
             var publicacion = _publicacionServicio.ObtenerPorId(id);
-            //valido que exista si no lo devuelvo al menu de publicaciones
+            // Si no existe o ya se revisó, vuelvo
             if (publicacion == null || publicacion.Estado != Enum_EstadoPublicacion.Pendiente)
             {
                 TempData["Mensaje"] = "La publicación no existe o ya fue revisada.";
@@ -768,25 +871,24 @@ namespace MetaGymWebApp.Controllers
 
             return View("RevisionPublicacion", publicacion);
         }
-      
+
+        // Acción que confirma la revisión (aprobar / rechazar)
         [HttpPost]
         public IActionResult ConfirmarRevision(int PublicacionId, string Accion, string? MotivoRechazo)
         {
             try
             {
-                //Evaluo si se acepta o se rechaza
+                // Si viene aceptar, apruebo
                 if (Accion == "Aceptar")
                 {
-                    //Apruebo la publicacion
                     _publicacionServicio.AprobarPublicacion(PublicacionId, GestionSesion.ObtenerUsuarioId(HttpContext));
                     TempData["Mensaje"] = "Publicación aprobada correctamente.";
                 }
+                // Si viene rechazar, valido motivo y rechazo
                 else if (Accion == "Rechazar")
                 {
-                    //Verifico que haya motivo de rechazo
                     if (string.IsNullOrWhiteSpace(MotivoRechazo))
                         throw new Exception("Debe especificar el motivo del rechazo.");
-                    //Rechazo la publicacion
                     _publicacionServicio.RechazarPublicacion(PublicacionId, MotivoRechazo, GestionSesion.ObtenerUsuarioId(HttpContext));
                     TempData["Mensaje"] = "Publicación rechazada correctamente.";
                 }
@@ -794,7 +896,7 @@ namespace MetaGymWebApp.Controllers
                 {
                     throw new Exception("Acción no reconocida.");
                 }
-                //Devuelvo a control
+                // Feedback y vuelvo al listado
                 TempData["TipoMensaje"] = "success";
                 return RedirectToAction("ControlPublicaciones");
             }
@@ -805,6 +907,8 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("RevisionPublicacion", new { id = PublicacionId });
             }
         }
+
+        // Carga de publicación para edición manual
         [HttpGet]
         public IActionResult EditarPublicacion(int id)
         {
@@ -816,7 +920,7 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("ControlPublicaciones");
             }
 
-            // Cargo enum en ViewBag
+            // Cargo enum en ViewBag para el select de estado
             ViewBag.Estados = Enum.GetValues(typeof(Enum_EstadoPublicacion))
                                   .Cast<Enum_EstadoPublicacion>()
                                   .Select(e => new SelectListItem
@@ -828,31 +932,31 @@ namespace MetaGymWebApp.Controllers
             return View(publicacion);
         }
 
+        // Guarda cambios manuales de una publicación + agrega media nueva si llega
         [HttpPost]
         public IActionResult EditarPublicacion(int Id, string Titulo, string Descripcion, bool EsPrivada, int Estado, bool MostrarEnNoticiasPublicas, List<IFormFile> archivos)
         {
             try
             {
-                //Instancio publicacion
+                // Busco la publicación
                 PublicacionDTO pub = _publicacionServicio.ObtenerPorId(Id);
-                //Valido que exista
+                // Valido existencia y datos mínimos
                 if (pub == null) throw new Exception("Publicación no encontrada.");
                 if (string.IsNullOrEmpty(Titulo)) throw new Exception("El titulo no puede estar vacia.");
-                //Seteo los cambios
+                // Seteo cambios
                 pub.Titulo = Titulo;
                 pub.Descripcion = Descripcion;
                 pub.EsPrivada = EsPrivada;
                 pub.MostrarEnNoticiasPublicas = MostrarEnNoticiasPublicas;
                 pub.Estado = (Enum_EstadoPublicacion)Estado;
-                //Actuaolizo en el repositori
+                // Actualizo en el servicio
                 _publicacionServicio.ActualizarPublicacion(pub);
 
 
-                //Si hay archivos en la publicacion(contando los actuales si existen)
+                // Si llegan archivos, los guardo asociados
                 if (archivos != null && archivos.Any())
                 {
                     foreach (var archivo in archivos)
-                        //Actualizo
                         _mediaServicio.GuardarArchivo(archivo, Enum_TipoEntidad.Publicacion, pub.Id);
                 }
 
@@ -867,10 +971,12 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("MisPublicaciones");
             }
         }
+
+        // Elimina una media puntual de una publicación
         [HttpPost]
         public IActionResult EliminarMedia(int mediaId, int publicacionId)
         {
-            //Para poder borrar  imagenes
+            // Para poder borrar imagenes
             try
             {
                 _mediaServicio.EliminarMedia(mediaId);
@@ -882,7 +988,7 @@ namespace MetaGymWebApp.Controllers
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("MisPublicaciones");
             }
-            
+
         }
     }
 }

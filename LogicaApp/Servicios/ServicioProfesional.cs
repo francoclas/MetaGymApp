@@ -12,83 +12,106 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LogicaApp.Servicios
 {
-    public class ServicioProfesional : IProfesionalServicio
 
+    public class ServicioProfesional : IProfesionalServicio
     {
+        // Repositorio de persistencia para Profesional
         private readonly IRepositorioProfesional _repositorioProfesional;
+
+        // Servicio de extras para resolver Tipos de Atención, etc.
         private readonly IExtraServicio _extraServicio;
-        public ServicioProfesional (IRepositorioProfesional repoProfesional, IExtraServicio extraServicio)
+
+        // Inyección de dependencias
+        public ServicioProfesional(IRepositorioProfesional repoProfesional, IExtraServicio extraServicio)
         {
             _repositorioProfesional = repoProfesional;
             _extraServicio = extraServicio;
         }
+
+        // Actualización básica
+
         public void ActualizarProfesional(Profesional profesional)
         {
-            //Mando el nuevo profesional a la base
+            // Persiste los cambios del profesional
             _repositorioProfesional.Actualizar(profesional);
         }
+
+        // Especialidades
+
         public void AgregarEspecialidad(Especialidad especialidad, Profesional profesional)
         {
-            //Verifico que no tenga la especialidad
+            // Evita duplicar la especialidad en la colección
             if (!profesional.Especialidades.Any(e => e.Id == especialidad.Id))
             {
-                //La agrego y actualizo
                 profesional.Especialidades.Add(especialidad);
                 _repositorioProfesional.Actualizar(profesional);
             }
         }
+
         public void EliminarEspecialidad(Especialidad especialidad, Profesional profesional)
         {
-            //Obtengo la especialidad
+            // Busca la especialidad en la colección del profesional
             var existente = profesional.Especialidades.FirstOrDefault(e => e.Id == especialidad.Id);
-            //Verifico que la tenga asignada
             if (existente != null)
             {
-                //La elimino
+                // La remueve y persiste
                 profesional.Especialidades.Remove(existente);
                 _repositorioProfesional.Actualizar(profesional);
             }
         }
 
+        // Publicaciones / Citas (no implementado) Se gestiona en su respectivo servicio
+
         public void EnviarPublicacion(Publicacion publicacion)
         {
+            // Pendiente de implementación
             throw new NotImplementedException();
         }
 
         public void GenerarCita(Cita cita)
         {
+            // Pendiente de implementación
             throw new NotImplementedException();
-        }
-
-        public List<int> ObtenerEspecialidadesProfesional(int profesionalId)
-        {
-            //Obtengo profesional
-            Profesional pro = _repositorioProfesional.ObtenerPorId(profesionalId);
-            // mando las ids
-            return pro.Especialidades.Select(x => x.Id).ToList();
-        }
-
-        public Profesional ObtenerProfesional(int id)
-        {
-            return _repositorioProfesional.ObtenerPorId(id);
-        }
-
-        public List<Profesional> ObtenerTodos()
-        {
-            return _repositorioProfesional.ObtenerTodos().ToList();
         }
 
         public void RechazarCita(Cita cita)
         {
+            // Pendiente de implementación
             throw new NotImplementedException();
         }
 
         public void RegistrarProfesional(Profesional profesional)
         {
+            // Pendiente de implementación
             throw new NotImplementedException();
         }
+
+        // Consultas de Profesional
+
+        public List<int> ObtenerEspecialidadesProfesional(int profesionalId)
+        {
+            // Obtiene el profesional y devuelve solo los Ids de sus especialidades
+            Profesional pro = _repositorioProfesional.ObtenerPorId(profesionalId);
+            return pro.Especialidades.Select(x => x.Id).ToList();
+        }
+
+        public Profesional ObtenerProfesional(int id)
+        {
+            // Trae un profesional por Id 
+            return _repositorioProfesional.ObtenerPorId(id);
+        }
+
+        public List<Profesional> ObtenerTodos()
+        {
+            // Lista de todos los profesionales
+            return _repositorioProfesional.ObtenerTodos().ToList();
+        }
+
+        // Tipos de atención
+
         public void AsignarTiposAtencion(int profesionalId, List<int> tipoAtencionIds)
         {
+            // Reemplaza la colección completa de tipos de atención por los enviados
             var profesional = ObtenerProfesional(profesionalId);
             if (profesional == null) throw new Exception("Profesional no encontrado.");
 
@@ -97,6 +120,7 @@ namespace LogicaApp.Servicios
 
             _repositorioProfesional.Actualizar(profesional);
         }
+
         public void AgregarTipoAtencion(TipoAtencion tipo, Profesional profesional)
         {
             if (!profesional.TiposAtencion.Contains(tipo))
@@ -105,6 +129,7 @@ namespace LogicaApp.Servicios
                 _repositorioProfesional.Actualizar(profesional);
             }
         }
+
         public void EliminarTipoAtencion(int profesionalId, int tipoAtencionId)
         {
             var profesional = ObtenerProfesional(profesionalId);
@@ -117,8 +142,10 @@ namespace LogicaApp.Servicios
                 _repositorioProfesional.Actualizar(profesional);
             }
         }
+
         public List<int> ObtenerTiposAtencionProfesional(int profesionalId)
         {
+            // A diferencia de ObtenerEspecialidadesProfesional, aquí se valida null y se lanza una excepción explícita
             Profesional profe = _repositorioProfesional.ObtenerPorId(profesionalId);
 
             if (profe == null)
@@ -141,7 +168,8 @@ namespace LogicaApp.Servicios
                     NombreEspecialidad = item.NombreEspecialidad,
                     TipoAtenciones = new List<TipoAtencionDTO>()
                 };
-                if(item.TiposAtencion != null)
+
+                if (item.TiposAtencion != null)
                 {
                     foreach (TipoAtencion tp in item.TiposAtencion)
                     {
@@ -154,7 +182,7 @@ namespace LogicaApp.Servicios
                         });
                     }
                 }
-                
+
                 salida.Add(aux);
             }
             return salida;

@@ -8,11 +8,13 @@ public class RepoNotificacion : IRepositorioNotificacion
 {
     private readonly DbContextApp _context;
 
+    // Inyección de DbContext
     public RepoNotificacion(DbContextApp context)
     {
         _context = context;
     }
 
+    // Alta de notificación 
     public void Crear(Notificacion notificacion)
     {
         notificacion.Fecha = DateTime.Now;
@@ -20,6 +22,7 @@ public class RepoNotificacion : IRepositorioNotificacion
         _context.SaveChanges();
     }
 
+    // Marca una notificación como leída
     public void MarcarComoLeida(int notificacionId)
     {
         var noti = _context.Notificaciones.FirstOrDefault(n => n.Id == notificacionId);
@@ -30,6 +33,11 @@ public class RepoNotificacion : IRepositorioNotificacion
         }
     }
 
+    // =======================
+    // Consultas por usuario
+    // =======================
+
+    // Devuelve las notificaciones leídas del usuario según su rol
     public List<Notificacion> ObtenerLeidasUsuario(int usuarioId, string rolUsuario)
     {
         List<Notificacion> salida = new List<Notificacion>();
@@ -60,6 +68,7 @@ public class RepoNotificacion : IRepositorioNotificacion
         return salida;
     }
 
+    // Devuelve las no leídas del usuario según su rol
     public List<Notificacion> ObtenerNoLeidasUsuario(int usuarioId, string rolUsuario)
     {
         List<Notificacion> salida = new List<Notificacion>();
@@ -90,10 +99,12 @@ public class RepoNotificacion : IRepositorioNotificacion
         return salida;
     }
 
+    // Obtiene todas las notificaciones del usuario
     public List<Notificacion> ObtenerPorUsuario(int usuarioId, string rolUsuario, Enum_TipoNotificacion? tipo = null)
     {
         IQueryable<Notificacion> salida = _context.Notificaciones.AsQueryable();
 
+        // Filtro base por rol
         switch (rolUsuario.ToLower())
         {
             case "cliente":
@@ -113,15 +124,15 @@ public class RepoNotificacion : IRepositorioNotificacion
                 return new List<Notificacion>();
         }
 
+        // Filtro opcional por tipo
         if (tipo.HasValue)
         {
             salida = salida.Where(n => n.Tipo == tipo.Value);
         }
 
+        // Orden descendente por fecha 
         return salida
             .OrderByDescending(n => n.Fecha)
             .ToList();
     }
-
-
 }

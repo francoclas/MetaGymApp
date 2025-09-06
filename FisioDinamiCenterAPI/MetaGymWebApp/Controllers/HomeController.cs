@@ -10,20 +10,26 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MetaGymWebApp.Controllers
 {
+    // Controlador general para vistas públicas, login/registro y perfil de usuario
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IUsuarioServicio _usuarioServicio;
         private readonly IMediaServicio _mediaServicio;
         private readonly INotificacionServicio _notificacionServicio;
-        public HomeController(ILogger<HomeController> logger,IUsuarioServicio usuario, IMediaServicio mediaServicio,INotificacionServicio notificacion)
+
+        // Constructor con inyección de servicios
+        public HomeController(ILogger<HomeController> logger, IUsuarioServicio usuario, IMediaServicio mediaServicio, INotificacionServicio notificacion)
         {
             _logger = logger;
             _usuarioServicio = usuario;
             _mediaServicio = mediaServicio;
             _notificacionServicio = notificacion;
-
         }
+
+        // ========================
+        // Vistas públicas
+        // ========================
 
         public IActionResult Index()
         {
@@ -40,27 +46,28 @@ namespace MetaGymWebApp.Controllers
             return View("~/Views/Legal/TerminosUso.cshtml");
         }
 
+        // ========================
+        // Login
+        // ========================
+
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
+
         [HttpPost]
         public IActionResult Login(LoginDTO login)
         {
-            
             try
             {
-                //Valido Credenciales
+                // Validación básica
                 if (string.IsNullOrEmpty(login.Password))
-                {
                     throw new Exception("Verifique ingresar la contraseña.");
-                }
                 if (string.IsNullOrEmpty(login.NombreUsuario))
-                {
                     throw new Exception("Verifique ingresar el usuario.");
-                }
-                //Consulto 
+
+                // Autenticación por servicio
                 SesionDTO sesion = _usuarioServicio.IniciarSesion(login);
                 GestionSesion.SetearSesion(HttpContext, sesion);
             }
@@ -72,24 +79,29 @@ namespace MetaGymWebApp.Controllers
             }
             return RedirectToAction("Inicio", "Publicacion");
         }
+
+        // ========================
+        // Registro de usuarios
+        // ========================
+
         [HttpGet]
         public IActionResult RegistrarUsuario()
         {
             return View();
         }
+
         [HttpPost]
         public IActionResult RegistrarUsuario(ClienteDTO cliente)
         {
             try
             {
                 if (cliente.Password != cliente.ConfPass)
-                {
                     throw new Exception("La confirmacion no coincide.");
-                }
-                //Mando a Servicio
+
+                _usuarioServicio.RegistrarCliente(cliente);
+
                 TempData["Mensaje"] = "Se registro su usuario correctamente";
                 TempData["TipoMensaje"] = "success";
-                _usuarioServicio.RegistrarCliente(cliente);
                 return RedirectToAction("Login", "Home");
             }
             catch (Exception e)
@@ -98,10 +110,12 @@ namespace MetaGymWebApp.Controllers
                 TempData["TipoMensaje"] = "danger";
                 return View("RegistrarUsuario", cliente);
             }
-            //Valido datos ingresados
-
         }
-        //Funciones Usuario
+
+        // ========================
+        // Perfil y edición
+        // ========================
+
         [HttpGet]
         public IActionResult EditarPerfil()
         {
@@ -109,9 +123,9 @@ namespace MetaGymWebApp.Controllers
             string rol = GestionSesion.ObtenerRol(HttpContext);
 
             var dto = _usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId, rol);
-
             return View(dto);
         }
+
         [HttpPost]
         public IActionResult GuardarCambiosPerfil(UsuarioGenericoDTO dto)
         {
@@ -121,7 +135,6 @@ namespace MetaGymWebApp.Controllers
                 TempData["Mensaje"] = "Se modificaron datos correctamente.";
                 TempData["TipoMensaje"] = "success";
                 return RedirectToAction("EditarPerfil");
-
             }
             catch (Exception e)
             {
@@ -130,44 +143,46 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("EditarPerfil");
             }
         }
+
         [HttpPost]
         public IActionResult EliminarMediaPerfil(int mediaId)
         {
             _mediaServicio.EliminarMedia(mediaId);
             return RedirectToAction("EditarPerfil");
         }
+
         [HttpPost]
         public IActionResult ActualizarFotoPerfil(IFormFile archivo)
         {
-            if(archivo == null)
+            if (archivo == null)
             {
                 TempData["Mensaje"] = "Debe seleccionar una imagen a cargar.";
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("EditarPerfil");
-
             }
-            string[] tiposValidos = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
-            string contentType = archivo.ContentType;
 
-            if (!tiposValidos.Contains(contentType))
+            // Validación de tipo MIME
+            string[] tiposValidos = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
+            if (!tiposValidos.Contains(archivo.ContentType))
             {
                 TempData["Mensaje"] = "El archivo debe ser una imagen (jpg, png, gif, webp).";
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("EditarPerfil");
             }
 
+            // Validación de extensión
             string[] extensionesValidas = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
             string extension = Path.GetExtension(archivo.FileName).ToLowerInvariant();
-
             if (!extensionesValidas.Contains(extension))
             {
                 TempData["Mensaje"] = "Extensión de archivo inválida. Solo se permiten imágenes.";
                 TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("EditarPerfil");
             }
+
+            // Rol determina tipo de entidad para guardar
             int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
             var rol = GestionSesion.ObtenerRol(HttpContext);
-
             var tipo = rol switch
             {
                 "Cliente" => Enum_TipoEntidad.Cliente,
@@ -179,12 +194,13 @@ namespace MetaGymWebApp.Controllers
             _mediaServicio.GuardarArchivo(archivo, tipo, usuarioId);
             return RedirectToAction("EditarPerfil");
         }
+
         [HttpPost]
+        //Se obtiene el id de la imagen y se marca como favorita que es para perfil
         public IActionResult AsignarComoFavorita(int mediaId)
         {
             int usuarioId = GestionSesion.ObtenerUsuarioId(HttpContext);
             var rol = GestionSesion.ObtenerRol(HttpContext);
-
             var tipo = rol switch
             {
                 "Cliente" => Enum_TipoEntidad.Cliente,
@@ -196,6 +212,7 @@ namespace MetaGymWebApp.Controllers
             _usuarioServicio.AsignarFotoFavorita(mediaId, tipo, usuarioId);
             return RedirectToAction("EditarPerfil");
         }
+        //A partir del ID se bloquea el usuario
         [HttpPost]
         public IActionResult DeshabilitarUsuario(int usuarioId, string rol, string password)
         {
@@ -203,7 +220,6 @@ namespace MetaGymWebApp.Controllers
             {
                 _usuarioServicio.DeshabilitarUsuario(usuarioId, rol, password);
                 HttpContext.Session.Clear();
-
                 TempData["Mensaje"] = "Tu cuenta fue deshabilitada correctamente. Si quisieras volver a tener acceso, debes comunicarte con un administrador de MetaGym.";
                 return RedirectToAction("Login");
             }
@@ -213,7 +229,12 @@ namespace MetaGymWebApp.Controllers
                 return RedirectToAction("EditarPerfil");
             }
         }
-        [AutorizacionRol("Cliente","Profesional","Admin")]
+
+        // ========================
+        // Perfil con notificaciones
+        // ========================
+
+        [AutorizacionRol("Cliente", "Profesional", "Admin")]
         [HttpGet]
         public IActionResult MiPerfil()
         {
@@ -221,33 +242,46 @@ namespace MetaGymWebApp.Controllers
             string rol = GestionSesion.ObtenerRol(HttpContext);
 
             UsuarioGenericoDTO dto = _usuarioServicio.ObtenerUsuarioGenericoDTO(usuarioId, rol);
-            dto.Notificaciones = _notificacionServicio.ObtenerPorUsuario(usuarioId,rol);
+            dto.Notificaciones = _notificacionServicio.ObtenerPorUsuario(usuarioId, rol);
+
+            // Armo lista de tipos de notificación disponibles
             List<string> tipos = new List<string>();
             foreach (var item in Enum.GetValues(typeof(Enum_TipoNotificacion)))
             {
                 tipos.Add(item.ToString());
             }
-            ViewBag.TiposNotificacion = tipos; ;
+            ViewBag.TiposNotificacion = tipos;
+
             return View(dto);
         }
+
+        // ========================
+        // Sesión / logout
+        // ========================
+
         [HttpGet]
         public IActionResult Logout()
         {
-            //Limpio
             GestionSesion.CerrarSesion(HttpContext);
             return View("AcercaDe");
         }
+
+        // ========================
+        // vistas generales
+        // ========================
+
         [HttpGet]
         public IActionResult AcercaDe()
         {
             return View();
         }
+
         [HttpGet]
         public IActionResult Publicaciones()
         {
-            //Pasar lista de publicaciones para que muestre
             return View();
         }
+
         [HttpGet]
         public IActionResult Comunidad()
         {

@@ -13,30 +13,37 @@ namespace LogicaDatos.Repositorio
     {
         private readonly DbContextApp _context;
 
+        // Inyección de DbContext
         public RepoMedias(DbContextApp contextApp)
         {
             _context = contextApp;
         }
 
+        // =======================
+        // Operaciones básicas
+        // =======================
 
+        // Alta de un registro Media
         public void Agregar(Media media)
         {
             _context.Medias.Add(media);
             _context.SaveChanges();
         }
 
+        // Eliminación directa de un registro Media
         public void Eliminar(Media media)
         {
             _context.Medias.Remove(media);
             _context.SaveChanges();
-
         }
 
+        // Búsqueda por Id
         public Media ObtenerPorId(int mediaId)
         {
             return _context.Medias.Find(mediaId);
         }
 
+        // Trae la primera media asociada a una entidad concreta, según su tipo
         public Media ObtenerPorEntidad(Enum_TipoEntidad tipoEntidad, int idEntidad)
         {
             return tipoEntidad switch
@@ -47,29 +54,35 @@ namespace LogicaDatos.Repositorio
                 Enum_TipoEntidad.Ejercicio => _context.Medias.FirstOrDefault(m => m.EjercicioId == idEntidad),
                 Enum_TipoEntidad.Publicacion => _context.Medias.FirstOrDefault(m => m.PublicacionId == idEntidad),
                 Enum_TipoEntidad.Establecimiento => _context.Medias.FirstOrDefault(m => m.EstablecimientoId == idEntidad),
-                _ => null
+                _ => null // si se agrega un nuevo Enum_TipoEntidad y no se contempla acá, devuelve null
             };
         }
 
+        // Guardar cambios sueltos
         public void Guardar()
         {
-            _context.SaveChanges(); 
+            _context.SaveChanges();
         }
 
+        // =======================
+        // Favoritas / Perfil
+        // =======================
+
+        // Devuelve la media marcada como favorita para una entidad (imagen de perfil, por ejemplo)
         public Media? ObtenerFavorita(Enum_TipoEntidad tipo, int idEntidad)
         {
             return tipo switch
             {
                 Enum_TipoEntidad.Cliente => _context.Medias.FirstOrDefault(m => m.EsFavorito && m.ClienteId == idEntidad),
                 Enum_TipoEntidad.Profesional => _context.Medias.FirstOrDefault(m => m.EsFavorito && m.ProfesionalId == idEntidad),
-                Enum_TipoEntidad.Admin => _context.Medias.FirstOrDefault(m => m.EsFavorito && m.AdminId == idEntidad),
-
+                Enum_TipoEntidad.Admin => _context.Medias.FirstOrDefault(m => m.EsFavorito && m.AdminId == idEntidad)
             };
-
         }
 
+        // Marca una media como favorita dentro del conjunto de medias de esa entidad (desmarca el resto)
         public void AsignarFotoFavorita(int mediaId, Enum_TipoEntidad tipo, int entidadId)
         {
+            // Busco todas las medias asociadas a la entidad según el tipo
             var medias = _context.Medias
                    .Where(m =>
                        (tipo == Enum_TipoEntidad.Cliente && m.ClienteId == entidadId) ||
@@ -80,16 +93,23 @@ namespace LogicaDatos.Repositorio
             if (!medias.Any())
                 throw new Exception("No se encontraron archivos multimedia para esta entidad.");
 
+            // Verifico que la seleccionada pertenezca a ese conjunto
             var seleccionada = medias.FirstOrDefault(m => m.Id == mediaId);
-
             if (seleccionada == null)
                 throw new Exception("La media especificada no pertenece a la entidad indicada.");
 
+            // Seteo única favorita
             foreach (var media in medias)
                 media.EsFavorito = (media.Id == mediaId);
 
             _context.SaveChanges();
         }
+
+        // =======================
+        // Listados útiles
+        // =======================
+
+        // Todas las imágenes (Tipo == Imagen) de una entidad según su tipo
         public List<Media> ObtenerImagenesUsuario(Enum_TipoEntidad tipo, int idEntidad)
         {
             return _context.Medias
@@ -104,6 +124,8 @@ namespace LogicaDatos.Repositorio
                 )
                 .ToList();
         }
+
+        // Imagen de perfil (favorita) de una entidad
         public Media? ObtenerImagenPerfil(Enum_TipoEntidad tipo, int idEntidad)
         {
             return _context.Medias
@@ -118,6 +140,8 @@ namespace LogicaDatos.Repositorio
                     )
                 );
         }
+
+        // Trae todas las medias asociadas a una entidad concreta (sin filtrar por tipo de media)
         public List<Media> ObtenerPorEntidadGeneral(Enum_TipoEntidad tipo, int idEntidad)
         {
             return _context.Medias
@@ -134,8 +158,5 @@ namespace LogicaDatos.Repositorio
                 )
                 .ToList();
         }
-
-
-
     }
 }
