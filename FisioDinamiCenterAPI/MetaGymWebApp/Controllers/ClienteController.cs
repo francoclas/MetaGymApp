@@ -196,8 +196,14 @@ namespace MetaGymWebApp.Controllers
                 dto.CorreoProfesional = cita.Profesional.Correo ?? "-";
                 dto.ProfesionalId = cita.ProfesionalId;
             }
+            else
+            {
+                dto.NombreProfesional = "Pendiente de revision";
+                dto.TelefonoProfesional =  "-";
+                dto.CorreoProfesional = "-";
+            }
 
-            return View("DetalleCita", dto);
+                return View("DetalleCita", dto);
         }
 
         // =======================

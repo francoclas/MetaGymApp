@@ -176,12 +176,21 @@ namespace LogicaApp.Servicios
                 Nombre = ejercicio.Nombre,
                 Tipo = ejercicio.Tipo,
                 GrupoMuscular = ejercicio.GrupoMuscular,
-                Media = ejercicio.Medias[0],
-                Medias = ejercicio.Medias,
                 Mediciones = ejercicio.Mediciones,
                 Instrucciones = ejercicio.Instrucciones
             };
-            return e;
+            if (ejercicio.Medias.Any())
+            {
+                e.Media = ejercicio.Medias[0];
+                e.Medias = ejercicio.Medias;
+            }
+            else
+            {
+                e.Medias = new List<Media>();
+                e.Medias.Add(new Media { Url = "/MediaWeb/Default/ejercicio_default.jpg"});
+                e.Media = new Media { Url = "/MediaWeb/Default/ejercicio_default.jpg" };
+            }
+                return e;
         }
 
         public Ejercicio ObtenerEjercicioId(int id)

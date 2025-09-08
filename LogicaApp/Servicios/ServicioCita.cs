@@ -110,6 +110,7 @@ namespace LogicaApp.Servicios
                 Profesional = null, // sin asignar
                 Establecimiento = establecimientoAux,
                 Descripcion = cita.Descripcion,
+                FechaCreacion = DateTime.UtcNow,
                 FechaAsistencia = cita.FechaAsistencia,
                 TipoAtencion = tipoAtencionAux,
                 Estado = EstadoCita.EnEspera
