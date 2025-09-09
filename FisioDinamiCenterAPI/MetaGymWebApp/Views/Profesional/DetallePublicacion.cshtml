@@ -1,5 +1,9 @@
 ﻿@using LogicaNegocio.Extra
+@{
+    ViewData["Title"] = "Informacion de publicacion";
+}
 <h2>Detalle de Publicación</h2>
+
 
 <div class="mb-3">
     <a asp-action="MisPublicaciones" class="btn btn-secondary">← Volver</a>
@@ -52,8 +56,8 @@
                 <ul class="list-group">
                     @foreach (var c in Model.Comentarios)
                     {
-                        <li class="list-group-item">
-                            <strong>@c.AutorNombre</strong> (@c.RolAutor) dijo:
+                        <li class="list-group-item bg-dark">
+                           <label class="text-light">@c.AutorNombre (@c.RolAutor) dijo:</label>
                             <p>@c.Contenido</p>
                             <small class="text-muted">@c.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</small>
                         </li>

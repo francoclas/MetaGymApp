@@ -99,6 +99,8 @@ namespace MetaGymWebApp.Controllers
 
                 // Registro la cita en el sistema
                 _citaServicio.GenerarNuevaCita(vm.Cita);
+                TempData["Mensaje"] = "Se genero solicitud de citas, se notificaran los avances.";
+                TempData["TipoMensaje"] = "success";
                 return RedirectToAction("MisCitas");
             }
             catch (Exception e)
@@ -153,11 +155,17 @@ namespace MetaGymWebApp.Controllers
         public IActionResult VerDetalleCita(int id)
         {
             var cita = _citaServicio.ObtenerPorId(id);
-
-            // Seguridad: solo el dueño puede ver la cita
-            if (cita == null || cita.ClienteId != GestionSesion.ObtenerUsuarioId(HttpContext))
+            if (cita == null)
             {
-                TempDataMensaje.SetMensaje(this, "No tenés permisos para ver esta cita.", "Error");
+                TempData["Mensaje"] = "La cita se elimino o no existe.";
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("MisCitas");
+            }
+            // Seguridad: solo el dueño puede ver la cita
+            if ( cita.ClienteId != GestionSesion.ObtenerUsuarioId(HttpContext))
+            {
+                TempData["Mensaje"] = "No tenés permisos para ver esta cita.";
+                TempData["TipoMensaje"] = "danger";
                 return RedirectToAction("MisCitas");
             }
 
@@ -242,58 +250,71 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult SesionEntrenada(int id)
         {
-            int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
-            SesionRutina sesion = _rutinaServicio.ObtenerSesionPorId(id);
-
-            // Si la rutina original existe, la uso para completar datos (si no, uso snapshot)
-            Rutina rutina = sesion.RutinaAsignada != null
-                ? _rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignada.RutinaId)
-                : null;
-
-            if (rutina != null)
+            try
             {
-                // Enlazo cada ejercicio realizado con el ejercicio actual de la rutina (si coincide)
-                foreach (var er in sesion.EjerciciosRealizados)
+                int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
+                SesionRutina sesion = _rutinaServicio.ObtenerSesionPorId(id);
+                if (sesion == null)
+                    throw new Exception("No se encontro sesion o se elimino.");
+                if(sesion.ClienteId != clienteId)
+                    throw new Exception("No tiene permisos para ver esta sesion.");
+
+                // Si la rutina original existe, la uso para completar datos (si no, uso snapshot)
+                Rutina rutina = sesion.RutinaAsignada != null
+                    ? _rutinaServicio.ObtenerRutinaPorId(sesion.RutinaAsignada.RutinaId)
+                    : null;
+
+                if (rutina != null)
                 {
-                    er.Ejercicio = rutina.Ejercicios
-                        .FirstOrDefault(re => re.Ejercicio.Id == er.EjercicioId)?.Ejercicio;
+                    // Enlazo cada ejercicio realizado con el ejercicio actual de la rutina (si coincide)
+                    foreach (var er in sesion.EjerciciosRealizados)
+                    {
+                        er.Ejercicio = rutina.Ejercicios
+                            .FirstOrDefault(re => re.Ejercicio.Id == er.EjercicioId)?.Ejercicio;
+                    }
                 }
-            }
 
-            // Armo DTO para la vista
-            var dto = new SesionEntrenadaDTO
-            {
-                NombreRutina = rutina != null
-                    ? rutina.NombreRutina
-                    : sesion.NombreRutinaHistorial, // snapshot si la rutina cambió
-                FechaRealizada = sesion.FechaRealizada,
-                DuracionMin = sesion.DuracionMin,
-                Ejercicios = sesion.EjerciciosRealizados.Select(er => new EjercicioRealizadoDTO
+                // Armo DTO para la vista
+                var dto = new SesionEntrenadaDTO
                 {
-                    Nombre = er.NombreHistorial,
-                    Tipo = er.TipoHistorial,
-                    GrupoMuscular = er.GrupoMuscularHistorial,
-                    SeRealizo = er.SeRealizo,
-                    ImagenURL = rutina != null
-                        ? er.Ejercicio?.Medias.FirstOrDefault()?.Url
-                        : er.ImagenUrlHistorial, // snapshot
-
-                    Series = er.Series.Select(s => new SerieDTO
+                    NombreRutina = rutina != null
+                        ? rutina.NombreRutina
+                        : sesion.NombreRutinaHistorial, // snapshot si la rutina cambió
+                    FechaRealizada = sesion.FechaRealizada,
+                    DuracionMin = sesion.DuracionMin,
+                    Ejercicios = sesion.EjerciciosRealizados.Select(er => new EjercicioRealizadoDTO
                     {
-                        Repeticiones = s.Repeticiones,
-                        PesoUtilizado = s.PesoUtilizado
-                    }).ToList(),
+                        Nombre = er.NombreHistorial,
+                        Tipo = er.TipoHistorial,
+                        GrupoMuscular = er.GrupoMuscularHistorial,
+                        SeRealizo = er.SeRealizo,
+                        ImagenURL = rutina != null
+                            ? er.Ejercicio?.Medias.FirstOrDefault()?.Url
+                            : er.ImagenUrlHistorial, // snapshot
 
-                    Mediciones = er.ValoresMediciones.Select(vm => new MedicionDTO
-                    {
-                        Nombre = vm.Medicion?.Nombre,  // si es snapshot, puede venir null
-                        Unidad = vm.Medicion?.Unidad,
-                        Valor = vm.Valor
+                        Series = er.Series.Select(s => new SerieDTO
+                        {
+                            Repeticiones = s.Repeticiones,
+                            PesoUtilizado = s.PesoUtilizado
+                        }).ToList(),
+
+                        Mediciones = er.ValoresMediciones.Select(vm => new MedicionDTO
+                        {
+                            Nombre = vm.Medicion?.Nombre,  // si es snapshot, puede venir null
+                            Unidad = vm.Medicion?.Unidad,
+                            Valor = vm.Valor
+                        }).ToList()
                     }).ToList()
-                }).ToList()
-            };
+                };
 
-            return View(dto);
+                return View(dto);
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("HistoricoSesionesEntrenamiento");
+            }
         }
 
         // Historial completo de sesiones entrenadas

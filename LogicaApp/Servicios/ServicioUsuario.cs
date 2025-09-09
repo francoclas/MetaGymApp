@@ -335,9 +335,14 @@ namespace LogicaNegocio.Servicios
 
                     if (!string.Equals(cliente.Correo, dto.Correo, StringComparison.OrdinalIgnoreCase))
                     {
+                        FuncionesAuxiliares.EsCorreoValido(dto.Correo);
                         VerificarCorreoUnico(dto.Correo);
                     }
-
+                    if (!string.Equals(cliente.Telefono, dto.Telefono))
+                    {
+                        if (!FuncionesAuxiliares.EsTelefonoValido(dto.Telefono))
+                            throw new Exception("Debe ingresar un telefono valido");
+                    }
                     cliente.NombreCompleto = dto.Nombre;
                     cliente.Correo = dto.Correo;
                     cliente.Telefono = dto.Telefono;
@@ -349,9 +354,15 @@ namespace LogicaNegocio.Servicios
 
                     if (!string.Equals(profesional.Correo, dto.Correo, StringComparison.OrdinalIgnoreCase))
                     {
+                        if (!FuncionesAuxiliares.EsCorreoValido(dto.Correo))
+                            throw new Exception("Debe ingresar un correo valido");
                         VerificarCorreoUnico(dto.Correo);
                     }
-
+                    if (!string.Equals(profesional.Telefono, dto.Telefono))
+                    {
+                        if (!FuncionesAuxiliares.EsTelefonoValido(dto.Telefono))
+                            throw new Exception("Debe ingresar un telefono valido");
+                    }
                     profesional.NombreCompleto = dto.Nombre;
                     profesional.Correo = dto.Correo;
                     profesional.Telefono = dto.Telefono;
@@ -361,11 +372,17 @@ namespace LogicaNegocio.Servicios
                 case "Admin":
                     Admin admin = _repositorioAdmin.ObtenerPorId(dto.Id);
 
-                    if (!string.Equals(admin.Correo, dto.Correo, StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(admin.Correo, dto.Correo))
                     {
+                        if (!FuncionesAuxiliares.EsCorreoValido(dto.Correo))
+                            throw new Exception("Debe ingresar un correo valido");
                         VerificarCorreoUnico(dto.Correo);
                     }
-
+                    if(!string.Equals(admin.Telefono, dto.Telefono))
+                    {
+                        if (!FuncionesAuxiliares.EsTelefonoValido(dto.Telefono))
+                            throw new Exception("Debe ingresar un telefono valido");
+                    }
                     admin.NombreCompleto = dto.Nombre;
                     admin.Correo = dto.Correo;
                     admin.Telefono = dto.Telefono;

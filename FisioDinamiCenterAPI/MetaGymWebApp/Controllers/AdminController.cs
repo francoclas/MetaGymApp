@@ -9,6 +9,7 @@ using MetaGymWebApp.Filtros;
 using MetaGymWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -68,9 +69,16 @@ namespace MetaGymWebApp.Controllers
                 TempData["TipoMensaje"] = "danger";
                 return View(dto);
             }
-
             try
             {
+                if (!FuncionesAuxiliares.EsCorreoValido(dto.Correo))
+                    throw new Exception("Debe ingresar un correo valido.");
+                if (!FuncionesAuxiliares.EsTelefonoValido(dto.Telefono))
+                    throw new Exception("Debe ingresar un Telefono valido.");
+                if (!FuncionesAuxiliares.EsContrasenaValida(dto.Password))
+                    throw new Exception("Debe ingresar un Password valido.");
+                if(!FuncionesAuxiliares.EsCedulaValida(dto.Ci))
+                    throw new Exception("Debe ingresar una Cedula Digital valida.");
                 // Valido que no haya usuario/correo repetidos
                 _usuarioServicio.VerificarUsuarioRepetido(dto.Usuario, dto.Correo);
                 // Según el rol, llamo a la creación que corresponda
@@ -90,14 +98,14 @@ namespace MetaGymWebApp.Controllers
                 // Feedback positivo
                 TempData["Mensaje"] = "Usuario creado correctamente.";
                 TempData["TipoMensaje"] = "success";
-                return RedirectToAction("CrearUsuario");
+                return RedirectToAction("CrearUsuario", dto);
             }
             catch (Exception e)
             {
                 // Cualquier error se informa por TempData y se vuelve al form
                 TempData["Mensaje"] = e.Message;
                 TempData["TipoMensaje"] = "danger";
-                return RedirectToAction("CrearUsuario");
+                return View("CrearUsuario", dto);
             }
         }
 
@@ -196,18 +204,30 @@ namespace MetaGymWebApp.Controllers
                 if (cliente == null) throw new Exception("No se logro obtener el usuario");
                 // Actualizo solo si cambió algo, así evito escrituras innecesarias
                 if (!string.Equals(cliente.NombreCompleto, dto.Nombre))
+                    if (string.IsNullOrEmpty(dto.Nombre))
+                        throw new Exception("El nombre no puedo ser vacio");
                     cliente.NombreCompleto = dto.Nombre;
                 if (!string.Equals(cliente.Correo, dto.Correo))
                 {
+                    if (string.IsNullOrEmpty(dto.Correo))
+                        throw new Exception("El correo nuevo no puede ser vacio");
+                    if (!FuncionesAuxiliares.EsCorreoValido(dto.Correo))
+                        throw new Exception("El correo no es valido.");
                     // Si cambia el correo, me aseguro que no esté repetido
                     _usuarioServicio.VerificarCorreoUnico(dto.Correo);
                     cliente.Correo = dto.Correo;
                 }
                 if (!string.Equals(cliente.Telefono, dto.Telefono))
+                {
+                    if (string.IsNullOrEmpty(dto.Telefono))
+                        throw new Exception("El telefono no puede ser vacio.");
                     cliente.Telefono = dto.Telefono;
+                }
                 // Cambio de contraseña (si se mandó algo)
                 if (!string.IsNullOrEmpty(dto.Pass))
                 {
+                    if (!FuncionesAuxiliares.EsContrasenaValida(dto.Pass))
+                        throw new Exception("La contraseña ingresada no es valida");
                     cliente.Pass = HashContrasena.Hashear(dto.Pass);
                 }
                 // Activo/inactivo
@@ -304,14 +324,22 @@ namespace MetaGymWebApp.Controllers
                     profesional.NombreCompleto = dto.Nombre;
                 if (!string.Equals(profesional.Correo, dto.Correo))
                 {
+                    if(string.IsNullOrEmpty(dto.Correo))
+                        throw new Exception("El correo nuevo no puede ser vacio");
+                    if (!FuncionesAuxiliares.EsCorreoValido(dto.Correo))
+                        throw new Exception("Debe ingresar un correo valido");
                     _usuarioServicio.VerificarCorreoUnico(dto.Correo);
                     profesional.Correo = dto.Correo;
                 }
                 if (!string.IsNullOrEmpty(dto.Pass))
                     profesional.Pass = HashContrasena.Hashear(dto.Pass);
-                if (!string.Equals(profesional.Telefono, dto.Telefono))
+                if (!string.Equals(profesional.Telefono, dto.Telefono)) { 
+                    if (string.IsNullOrEmpty(dto.Telefono))
+                        throw new Exception("El telefono nuevo no puede ser vacio");
+                    if (!FuncionesAuxiliares.EsTelefonoValido(dto.Telefono))
+                            throw new Exception("Debe ingresar un telefono valido");
                     profesional.Telefono = dto.Telefono;
-
+                }
                 profesional.UsuarioActivo = dto.UsuarioActivo;
 
                 // Alta rápida de una especialidad (si vino una)
@@ -326,7 +354,7 @@ namespace MetaGymWebApp.Controllers
 
                 TempData["Mensaje"] = "Se actualizó el profesional correctamente.";
                 TempData["TipoMensaje"] = "success";
-                return RedirectToAction("GestionUsuarios");
+                return RedirectToAction("EditarProfesional", new { dto.Id });
             }
             catch (Exception e)
             {
@@ -445,13 +473,19 @@ namespace MetaGymWebApp.Controllers
                     admin.NombreCompleto = dto.Nombre;
                 if (!string.Equals(admin.Correo, dto.Correo))
                 {
+                    if (!FuncionesAuxiliares.EsCorreoValido(dto.Correo))
+                        throw new Exception("El correo no es valido");
                     _usuarioServicio.VerificarCorreoUnico(dto.Correo);
                     admin.Correo = dto.Correo;
                 }
                 if (!string.Equals(admin.Telefono, dto.Telefono))
-                    admin.Telefono = dto.Telefono;
+                    if(!FuncionesAuxiliares.EsTelefonoValido(dto.Telefono))
+                        throw new Exception("El telefono no es valido");
+                admin.Telefono = dto.Telefono;
                 if (!string.IsNullOrEmpty(dto.Pass))
                 {
+                    if (!FuncionesAuxiliares.EsContrasenaValida(dto.Pass))
+                        throw new Exception("La contraseña no es segura");
                     admin.Pass = HashContrasena.Hashear(dto.Pass);
                 }
                 admin.UsuarioActivo = dto.UsuarioActivo;
@@ -504,7 +538,7 @@ namespace MetaGymWebApp.Controllers
                 // Mantengo tu lógica exacta, pero lo dejo comentado para revisar en el futuro.
                 TempData["Mensaje"] = e;
                 TempData["TipoMensaje"] = "danger";
-                return RedirectToAction("RegistrarEspecialidad", dto);
+                return View("RegistrarEspecialidad");
             }
 
         }

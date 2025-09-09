@@ -390,7 +390,8 @@ namespace LogicaApp.Servicios
 
                 if (sesion.RutinaAsignada != null)
                     aux.NombreRutina = sesion.RutinaAsignada.Rutina.NombreRutina;
-
+                if (!string.IsNullOrEmpty(sesion.NombreRutinaHistorial))
+                    aux.NombreRutina = sesion.NombreRutinaHistorial;
                 if (!salida.Contains(aux))
                 {
                     salida.Add(aux);

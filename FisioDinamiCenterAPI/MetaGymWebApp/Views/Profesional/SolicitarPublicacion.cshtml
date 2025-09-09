@@ -20,7 +20,7 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="ArchivosMedia" class="form-label">Subir imágenes o videos <span class="text-muted small">(opcional, múltiples)</span></label>
+        <label asp-for="ArchivosMedia" class="form-label">Subir imágenes o videos <span class="text-muted small">(puede ser un archivo solo o múltiples)</span></label>
         <input asp-for="ArchivosMedia" type="file" class="form-control" multiple accept="image/*,video/*" onchange="previewArchivos()" />
         <div id="preview" class="mt-3 d-flex gap-3 flex-wrap"></div>
     </div>

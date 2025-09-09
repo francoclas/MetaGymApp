@@ -56,5 +56,29 @@ namespace LogicaNegocio.Extra
             }
             return tieneMayus && tieneMin && tieneDig;
         }
+        /*
+         Para verificar que el telefono sea valido se necesita que: Solo tenga numeros y este en tre 8 y 9 caracteres,
+         */
+        public static bool EsTelefonoValido(string telefono)
+        {
+            if (string.IsNullOrWhiteSpace(telefono))
+                return false;
+            if (!telefono.All(char.IsDigit))
+                return false;
+            return telefono.Length >= 8 && telefono.Length <= 9;
+        }
+        public static bool EsCedulaValida(string ci)
+        {
+            if (string.IsNullOrWhiteSpace(ci))
+                return false;
+
+            // Solo dígitos
+            if (!ci.All(char.IsDigit))
+                return false;
+
+            // Longitud válida: 7 u 8 dígitos
+            return ci.Length == 7 || ci.Length == 8;
+        }
     }
-}
+    }
+

@@ -46,6 +46,10 @@ namespace LogicaApp.Servicios
                 profesional.Especialidades.Add(especialidad);
                 _repositorioProfesional.Actualizar(profesional);
             }
+            else
+            {
+                throw new Exception("El profesional ya cuenta con esta especialidad");
+            }
         }
 
         public void EliminarEspecialidad(Especialidad especialidad, Profesional profesional)

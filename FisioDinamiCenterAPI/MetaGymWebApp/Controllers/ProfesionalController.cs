@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Design;
+using System.Data;
 using LogicaApp.DTOS;
 using LogicaNegocio.Clases;
 using LogicaNegocio.Extra;
@@ -762,6 +763,7 @@ namespace MetaGymWebApp.Controllers
                 if (String.IsNullOrEmpty(dto.GrupoMuscular)) throw new Exception("Debe colocar al menos un grupo muscular");
                 if (String.IsNullOrEmpty(dto.Tipo)) throw new Exception("Debe colocar un tipo de ejercicio.");
                 if (String.IsNullOrEmpty(dto.Instrucciones)) throw new Exception("Debe completar las instrucciones.");
+                if (archivos.Count() == 0) throw new Exception("Debe cargar almenos una imagen al ejercicio");
             }
             catch (Exception e)
             {
@@ -1170,15 +1172,25 @@ namespace MetaGymWebApp.Controllers
         [HttpGet]
         public IActionResult DetallePublicacion(int id)
         {
-            var publicacion = _publicacionServicio.ObtenerPorId(id);
-            if (publicacion == null)
-                return NotFound();
+            try
+            {
+                var publicacion = _publicacionServicio.ObtenerPorId(id);
+                if (publicacion == null)
+                    throw new Exception("No se encontro o no existe publicacion.");
 
-            int idSesion = GestionSesion.ObtenerUsuarioId(HttpContext);
-            if (publicacion.RolAutor == "Profesional" && publicacion.AutorId != idSesion)
-                return Forbid();
+                int idSesion = GestionSesion.ObtenerUsuarioId(HttpContext);
+                if (publicacion.RolAutor == "Profesional" && publicacion.AutorId != idSesion)
+                    return Forbid();
 
-            return View(publicacion);
+                return View(publicacion);
+            }
+            catch (Exception e)
+            {
+                TempData["Mensaje"] = e.Message;
+                TempData["TipoMensaje"] = "danger";
+                return RedirectToAction("MisPublicaciones");
+            }
+            
         }
 
         [HttpGet]
