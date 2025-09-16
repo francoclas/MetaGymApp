@@ -253,10 +253,11 @@ namespace MetaGymWebApp.Controllers
             try
             {
                 int clienteId = GestionSesion.ObtenerUsuarioId(HttpContext);
+                string Rol = GestionSesion.ObtenerRol(HttpContext);
                 SesionRutina sesion = _rutinaServicio.ObtenerSesionPorId(id);
                 if (sesion == null)
                     throw new Exception("No se encontro sesion o se elimino.");
-                if(sesion.ClienteId != clienteId)
+                if (Rol == "Cliente" && sesion.ClienteId != clienteId)
                     throw new Exception("No tiene permisos para ver esta sesion.");
 
                 // Si la rutina original existe, la uso para completar datos (si no, uso snapshot)
